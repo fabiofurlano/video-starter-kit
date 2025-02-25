@@ -11,9 +11,5 @@ export default function AppLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
-    <div className="app-container">
-      {children}
-    </div>
-  );
+  return <div className="app-container">{children}</div>;
 }

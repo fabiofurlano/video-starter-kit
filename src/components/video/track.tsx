@@ -145,6 +145,9 @@ export function VideoTrackView({
   ...props
 }: VideoTrackViewProps) {
   const queryClient = useQueryClient();
+  const projectId = useProjectId();
+  const { data: mediaItems = [] } = useProjectMediaItems(projectId);
+
   const deleteKeyframe = useMutation({
     mutationFn: () => db.keyFrames.delete(frame.id),
     onSuccess: () => refreshVideoCache(queryClient, track.projectId),
@@ -164,20 +167,14 @@ export function VideoTrackView({
     selectKeyframe(frame.id);
   };
 
-  const projectId = useProjectId();
-  const { data: mediaItems = [] } = useProjectMediaItems(projectId);
-
   const media = mediaItems.find((item) => item.id === frame.data.mediaId);
-  // TODO improve missing data
-  if (!media) return null;
-
-  const mediaUrl = resolveMediaUrl(media);
+  const mediaUrl = media ? resolveMediaUrl(media) : undefined;
 
   const imageUrl = useMemo(() => {
-    if (media.mediaType === "image") {
+    if (media && media.mediaType === "image") {
       return mediaUrl;
     }
-    if (media.mediaType === "video") {
+    if (media && media.mediaType === "video") {
       return (
         media.input?.image_url ||
         media.metadata?.start_frame_url ||
@@ -187,9 +184,22 @@ export function VideoTrackView({
     return undefined;
   }, [media, mediaUrl]);
 
-  const label = media.mediaType ?? "unknown";
-
   const trackRef = useRef<HTMLDivElement>(null);
+
+  // If media is not found, render a placeholder
+  if (!media) {
+    console.warn(`Media not found for ID: ${frame.data.mediaId}. This keyframe may need to be removed.`);
+    return (
+      <div 
+        className={cn("relative flex h-full w-full items-center justify-center bg-muted/30", className)}
+        {...props}
+      >
+        <div className="text-xs text-muted-foreground">Media not found</div>
+      </div>
+    );
+  }
+
+  const label = media.mediaType ?? "unknown";
 
   const calculateBounds = () => {
     const timelineElement = document.querySelector(".timeline-container");
