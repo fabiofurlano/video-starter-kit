@@ -9,14 +9,14 @@ export interface UserData {
   openaiApiKey?: string;
   openrouterApiKey?: string;
   falaiApiKey?: string;
-  
+
   // Story elements
   language?: string;
   genre?: string;
   title?: string;
   location?: string;
   timeline?: string;
-  
+
   // Characters and chapters
   characters?: any[];
   outline?: any[];
@@ -54,31 +54,31 @@ class SessionManager {
    * @param data The data received from postMessage
    */
   initializeSession(data: ParentPostMessageData): void {
-    console.log('Initializing session with data from parent');
-    
+    console.log("Initializing session with data from parent");
+
     // Convert from parent format to internal UserData format
     const userData: UserData = {
       // Map API keys
-      openaiApiKey: data.apiKeys?.openai || '',
-      openrouterApiKey: data.apiKeys?.openrouter || '',
-      falaiApiKey: data.apiKeys?.falai || '',
-      
+      openaiApiKey: data.apiKeys?.openai || "",
+      openrouterApiKey: data.apiKeys?.openrouter || "",
+      falaiApiKey: data.apiKeys?.falai || "",
+
       // Story elements
-      language: data.language || '',
-      genre: data.genre || '',
-      title: data.title || '',
-      location: data.location || '',
-      timeline: data.timeline || '',
-      
+      language: data.language || "",
+      genre: data.genre || "",
+      title: data.title || "",
+      location: data.location || "",
+      timeline: data.timeline || "",
+
       // Characters, outline, chapters
       characters: data.characters || [],
       outline: data.outline || [],
-      chapters: data.chapters || []
+      chapters: data.chapters || [],
     };
-    
+
     // Set the user data
     this.setUserData(userData);
-    console.log('Session initialized successfully with data from parent');
+    console.log("Session initialized successfully with data from parent");
   }
 
   /**
@@ -88,8 +88,8 @@ class SessionManager {
   setUserData(data: UserData): void {
     this.userData = data;
     this.initialized = true;
-    console.log('Session data initialized:', this.userData);
-    
+    console.log("Session data initialized:", this.userData);
+
     // Save API keys for later use
     if (data.falaiApiKey) {
       this.saveFalApiKey(data.falaiApiKey);
@@ -117,18 +117,18 @@ class SessionManager {
    * @param keyType The type of API key to get
    * @returns The API key or an empty string if not found
    */
-  getApiKey(keyType: 'openai' | 'openrouter' | 'falai'): string {
-    if (!this.userData) return '';
-    
+  getApiKey(keyType: "openai" | "openrouter" | "falai"): string {
+    if (!this.userData) return "";
+
     switch (keyType) {
-      case 'openai':
-        return this.userData.openaiApiKey || '';
-      case 'openrouter':
-        return this.userData.openrouterApiKey || '';
-      case 'falai':
-        return this.userData.falaiApiKey || '';
+      case "openai":
+        return this.userData.openaiApiKey || "";
+      case "openrouter":
+        return this.userData.openrouterApiKey || "";
+      case "falai":
+        return this.userData.falaiApiKey || "";
       default:
-        return '';
+        return "";
     }
   }
 
@@ -139,12 +139,12 @@ class SessionManager {
   private saveFalApiKey(apiKey: string): void {
     try {
       // Save to window.localStorage for SDK compatibility
-      if (typeof window !== 'undefined' && window.localStorage) {
-        window.localStorage.setItem('fal_key', apiKey);
-        console.log('Fal.ai API key stored for SDK use');
+      if (typeof window !== "undefined" && window.localStorage) {
+        window.localStorage.setItem("fal_key", apiKey);
+        console.log("Fal.ai API key stored for SDK use");
       }
     } catch (error) {
-      console.error('Failed to save Fal.ai API key:', error);
+      console.error("Failed to save Fal.ai API key:", error);
     }
   }
 
@@ -177,7 +177,7 @@ class SessionManager {
    * @returns The genre or an empty string if not initialized
    */
   getGenre(): string {
-    return this.userData?.genre || '';
+    return this.userData?.genre || "";
   }
 
   /**
@@ -185,11 +185,11 @@ class SessionManager {
    * @returns The title or an empty string if not initialized
    */
   getTitle(): string {
-    return this.userData?.title || '';
+    return this.userData?.title || "";
   }
 }
 
 // Create a singleton instance
 const sessionManager = new SessionManager();
 
-export default sessionManager; 
+export default sessionManager;

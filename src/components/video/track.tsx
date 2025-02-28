@@ -188,10 +188,15 @@ export function VideoTrackView({
 
   // If media is not found, render a placeholder
   if (!media) {
-    console.warn(`Media not found for ID: ${frame.data.mediaId}. This keyframe may need to be removed.`);
+    console.warn(
+      `Media not found for ID: ${frame.data.mediaId}. This keyframe may need to be removed.`,
+    );
     return (
-      <div 
-        className={cn("relative flex h-full w-full items-center justify-center bg-muted/30", className)}
+      <div
+        className={cn(
+          "relative flex h-full w-full items-center justify-center bg-muted/30",
+          className,
+        )}
         {...props}
       >
         <div className="text-xs text-muted-foreground">Media not found</div>
