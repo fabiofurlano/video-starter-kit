@@ -266,12 +266,12 @@ export default function IndexPage() {
               )}
             </div>
 
-            {/* Project Actions */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <Link href="/video" className="block">
-                <div className="bg-gradient-to-br from-blue-800 to-indigo-900 hover:from-blue-700 hover:to-indigo-800 p-6 rounded-lg text-center transition-colors duration-300 h-full flex flex-col items-center justify-center">
+            {/* Direct Video Studio Button (replacing the grid of project actions) */}
+            <div className="flex justify-center">
+              <Link href="/app" className="block w-full max-w-xl">
+                <div className="bg-gradient-to-br from-blue-600 to-purple-700 hover:from-blue-500 hover:to-purple-600 p-8 rounded-lg text-center transition-colors duration-300 shadow-lg">
                   <svg
-                    className="w-12 h-12 mb-3"
+                    className="w-16 h-16 mx-auto mb-4"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -284,55 +284,9 @@ export default function IndexPage() {
                       d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                     />
                   </svg>
-                  <h3 className="text-xl font-bold">Video Creator</h3>
-                  <p className="mt-2 text-gray-300">
-                    Generate videos based on your story
-                  </p>
-                </div>
-              </Link>
-
-              <Link href="/music" className="block">
-                <div className="bg-gradient-to-br from-purple-800 to-pink-900 hover:from-purple-700 hover:to-pink-800 p-6 rounded-lg text-center transition-colors duration-300 h-full flex flex-col items-center justify-center">
-                  <svg
-                    className="w-12 h-12 mb-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
-                    />
-                  </svg>
-                  <h3 className="text-xl font-bold">Music Creator</h3>
-                  <p className="mt-2 text-gray-300">
-                    Create custom music for your story
-                  </p>
-                </div>
-              </Link>
-
-              <Link href="/image" className="block">
-                <div className="bg-gradient-to-br from-green-800 to-teal-900 hover:from-green-700 hover:to-teal-800 p-6 rounded-lg text-center transition-colors duration-300 h-full flex flex-col items-center justify-center">
-                  <svg
-                    className="w-12 h-12 mb-3"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <h3 className="text-xl font-bold">Image Creator</h3>
-                  <p className="mt-2 text-gray-300">
-                    Generate images from your story descriptions
+                  <h3 className="text-2xl font-bold mb-2">Open Video Studio</h3>
+                  <p className="text-lg text-gray-200">
+                    Generate AI videos based on your story elements
                   </p>
                 </div>
               </Link>

@@ -138,10 +138,10 @@ class SessionManager {
    */
   private saveFalApiKey(apiKey: string): void {
     try {
-      // Save to window.localStorage for SDK compatibility
+      // Save to window.localStorage using the same key name as settings.js
       if (typeof window !== "undefined" && window.localStorage) {
-        window.localStorage.setItem("fal_key", apiKey);
-        console.log("Fal.ai API key stored for SDK use");
+        window.localStorage.setItem("falai_key", apiKey);
+        console.log("Fal.ai API key stored as 'falai_key'");
       }
     } catch (error) {
       console.error("Failed to save Fal.ai API key:", error);

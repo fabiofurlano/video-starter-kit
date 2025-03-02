@@ -3,7 +3,21 @@
 import { createFalClient } from "@fal-ai/client";
 
 export const fal = createFalClient({
-  credentials: () => localStorage?.getItem("falKey") as string,
+  credentials: () => {
+    // Safe check for browser environment
+    if (typeof window === 'undefined') {
+      return ""; // Empty string on server-side
+    }
+    
+    // Only check for falai_key as used in settings.js
+    const apiKey = localStorage?.getItem("falai_key") || "";
+    
+    if (!apiKey) {
+      console.error("No Fal.ai API key found in localStorage (falai_key)");
+    }
+    
+    return apiKey;
+  },
   proxyUrl: "/api/fal",
 });
 
