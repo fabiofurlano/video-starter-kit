@@ -27,6 +27,8 @@ export async function enhancePrompt(
   prompt: string,
   options: EnhancePromptOptions = { type: "video" },
 ) {
+  console.log("🔍 Starting enhancePrompt with:", { prompt, options });
+  
   const { type, project } = options;
   const projectInfo = !project
     ? ""
@@ -38,16 +40,29 @@ export async function enhancePrompt(
   `.trim();
   const promptInfo = !prompt.trim() ? "" : `User prompt: ${prompt}`;
 
-  const { data } = await fal.subscribe("fal-ai/any-llm", {
-    input: {
-      system_prompt: SYSTEM_PROMPT,
-      prompt: `
-        Create a prompt for generating a ${type} via AI inference. Here's the context:
-        ${projectInfo}
-        ${promptInfo}
-      `.trim(),
-      model: "meta-llama/llama-3.2-1b-instruct",
-    },
-  });
-  return data.output.replace(/^"|"$/g, "");
+  // Check if API key exists before making the request
+  const apiKey = typeof window !== "undefined" ? window.localStorage?.getItem("falai_key") || "" : "";
+  console.log("🔍 Using API key from localStorage:", apiKey ? "Found (starts with " + apiKey.substring(0, 5) + "...)" : "NOT FOUND");
+
+  try {
+    console.log("🔍 Making request to Fal.ai using fal.subscribe...");
+    
+    const { data } = await fal.subscribe("fal-ai/any-llm", {
+      input: {
+        system_prompt: SYSTEM_PROMPT,
+        prompt: `
+          Create a prompt for generating a ${type} via AI inference. Here's the context:
+          ${projectInfo}
+          ${promptInfo}
+        `.trim(),
+        model: "meta-llama/llama-3.2-1b-instruct",
+      },
+    });
+    
+    console.log("🔍 Received response from Fal.ai:", data);
+    return data.output.replace(/^"|"$/g, "");
+  } catch (error) {
+    console.error("❌ enhancePrompt error:", error);
+    throw error;
+  }
 }

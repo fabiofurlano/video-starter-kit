@@ -90,3 +90,88 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## Deployment
 
 The easiest way to deploy your application is through [Vercel](https://vercel.com/new?utm_source=fal-ai&utm_medium=default-template&utm_campaign=video-starter-kit).
+
+## Fal.ai Integration Guide
+
+### Overview
+This application integrates with Fal.ai API services for AI-powered video, image, and audio generation. The integration follows the official Fal.ai proxy pattern to securely handle API keys.
+
+### How It Works
+
+#### 1. Client-Side Configuration (`src/lib/fal.ts`)
+
+The client is configured to:
+- Retrieve the API key from localStorage (`falai_key`)
+- Send API requests through our custom proxy endpoint
+- Include the target URL in the `x-fal-target-url` header
+
+```typescript
+export const fal = createFalClient({
+  proxyUrl: "/api/fal",
+  credentials: () => {
+    // Get API key from localStorage
+    return typeof window !== "undefined" ? localStorage?.getItem("falai_key") || "" : "";
+  },
+  requestMiddleware: async (request) => {
+    // Add the target URL header for the proxy
+    const apiKey = typeof window !== "undefined" ? localStorage?.getItem("falai_key") || "" : "";
+    if (apiKey) {
+      request.headers = {
+        ...request.headers,
+        "Authorization": `Key ${apiKey}`,
+        "x-fal-target-url": request.url
+      };
+    }
+    return request;
+  }
+});
+```
+
+#### 2. Server-Side Proxy (`src/app/api/fal/route.ts`)
+
+The proxy:
+- Extracts the target URL from the `x-fal-target-url` header
+- Forwards the request to Fal.ai with proper authentication
+- Returns the response from Fal.ai to the client
+
+```typescript
+async function forwardToFal(req: NextRequest) {
+  // Get the target URL from headers
+  const targetUrl = req.headers.get("x-fal-target-url");
+  
+  // Forward the request with the API key
+  const forwardedResponse = await fetch(targetUrl, {
+    method: req.method,
+    headers: {
+      // Include the Authorization header
+      "Authorization": authHeader,
+      // Other headers...
+    },
+    body: requestBody
+  });
+  
+  // Return the response to the client
+  return new NextResponse(responseData, {
+    status: forwardedResponse.status,
+    headers: responseHeaders
+  });
+}
+```
+
+### Common Issues and Solutions
+
+1. **400 Bad Request Error**:
+   - Make sure the client is setting the `x-fal-target-url` header
+   - Verify the URL format being passed to Fal.ai
+
+2. **401 Unauthorized Error**:
+   - Check that the API key is correctly stored in localStorage
+   - Ensure the Authorization header is properly formatted as `Key YOUR_API_KEY`
+
+3. **DNS Resolution Errors**:
+   - Ensure your network can reach the Fal.ai servers
+   - Check for any firewall or network restrictions
+
+### Resources
+- [Official Fal.ai Documentation](https://docs.fal.ai/clients/javascript/)
+- [Fal.ai Next.js Integration Guide](https://docs.fal.ai/integrations/nextjs/)
