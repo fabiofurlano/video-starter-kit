@@ -35,9 +35,9 @@ export default function Header({
       <nav className="flex flex-row items-center justify-end gap-2">
         <ThemeToggle />
 
-        <Button 
-          variant="ghost" 
-          size="sm" 
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={() => setExportDialogOpen(true)}
         >
           <DownloadIcon className="w-4 h-4 mr-1" />
