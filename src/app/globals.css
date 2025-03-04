@@ -161,3 +161,8 @@ button:hover,
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
+
+/* Hide the dark mode toggle that might be coming from the parent page */
+#darkModeToggle {
+  display: none !important;
+}

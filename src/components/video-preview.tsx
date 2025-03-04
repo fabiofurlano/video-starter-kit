@@ -283,15 +283,6 @@ export default function VideoPreview() {
 
   return (
     <div className="flex-grow flex-1 h-full flex items-center justify-center bg-background-dark dark:bg-background-light relative">
-      <Button
-        className="absolute top-4 right-4 z-40"
-        variant="default"
-        onClick={() => setExportDialogOpen(true)}
-        disabled={isCompositionLoading || tracks.length === 0}
-      >
-        <DownloadIcon className="w-4 h-4" />
-        Export
-      </Button>
       <div className="w-full h-full flex items-center justify-center mx-6  max-h-[calc(100vh-25rem)]">
         <Player
           className={cn(
