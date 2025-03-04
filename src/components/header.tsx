@@ -2,7 +2,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Logo } from "./logo";
-import { SettingsIcon, Edit3Icon, Users, FileTextIcon, Home } from "lucide-react";
+import {
+  SettingsIcon,
+  Edit3Icon,
+  Users,
+  FileTextIcon,
+  Home,
+} from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import config from "@/lib/config";
 import Link from "next/link";
@@ -19,45 +25,45 @@ export default function Header({
         <span className="mx-2 text-gray-400">|</span>
         <h2 className="text-lg font-medium">AI Visual Studio</h2>
       </div>
-      
+
       <nav className="flex flex-row items-center justify-end gap-2">
         <ThemeToggle />
-        
+
         <Button variant="ghost" size="sm" asChild>
           <Link href={config.urls.main} target="_blank">
             <Home className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Home</span>
           </Link>
         </Button>
-        
+
         <Button variant="ghost" size="sm" asChild>
           <Link href={config.urls.writingWorkspace} target="_blank">
             <Edit3Icon className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Writing Space</span>
           </Link>
         </Button>
-        
+
         <Button variant="ghost" size="sm" asChild>
           <Link href={config.urls.characterSetup} target="_blank">
             <Users className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Characters</span>
           </Link>
         </Button>
-        
+
         <Button variant="ghost" size="sm" asChild>
           <Link href={config.urls.storyOutline} target="_blank">
             <FileTextIcon className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Outline</span>
           </Link>
         </Button>
-        
+
         <Button variant="ghost" size="sm" asChild>
           <Link href={config.urls.settings} target="_blank">
             <SettingsIcon className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Settings</span>
           </Link>
         </Button>
-        
+
         {openKeyDialog && (
           <Button variant="outline" size="sm" onClick={openKeyDialog}>
             <SettingsIcon className="w-4 h-4 mr-1" />

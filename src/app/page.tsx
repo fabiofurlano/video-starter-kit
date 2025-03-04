@@ -298,7 +298,7 @@ export default function IndexPage() {
             <div className="absolute top-4 right-4">
               <ThemeToggle />
             </div>
-            
+
             <div className="mb-6 inline-block p-6 rounded-full bg-indigo-900 bg-opacity-50">
               <svg
                 className="w-12 h-12 text-indigo-400"

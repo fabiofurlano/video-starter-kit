@@ -8,18 +8,25 @@ console.log("🔍 Initializing Fal.ai client...");
 export const fal = createFalClient({
   // Use the official fal.ai configuration pattern
   proxyUrl: "/api/fal", // This is our custom proxy endpoint
-  
+
   // The credentials function is called when the client needs to authenticate
   credentials: () => {
     // Safe check for browser environment
     if (typeof window === "undefined") {
-      console.log("🔍 FAL CLIENT: Running on server, returning empty credentials");
+      console.log(
+        "🔍 FAL CLIENT: Running on server, returning empty credentials",
+      );
       return ""; // Empty string on server-side
     }
 
     // Get the API key from localStorage
     const apiKey = localStorage?.getItem("falai_key") || "";
-    console.log("🔍 FAL CLIENT: API key from localStorage:", apiKey ? "Found (starts with " + apiKey.substring(0, 5) + "...)" : "NOT FOUND");
+    console.log(
+      "🔍 FAL CLIENT: API key from localStorage:",
+      apiKey
+        ? "Found (starts with " + apiKey.substring(0, 5) + "...)"
+        : "NOT FOUND",
+    );
 
     if (!apiKey) {
       console.error("❌ No Fal.ai API key found in localStorage (falai_key)");
@@ -27,35 +34,47 @@ export const fal = createFalClient({
 
     return apiKey;
   },
-  
+
   // This middleware is called before each request to allow customizing the request
   requestMiddleware: async (request) => {
     console.log("🔍 FAL CLIENT: Request middleware executed");
-    
+
     // Log request details for debugging
     const targetUrl = request.url;
     console.log("🔍 FAL CLIENT middleware: Target URL:", targetUrl);
     console.log("🔍 FAL CLIENT middleware: Request method:", request.method);
-    
+
     // Get API key from localStorage
-    const apiKey = typeof window !== "undefined" ? localStorage?.getItem("falai_key") || "" : "";
-    console.log("🔍 FAL CLIENT middleware: API key from localStorage:", apiKey ? "Found (starts with " + apiKey.substring(0, 5) + "...)" : "NOT FOUND");
-    
+    const apiKey =
+      typeof window !== "undefined"
+        ? localStorage?.getItem("falai_key") || ""
+        : "";
+    console.log(
+      "🔍 FAL CLIENT middleware: API key from localStorage:",
+      apiKey
+        ? "Found (starts with " + apiKey.substring(0, 5) + "...)"
+        : "NOT FOUND",
+    );
+
     // Add the Authorization header with the API key
     if (apiKey) {
       request.headers = {
         ...request.headers,
-        "Authorization": `Key ${apiKey}`,
+        Authorization: `Key ${apiKey}`,
         // IMPORTANT: Add the x-fal-target-url header for the proxy to know where to forward the request
-        "x-fal-target-url": targetUrl
+        "x-fal-target-url": targetUrl,
       };
-      console.log("🔍 FAL CLIENT middleware: Added Authorization header and x-fal-target-url header");
+      console.log(
+        "🔍 FAL CLIENT middleware: Added Authorization header and x-fal-target-url header",
+      );
     } else {
-      console.error("❌ FAL CLIENT middleware: No API key available to add to request");
+      console.error(
+        "❌ FAL CLIENT middleware: No API key available to add to request",
+      );
     }
-    
+
     return request;
-  }
+  },
 });
 
 export type InputAsset =

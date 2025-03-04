@@ -7,9 +7,13 @@ html {
 }
 
 body {
-  font-family: 'Poppins', -apple-system, Arial, sans-serif;
+  font-family: "Poppins", -apple-system, Arial, sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
-  background: linear-gradient(to bottom right, var(--tw-gradient-from), var(--tw-gradient-to));
+  background: linear-gradient(
+    to bottom right,
+    var(--tw-gradient-from),
+    var(--tw-gradient-to)
+  );
   min-height: 100vh;
 }
 
@@ -49,7 +53,7 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
     --radius: 0.5rem;
-    
+
     /* Background gradient */
     --tw-gradient-from: hsl(214, 100%, 97%);
     --tw-gradient-to: hsl(226, 100%, 97%);
@@ -82,7 +86,7 @@ body {
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
-    
+
     /* Background gradient for dark mode */
     --tw-gradient-from: hsl(220, 24%, 7%);
     --tw-gradient-to: hsl(246, 24%, 9%);
@@ -115,7 +119,7 @@ body {
 }
 
 /* Button Styling */
-button, 
+button,
 .btn {
   border-radius: var(--radius);
   transition: all 0.2s ease-in-out;
