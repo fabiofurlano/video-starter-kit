@@ -236,7 +236,7 @@ export function ProjectDialog({ onOpenChange, ...props }: ProjectDialogProps) {
         </div>
         <DialogFooter>
           <p className="text-muted-foreground text-sm mt-4 w-full text-center">
-            Project management for your creative work       
+            Project management for your creative work
           </p>
         </DialogFooter>
       </DialogContent>
