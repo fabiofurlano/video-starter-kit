@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { UserData } from "./session-manager";
 import sessionManager from "./session-manager";
 import Link from "next/link";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -293,7 +294,11 @@ export default function IndexPage() {
             </div>
           </div>
         ) : (
-          <div className="text-center py-12">
+          <div className="flex min-h-screen w-full flex-col items-center justify-center relative transition-colors duration-300">
+            <div className="absolute top-4 right-4">
+              <ThemeToggle />
+            </div>
+            
             <div className="mb-6 inline-block p-6 rounded-full bg-indigo-900 bg-opacity-50">
               <svg
                 className="w-12 h-12 text-indigo-400"

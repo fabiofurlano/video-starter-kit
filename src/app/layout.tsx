@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/react";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
+import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
-  title: "AI Video Developer Starter Kit | fal.ai",
-  description: "Open-source AI video editor built for developers.",
+  title: "AI Visual Studio",
+  description: "Create videos from your story using AI",
 };
 
 export default function RootLayout({
@@ -13,10 +14,20 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className="antialiased dark">
-        {children}
-        <Analytics />
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+      </head>
+      <body className={GeistSans.className}>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange={false}
+          themes={['light', 'dark']}
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
