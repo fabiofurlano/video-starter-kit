@@ -364,8 +364,8 @@ export default function RightPanel({
   return (
     <div
       className={cn(
-        "flex flex-col border-l border-border w-96 z-50 transition-all duration-300 absolute top-0 h-full bg-background glassmorphism",
-        generateDialogOpen ? "right-0" : "-right-96",
+        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 absolute top-0 h-full bg-background glassmorphism",
+        generateDialogOpen ? "right-0" : "-right-[400px]",
       )}
     >
       <div className="flex-1 p-4 flex flex-col gap-4 border-b border-border h-full overflow-hidden relative">

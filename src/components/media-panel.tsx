@@ -250,7 +250,7 @@ export function MediaItemPanel({
   return (
     <div
       className={cn(
-        "flex flex-col overflow-hidden divide-y divide-border",
+        "flex flex-col overflow-hidden divide-y divide-border w-[400px] min-w-[400px]",
         className,
       )}
     >
