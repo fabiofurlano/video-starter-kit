@@ -50,34 +50,38 @@ class SessionManager {
   private initialized: boolean = false;
 
   /**
-   * Initialize session with data from parent iframe
-   * @param data The data received from postMessage
+   * Initialize the SDK session with user data
+   * @param userData The user data to initialize with
    */
-  initializeSession(data: ParentPostMessageData): void {
-    console.log("Initializing session with data from parent");
-
-    // Convert from parent format to internal UserData format
-    const userData: UserData = {
-      // Map API keys
-      openaiApiKey: data.apiKeys?.openai || "",
-      openrouterApiKey: data.apiKeys?.openrouter || "",
-      falaiApiKey: data.apiKeys?.falai || "",
-
-      // Story elements
-      language: data.language || "",
-      genre: data.genre || "",
-      title: data.title || "",
-      location: data.location || "",
-      timeline: data.timeline || "",
-
-      // Characters, outline, chapters
-      characters: data.characters || [],
-      outline: data.outline || [],
-      chapters: data.chapters || [],
+  initializeSession(userData: Record<string, any>): void {
+    console.log("SDK receiving session data:", userData);
+    
+    // Process API keys from different message formats
+    let apiKeys: Record<string, string> = {};
+    
+    // Process direct keys in the userData object
+    if (userData.apiKeys) {
+      apiKeys = userData.apiKeys;
+    }
+    
+    // Set user data with properly formatted chapters
+    this.userData = {
+      openaiApiKey: apiKeys.openai || userData.openai_key || "",
+      openrouterApiKey: apiKeys.openrouter || userData.openrouter_key || "",
+      falaiApiKey: apiKeys.falai || userData.falai_key || "",
+      
+      language: userData.language || "",
+      genre: userData.genre || "",
+      title: userData.title || "",
+      location: userData.location || "",
+      timeline: userData.timeline || "",
+      
+      characters: userData.characters || [],
+      outline: userData.outline || [],
+      chapters: userData.chapters || [],
     };
-
-    // Set the user data
-    this.setUserData(userData);
+    
+    this.initialized = true;
     console.log("Session initialized successfully with data from parent");
   }
 

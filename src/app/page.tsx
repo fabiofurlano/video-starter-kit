@@ -160,7 +160,11 @@ export default function IndexPage() {
                   timeline: userData.timeline || "",
                   characters: userData.characters || [],
                   outline: userData.outline || [],
-                  chapters: userData.chapters || [],
+                  chapters: userData.chapters ? userData.chapters.map((chapter: any) => ({
+                    number: String(chapter.number || ""),
+                    title: chapter.title || "",
+                    content: chapter.content || ""
+                  })) : [],
                 };
 
                 // Initialize the session with the normalized data
@@ -286,6 +290,36 @@ export default function IndexPage() {
                 <p className="text-gray-400 text-center">
                   No characters found. You can create visual content without
                   defined characters.
+                </p>
+              )}
+            </div>
+
+            {/* Chapters Panel */}
+            <div className="bg-gray-800 bg-opacity-50 rounded-lg p-6 backdrop-blur-sm border border-gray-700 mt-6">
+              <h2 className="text-2xl font-bold mb-6 text-white">Chapters</h2>
+              {userData.chapters && userData.chapters.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6">
+                  {userData.chapters.map((chapter, index) => (
+                    <div
+                      key={index}
+                      className="bg-gradient-to-br from-gray-700 to-gray-800 p-5 rounded-lg shadow-lg border border-gray-600 hover:border-blue-500 transition-all duration-300"
+                    >
+                      <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-600 pb-2">
+                        Chapter {chapter.number}: {chapter.title}
+                      </h1>
+                      <div 
+                        className="text-sm mt-3 text-gray-300 leading-relaxed"
+                        dangerouslySetInnerHTML={{ 
+                          __html: chapter.content || "No content"
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 text-center py-6">
+                  No chapters found. You can create visual content without
+                  defined chapters.
                 </p>
               )}
             </div>
