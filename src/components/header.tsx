@@ -15,6 +15,9 @@ import { ThemeToggle } from "./theme-toggle";
 import config from "@/lib/config";
 import Link from "next/link";
 import { useVideoProjectStore } from "@/data/store";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+import sessionManager from "@/app/session-manager";
 
 export default function Header({
   openKeyDialog,
@@ -24,6 +27,15 @@ export default function Header({
   const setExportDialogOpen = useVideoProjectStore(
     (s) => s.setExportDialogOpen,
   );
+  const router = useRouter();
+
+  // Handle navigation to storyboard with session data
+  const navigateToStoryboard = useCallback(() => {
+    // The session data is already in sessionManager
+    // We just need to navigate while preserving it
+    console.log('Navigating to storyboard, current session data:', sessionManager.getUserData());
+    router.push('/');
+  }, [router]);
 
   return (
     <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism">
@@ -45,11 +57,13 @@ export default function Header({
           <span className="hidden sm:inline">Export</span>
         </Button>
 
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/">
-            <LayoutDashboard className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">Storyboard</span>
-          </Link>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={navigateToStoryboard}
+        >
+          <LayoutDashboard className="w-4 h-4 mr-1" />
+          <span className="hidden sm:inline">Storyboard</span>
         </Button>
 
         <Button variant="ghost" size="sm" asChild>
