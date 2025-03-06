@@ -32,12 +32,19 @@ export default function Header({
   // Handle navigation to storyboard with session data
   const navigateToStoryboard = useCallback(() => {
     // The session data is already in sessionManager
+    const userData = sessionManager.getUserData();
+    
+    if (userData) {
+      // Just back it up to localStorage without any complex manipulation
+      try {
+        localStorage.setItem('videoProjectSessionData', JSON.stringify(userData));
+      } catch (error) {
+        console.error('Error saving to localStorage:', error);
+      }
+    }
+    
     // We just need to navigate while preserving it
-    console.log(
-      "Navigating to storyboard, current session data:",
-      sessionManager.getUserData(),
-    );
-    router.push("/");
+    router.push('/');
   }, [router]);
 
   return (

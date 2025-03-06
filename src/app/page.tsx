@@ -18,6 +18,29 @@ export default function IndexPage() {
     );
     setDebugInfo("Setting up message listener...");
 
+    // Check for session data first
+    const currentData = sessionManager.getUserData();
+    if (!currentData) {
+      // Try to load from localStorage if no data in session
+      try {
+        const savedData = localStorage.getItem('videoProjectSessionData');
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          sessionManager.initializeSession(parsedData);
+          setUserData(sessionManager.getUserData());
+          setIsLoading(false);
+          setDebugInfo("Session data loaded from localStorage");
+        }
+      } catch (error) {
+        console.error("Error loading from localStorage:", error);
+      }
+    } else {
+      // We already have data in the session
+      setUserData(currentData);
+      setIsLoading(false);
+      setDebugInfo("Session data already available");
+    }
+
     function handleMessage(event: MessageEvent) {
       console.log(
         "Message received from:",
