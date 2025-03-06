@@ -33,8 +33,11 @@ export default function Header({
   const navigateToStoryboard = useCallback(() => {
     // The session data is already in sessionManager
     // We just need to navigate while preserving it
-    console.log('Navigating to storyboard, current session data:', sessionManager.getUserData());
-    router.push('/');
+    console.log(
+      "Navigating to storyboard, current session data:",
+      sessionManager.getUserData(),
+    );
+    router.push("/");
   }, [router]);
 
   return (
@@ -57,11 +60,7 @@ export default function Header({
           <span className="hidden sm:inline">Export</span>
         </Button>
 
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={navigateToStoryboard}
-        >
+        <Button variant="ghost" size="sm" onClick={navigateToStoryboard}>
           <LayoutDashboard className="w-4 h-4 mr-1" />
           <span className="hidden sm:inline">Storyboard</span>
         </Button>
