@@ -9,6 +9,7 @@ import {
   FileTextIcon,
   Home,
   DownloadIcon,
+  LayoutDashboard,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import config from "@/lib/config";
@@ -42,6 +43,13 @@ export default function Header({
         >
           <DownloadIcon className="w-4 h-4 mr-1" />
           <span className="hidden sm:inline">Export</span>
+        </Button>
+
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/">
+            <LayoutDashboard className="w-4 h-4 mr-1" />
+            <span className="hidden sm:inline">Storyboard</span>
+          </Link>
         </Button>
 
         <Button variant="ghost" size="sm" asChild>
