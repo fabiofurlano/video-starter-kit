@@ -33,18 +33,21 @@ export default function Header({
   const navigateToStoryboard = useCallback(() => {
     // The session data is already in sessionManager
     const userData = sessionManager.getUserData();
-    
+
     if (userData) {
       // Just back it up to localStorage without any complex manipulation
       try {
-        localStorage.setItem('videoProjectSessionData', JSON.stringify(userData));
+        localStorage.setItem(
+          "videoProjectSessionData",
+          JSON.stringify(userData),
+        );
       } catch (error) {
-        console.error('Error saving to localStorage:', error);
+        console.error("Error saving to localStorage:", error);
       }
     }
-    
+
     // We just need to navigate while preserving it
-    router.push('/');
+    router.push("/");
   }, [router]);
 
   return (

@@ -10,12 +10,14 @@ export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
-  const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
+  const [expandedChapters, setExpandedChapters] = useState<
+    Record<number, boolean>
+  >({});
 
   const toggleChapter = (index: number) => {
-    setExpandedChapters(prev => ({
+    setExpandedChapters((prev) => ({
       ...prev,
-      [index]: !prev[index]
+      [index]: !prev[index],
     }));
   };
 
@@ -31,7 +33,7 @@ export default function IndexPage() {
     if (!currentData) {
       // Try to load from localStorage if no data in session
       try {
-        const savedData = localStorage.getItem('videoProjectSessionData');
+        const savedData = localStorage.getItem("videoProjectSessionData");
         if (savedData) {
           const parsedData = JSON.parse(savedData);
           sessionManager.initializeSession(parsedData);
@@ -168,11 +170,13 @@ export default function IndexPage() {
                   timeline: userData.timeline || "",
                   characters: userData.characters || [],
                   outline: userData.outline || [],
-                  chapters: userData.chapters ? userData.chapters.map((chapter: any) => ({
-                    number: String(chapter.number || ""),
-                    title: chapter.title || "",
-                    content: chapter.content || ""
-                  })) : [],
+                  chapters: userData.chapters
+                    ? userData.chapters.map((chapter: any) => ({
+                        number: String(chapter.number || ""),
+                        title: chapter.title || "",
+                        content: chapter.content || "",
+                      }))
+                    : [],
                 };
 
                 // Initialize the session with the normalized data
@@ -237,7 +241,9 @@ export default function IndexPage() {
           <div className="space-y-8">
             {/* Story Info Panel */}
             <div className="glassmorphism p-6 border-gray-800">
-              <h2 className="text-2xl font-bold mb-4 text-white">Story Information</h2>
+              <h2 className="text-2xl font-bold mb-4 text-white">
+                Story Information
+              </h2>
               {userData.title || userData.genre || userData.language ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
@@ -318,24 +324,27 @@ export default function IndexPage() {
                       </h1>
                       <div className="text-sm mt-3 text-gray-300 leading-relaxed">
                         {expandedChapters[index] ? (
-                          <div 
-                            dangerouslySetInnerHTML={{ 
-                              __html: chapter.content || "No content" 
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: chapter.content || "No content",
                             }}
                           />
                         ) : (
                           <div className="line-clamp-4">
                             {chapter.content ? (
-                              <div dangerouslySetInnerHTML={{ 
-                                __html: chapter.content.substring(0, 250) + "..."
-                              }} />
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html:
+                                    chapter.content.substring(0, 250) + "...",
+                                }}
+                              />
                             ) : (
                               "No content"
                             )}
                           </div>
                         )}
-                        
-                        <button 
+
+                        <button
                           onClick={() => toggleChapter(index)}
                           className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
                         >
@@ -371,7 +380,9 @@ export default function IndexPage() {
                       d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                     />
                   </svg>
-                  <h3 className="text-2xl font-bold mb-2 text-white">Open Video Studio</h3>
+                  <h3 className="text-2xl font-bold mb-2 text-white">
+                    Open Video Studio
+                  </h3>
                   <p className="text-lg text-gray-300">
                     Generate AI videos based on your story elements
                   </p>

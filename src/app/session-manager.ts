@@ -55,32 +55,32 @@ class SessionManager {
    */
   initializeSession(userData: Record<string, any>): void {
     console.log("SDK receiving session data:", userData);
-    
+
     // Process API keys from different message formats
     let apiKeys: Record<string, string> = {};
-    
+
     // Process direct keys in the userData object
     if (userData.apiKeys) {
       apiKeys = userData.apiKeys;
     }
-    
+
     // Set user data with properly formatted chapters
     this.userData = {
       openaiApiKey: apiKeys.openai || userData.openai_key || "",
       openrouterApiKey: apiKeys.openrouter || userData.openrouter_key || "",
       falaiApiKey: apiKeys.falai || userData.falai_key || "",
-      
+
       language: userData.language || "",
       genre: userData.genre || "",
       title: userData.title || "",
       location: userData.location || "",
       timeline: userData.timeline || "",
-      
+
       characters: userData.characters || [],
       outline: userData.outline || [],
       chapters: userData.chapters || [],
     };
-    
+
     this.initialized = true;
     console.log("Session initialized successfully with data from parent");
   }
