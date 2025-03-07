@@ -10,6 +10,14 @@ export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
+  const [expandedChapters, setExpandedChapters] = useState<Record<number, boolean>>({});
+
+  const toggleChapter = (index: number) => {
+    setExpandedChapters(prev => ({
+      ...prev,
+      [index]: !prev[index]
+    }));
+  };
 
   // Listen for messages from the parent page
   useEffect(() => {
@@ -197,19 +205,20 @@ export default function IndexPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white relative">
-      <header className="p-6 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+    <div className="min-h-screen bg-gradient-to-br from-black to-[#0A0F23] text-white relative">
+      <header className="px-4 py-4 flex justify-between items-center border-b border-border glassmorphism mb-8">
+        <div className="flex items-center">
+          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
             AI Visual Studio
           </h1>
-          <div className="flex items-center space-x-2">
-            {userData && userData.falaiApiKey ? (
-              <div className="text-sm px-3 py-1 rounded-full bg-green-900 text-green-400">
-                API Key Connected
-              </div>
-            ) : null}
-          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          {userData && userData.falaiApiKey ? (
+            <div className="text-sm px-3 py-1 rounded-full bg-green-900/60 text-green-400 backdrop-blur-sm">
+              API Key Connected
+            </div>
+          ) : null}
+          <ThemeToggle />
         </div>
       </header>
 
@@ -227,31 +236,31 @@ export default function IndexPage() {
         ) : userData ? (
           <div className="space-y-8">
             {/* Story Info Panel */}
-            <div className="bg-gray-800 bg-opacity-50 rounded-lg p-6 backdrop-blur-sm border border-gray-700">
-              <h2 className="text-2xl font-bold mb-4">Story Information</h2>
+            <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-4 text-white">Story Information</h2>
               {userData.title || userData.genre || userData.language ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-gray-400 text-sm">Title</h3>
-                    <p className="text-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Title</h3>
+                    <p className="text-lg font-medium">
                       {userData.title || "Untitled Story"}
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-gray-400 text-sm">Genre</h3>
-                    <p className="text-lg">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Genre</h3>
+                    <p className="text-lg font-medium">
                       {userData.genre || "Not specified"}
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-gray-400 text-sm">Language</h3>
-                    <p className="text-lg">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Language</h3>
+                    <p className="text-lg font-medium">
                       {userData.language || "Not specified"}
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-gray-400 text-sm">Location</h3>
-                    <p className="text-lg">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Location</h3>
+                    <p className="text-lg font-medium">
                       {userData.location || "Not specified"}
                     </p>
                   </div>
@@ -267,27 +276,27 @@ export default function IndexPage() {
             </div>
 
             {/* Characters Panel */}
-            <div className="bg-gray-800 bg-opacity-50 rounded-lg p-6 backdrop-blur-sm border border-gray-700">
-              <h2 className="text-2xl font-bold mb-4">Characters</h2>
+            <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-6 text-white">Characters</h2>
               {userData.characters && userData.characters.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                   {userData.characters.map((character, index) => (
                     <div
                       key={index}
-                      className="bg-gray-700 bg-opacity-50 p-4 rounded-lg"
+                      className="bg-gray-900/50 p-5 rounded-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
                     >
-                      <h3 className="font-bold">{character.name}</h3>
-                      <p className="text-sm text-gray-300">
+                      <h3 className="font-bold text-white">{character.name}</h3>
+                      <p className="text-sm text-blue-300 mt-1">
                         {character.role || "No role specified"}
                       </p>
-                      <p className="text-xs mt-2 text-gray-400 line-clamp-3">
+                      <p className="text-xs mt-3 text-gray-400 line-clamp-3">
                         {character.description || "No description"}
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-center">
+                <p className="text-gray-400 text-center py-6">
                   No characters found. You can create visual content without
                   defined characters.
                 </p>
@@ -295,24 +304,44 @@ export default function IndexPage() {
             </div>
 
             {/* Chapters Panel */}
-            <div className="bg-gray-800 bg-opacity-50 rounded-lg p-6 backdrop-blur-sm border border-gray-700 mt-6">
+            <div className="glassmorphism p-6 border-gray-800 mt-6">
               <h2 className="text-2xl font-bold mb-6 text-white">Chapters</h2>
               {userData.chapters && userData.chapters.length > 0 ? (
                 <div className="grid grid-cols-1 gap-6">
                   {userData.chapters.map((chapter, index) => (
                     <div
                       key={index}
-                      className="bg-gradient-to-br from-gray-700 to-gray-800 p-5 rounded-lg shadow-lg border border-gray-600 hover:border-blue-500 transition-all duration-300"
+                      className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
                     >
-                      <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-600 pb-2">
+                      <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-700/50 pb-2">
                         Chapter {chapter.number}: {chapter.title}
                       </h1>
-                      <div 
-                        className="text-sm mt-3 text-gray-300 leading-relaxed"
-                        dangerouslySetInnerHTML={{ 
-                          __html: chapter.content || "No content"
-                        }}
-                      />
+                      <div className="text-sm mt-3 text-gray-300 leading-relaxed">
+                        {expandedChapters[index] ? (
+                          <div 
+                            dangerouslySetInnerHTML={{ 
+                              __html: chapter.content || "No content" 
+                            }}
+                          />
+                        ) : (
+                          <div className="line-clamp-4">
+                            {chapter.content ? (
+                              <div dangerouslySetInnerHTML={{ 
+                                __html: chapter.content.substring(0, 250) + "..."
+                              }} />
+                            ) : (
+                              "No content"
+                            )}
+                          </div>
+                        )}
+                        
+                        <button 
+                          onClick={() => toggleChapter(index)}
+                          className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
+                        >
+                          {expandedChapters[index] ? "Show Less" : "Show More"}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -325,11 +354,11 @@ export default function IndexPage() {
             </div>
 
             {/* Direct Video Studio Button (replacing the grid of project actions) */}
-            <div className="flex justify-center">
+            <div className="flex justify-center my-10">
               <Link href="/app" className="block w-full max-w-xl">
-                <div className="bg-gradient-to-br from-blue-600 to-purple-700 hover:from-blue-500 hover:to-purple-600 p-8 rounded-lg text-center transition-colors duration-300 shadow-lg">
+                <div className="glassmorphism bg-gradient-to-br from-blue-900/50 to-purple-900/50 hover:from-blue-800/50 hover:to-purple-800/50 p-8 rounded-xl text-center transition-all duration-300 shadow-lg border border-indigo-800/50 hover:border-indigo-600">
                   <svg
-                    className="w-16 h-16 mx-auto mb-4"
+                    className="w-16 h-16 mx-auto mb-4 text-indigo-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -342,8 +371,8 @@ export default function IndexPage() {
                       d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                     />
                   </svg>
-                  <h3 className="text-2xl font-bold mb-2">Open Video Studio</h3>
-                  <p className="text-lg text-gray-200">
+                  <h3 className="text-2xl font-bold mb-2 text-white">Open Video Studio</h3>
+                  <p className="text-lg text-gray-300">
                     Generate AI videos based on your story elements
                   </p>
                 </div>
