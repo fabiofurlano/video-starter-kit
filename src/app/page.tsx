@@ -5,6 +5,18 @@ import { UserData } from "./session-manager";
 import sessionManager from "./session-manager";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
+import { Button } from "@/components/ui/button";
+import {
+  SettingsIcon,
+  Edit3Icon,
+  Users,
+  FileTextIcon,
+  Home,
+  DownloadIcon,
+  LayoutDashboard,
+} from "lucide-react";
+import config from "@/lib/config";
 
 export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -210,20 +222,60 @@ export default function IndexPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-[#0A0F23] text-white relative">
-      <header className="px-4 py-4 flex justify-between items-center border-b border-border glassmorphism mb-8">
+      <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism mb-8">
         <div className="flex items-center">
-          <h1 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-            AI Visual Studio
-          </h1>
+          <Logo />
+          <span className="mx-2 text-gray-400">|</span>
+          <h2 className="text-lg font-medium">AI Visual Studio</h2>
         </div>
-        <div className="flex items-center space-x-2">
-          {userData && userData.falaiApiKey ? (
-            <div className="text-sm px-3 py-1 rounded-full bg-green-900/60 text-green-400 backdrop-blur-sm">
-              API Key Connected
-            </div>
-          ) : null}
+
+        <nav className="flex flex-row items-center justify-end gap-2">
           <ThemeToggle />
-        </div>
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => window.location.href = '/app'}
+          >
+            <LayoutDashboard className="w-4 h-4 mr-1" />
+            <span className="hidden sm:inline">Video Studio</span>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.main} target="_blank">
+              <Home className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Home</span>
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.writingWorkspace} target="_blank">
+              <Edit3Icon className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Writing Space</span>
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.characterSetup} target="_blank">
+              <Users className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Characters</span>
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.storyOutline} target="_blank">
+              <FileTextIcon className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Outline</span>
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.settings} target="_blank">
+              <SettingsIcon className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Settings</span>
+            </Link>
+          </Button>
+        </nav>
       </header>
 
       <main className="max-w-7xl mx-auto p-6">
