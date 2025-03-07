@@ -235,7 +235,7 @@ export default function IndexPage() {
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => window.location.href = '/app'}
+            onClick={() => (window.location.href = "/app")}
           >
             <LayoutDashboard className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Video Studio</span>
