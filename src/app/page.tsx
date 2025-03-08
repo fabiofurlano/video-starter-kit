@@ -17,6 +17,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import config from "@/lib/config";
+import { useRouter } from "next/navigation";
 
 export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -26,6 +27,7 @@ export default function IndexPage() {
     Record<number, boolean>
   >({});
   const [slideSelections, setSlideSelections] = useState<Record<number, string>>({});
+  const router = useRouter();
 
   const toggleChapter = (index: number) => {
     setExpandedChapters((prev) => ({
@@ -78,7 +80,7 @@ export default function IndexPage() {
       console.log('Successfully stored storyboard data in localStorage:', storyboardData);
       
       // Redirect to the video editor app with a clear URL indicator
-      window.location.href = '/app?storyboard=true';
+      router.push('/app?storyboard=true');
     } catch (error) {
       console.error('Error storing storyboard data:', error);
       alert('Error preparing storyboard data. Please try again.');
@@ -282,7 +284,7 @@ export default function IndexPage() {
     window.addEventListener("message", handleMessage);
     setDebugInfo("Message listener active, waiting for messages...");
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-[#0A0F23] text-white relative">
