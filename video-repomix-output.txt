@@ -1044,11 +1044,33 @@ import { UserData } from "./session-manager";
 import sessionManager from "./session-manager";
 import Link from "next/link";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { Logo } from "@/components/logo";
+import { Button } from "@/components/ui/button";
+import {
+  SettingsIcon,
+  Edit3Icon,
+  Users,
+  FileTextIcon,
+  Home,
+  DownloadIcon,
+  LayoutDashboard,
+} from "lucide-react";
+import config from "@/lib/config";
 
 export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [debugInfo, setDebugInfo] = useState<string>("Initializing...");
+  const [expandedChapters, setExpandedChapters] = useState<
+    Record<number, boolean>
+  >({});
+
+  const toggleChapter = (index: number) => {
+    setExpandedChapters((prev) => ({
+      ...prev,
+      [index]: !prev[index],
+    }));
+  };
 
   // Listen for messages from the parent page
   useEffect(() => {
@@ -1056,6 +1078,29 @@ export default function IndexPage() {
       "IndexPage component mounted - setting up postMessage listener",
     );
     setDebugInfo("Setting up message listener...");
+
+    // Check for session data first
+    const currentData = sessionManager.getUserData();
+    if (!currentData) {
+      // Try to load from localStorage if no data in session
+      try {
+        const savedData = localStorage.getItem("videoProjectSessionData");
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          sessionManager.initializeSession(parsedData);
+          setUserData(sessionManager.getUserData());
+          setIsLoading(false);
+          setDebugInfo("Session data loaded from localStorage");
+        }
+      } catch (error) {
+        console.error("Error loading from localStorage:", error);
+      }
+    } else {
+      // We already have data in the session
+      setUserData(currentData);
+      setIsLoading(false);
+      setDebugInfo("Session data already available");
+    }
 
     function handleMessage(event: MessageEvent) {
       console.log(
@@ -1176,7 +1221,13 @@ export default function IndexPage() {
                   timeline: userData.timeline || "",
                   characters: userData.characters || [],
                   outline: userData.outline || [],
-                  chapters: userData.chapters || [],
+                  chapters: userData.chapters
+                    ? userData.chapters.map((chapter: any) => ({
+                        number: String(chapter.number || ""),
+                        title: chapter.title || "",
+                        content: chapter.content || "",
+                      }))
+                    : [],
                 };
 
                 // Initialize the session with the normalized data
@@ -1209,20 +1260,61 @@ export default function IndexPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 to-indigo-900 text-white relative">
-      <header className="p-6 border-b border-gray-800">
-        <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <h1 className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
-            AI Visual Studio
-          </h1>
-          <div className="flex items-center space-x-2">
-            {userData && userData.falaiApiKey ? (
-              <div className="text-sm px-3 py-1 rounded-full bg-green-900 text-green-400">
-                API Key Connected
-              </div>
-            ) : null}
-          </div>
+    <div className="min-h-screen bg-gradient-to-br from-black to-[#0A0F23] text-white relative">
+      <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism mb-8">
+        <div className="flex items-center">
+          <Logo />
+          <span className="mx-2 text-gray-400">|</span>
+          <h2 className="text-lg font-medium">AI Visual Studio</h2>
         </div>
+
+        <nav className="flex flex-row items-center justify-end gap-2">
+          <ThemeToggle />
+
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => (window.location.href = "/app")}
+          >
+            <LayoutDashboard className="w-4 h-4 mr-1" />
+            <span className="hidden sm:inline">Video Studio</span>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.main} target="_blank">
+              <Home className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Home</span>
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.writingWorkspace} target="_blank">
+              <Edit3Icon className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Writing Space</span>
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.characterSetup} target="_blank">
+              <Users className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Characters</span>
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.storyOutline} target="_blank">
+              <FileTextIcon className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Outline</span>
+            </Link>
+          </Button>
+
+          <Button variant="ghost" size="sm" asChild>
+            <Link href={config.urls.settings} target="_blank">
+              <SettingsIcon className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Settings</span>
+            </Link>
+          </Button>
+        </nav>
       </header>
 
       <main className="max-w-7xl mx-auto p-6">
@@ -1239,31 +1331,33 @@ export default function IndexPage() {
         ) : userData ? (
           <div className="space-y-8">
             {/* Story Info Panel */}
-            <div className="bg-gray-800 bg-opacity-50 rounded-lg p-6 backdrop-blur-sm border border-gray-700">
-              <h2 className="text-2xl font-bold mb-4">Story Information</h2>
+            <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-4 text-white">
+                Story Information
+              </h2>
               {userData.title || userData.genre || userData.language ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <h3 className="text-gray-400 text-sm">Title</h3>
-                    <p className="text-lg">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Title</h3>
+                    <p className="text-lg font-medium">
                       {userData.title || "Untitled Story"}
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-gray-400 text-sm">Genre</h3>
-                    <p className="text-lg">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Genre</h3>
+                    <p className="text-lg font-medium">
                       {userData.genre || "Not specified"}
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-gray-400 text-sm">Language</h3>
-                    <p className="text-lg">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Language</h3>
+                    <p className="text-lg font-medium">
                       {userData.language || "Not specified"}
                     </p>
                   </div>
-                  <div>
-                    <h3 className="text-gray-400 text-sm">Location</h3>
-                    <p className="text-lg">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Location</h3>
+                    <p className="text-lg font-medium">
                       {userData.location || "Not specified"}
                     </p>
                   </div>
@@ -1279,39 +1373,92 @@ export default function IndexPage() {
             </div>
 
             {/* Characters Panel */}
-            <div className="bg-gray-800 bg-opacity-50 rounded-lg p-6 backdrop-blur-sm border border-gray-700">
-              <h2 className="text-2xl font-bold mb-4">Characters</h2>
+            <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-6 text-white">Characters</h2>
               {userData.characters && userData.characters.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                   {userData.characters.map((character, index) => (
                     <div
                       key={index}
-                      className="bg-gray-700 bg-opacity-50 p-4 rounded-lg"
+                      className="bg-gray-900/50 p-5 rounded-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
                     >
-                      <h3 className="font-bold">{character.name}</h3>
-                      <p className="text-sm text-gray-300">
+                      <h3 className="font-bold text-white">{character.name}</h3>
+                      <p className="text-sm text-blue-300 mt-1">
                         {character.role || "No role specified"}
                       </p>
-                      <p className="text-xs mt-2 text-gray-400 line-clamp-3">
+                      <p className="text-xs mt-3 text-gray-400 line-clamp-3">
                         {character.description || "No description"}
                       </p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-gray-400 text-center">
+                <p className="text-gray-400 text-center py-6">
                   No characters found. You can create visual content without
                   defined characters.
                 </p>
               )}
             </div>
 
+            {/* Chapters Panel */}
+            <div className="glassmorphism p-6 border-gray-800 mt-6">
+              <h2 className="text-2xl font-bold mb-6 text-white">Chapters</h2>
+              {userData.chapters && userData.chapters.length > 0 ? (
+                <div className="grid grid-cols-1 gap-6">
+                  {userData.chapters.map((chapter, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
+                    >
+                      <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-700/50 pb-2">
+                        Chapter {chapter.number}: {chapter.title}
+                      </h1>
+                      <div className="text-sm mt-3 text-gray-300 leading-relaxed">
+                        {expandedChapters[index] ? (
+                          <div
+                            dangerouslySetInnerHTML={{
+                              __html: chapter.content || "No content",
+                            }}
+                          />
+                        ) : (
+                          <div className="line-clamp-4">
+                            {chapter.content ? (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html:
+                                    chapter.content.substring(0, 250) + "...",
+                                }}
+                              />
+                            ) : (
+                              "No content"
+                            )}
+                          </div>
+                        )}
+
+                        <button
+                          onClick={() => toggleChapter(index)}
+                          className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
+                        >
+                          {expandedChapters[index] ? "Show Less" : "Show More"}
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 text-center py-6">
+                  No chapters found. You can create visual content without
+                  defined chapters.
+                </p>
+              )}
+            </div>
+
             {/* Direct Video Studio Button (replacing the grid of project actions) */}
-            <div className="flex justify-center">
+            <div className="flex justify-center my-10">
               <Link href="/app" className="block w-full max-w-xl">
-                <div className="bg-gradient-to-br from-blue-600 to-purple-700 hover:from-blue-500 hover:to-purple-600 p-8 rounded-lg text-center transition-colors duration-300 shadow-lg">
+                <div className="glassmorphism bg-gradient-to-br from-blue-900/50 to-purple-900/50 hover:from-blue-800/50 hover:to-purple-800/50 p-8 rounded-xl text-center transition-all duration-300 shadow-lg border border-indigo-800/50 hover:border-indigo-600">
                   <svg
-                    className="w-16 h-16 mx-auto mb-4"
+                    className="w-16 h-16 mx-auto mb-4 text-indigo-400"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -1324,8 +1471,10 @@ export default function IndexPage() {
                       d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
                     />
                   </svg>
-                  <h3 className="text-2xl font-bold mb-2">Open Video Studio</h3>
-                  <p className="text-lg text-gray-200">
+                  <h3 className="text-2xl font-bold mb-2 text-white">
+                    Open Video Studio
+                  </h3>
+                  <p className="text-lg text-gray-300">
                     Generate AI videos based on your story elements
                   </p>
                 </div>
@@ -1433,34 +1582,38 @@ class SessionManager {
   private initialized: boolean = false;
 
   /**
-   * Initialize session with data from parent iframe
-   * @param data The data received from postMessage
+   * Initialize the SDK session with user data
+   * @param userData The user data to initialize with
    */
-  initializeSession(data: ParentPostMessageData): void {
-    console.log("Initializing session with data from parent");
+  initializeSession(userData: Record<string, any>): void {
+    console.log("SDK receiving session data:", userData);
 
-    // Convert from parent format to internal UserData format
-    const userData: UserData = {
-      // Map API keys
-      openaiApiKey: data.apiKeys?.openai || "",
-      openrouterApiKey: data.apiKeys?.openrouter || "",
-      falaiApiKey: data.apiKeys?.falai || "",
+    // Process API keys from different message formats
+    let apiKeys: Record<string, string> = {};
 
-      // Story elements
-      language: data.language || "",
-      genre: data.genre || "",
-      title: data.title || "",
-      location: data.location || "",
-      timeline: data.timeline || "",
+    // Process direct keys in the userData object
+    if (userData.apiKeys) {
+      apiKeys = userData.apiKeys;
+    }
 
-      // Characters, outline, chapters
-      characters: data.characters || [],
-      outline: data.outline || [],
-      chapters: data.chapters || [],
+    // Set user data with properly formatted chapters
+    this.userData = {
+      openaiApiKey: apiKeys.openai || userData.openai_key || "",
+      openrouterApiKey: apiKeys.openrouter || userData.openrouter_key || "",
+      falaiApiKey: apiKeys.falai || userData.falai_key || "",
+
+      language: userData.language || "",
+      genre: userData.genre || "",
+      title: userData.title || "",
+      location: userData.location || "",
+      timeline: userData.timeline || "",
+
+      characters: userData.characters || [],
+      outline: userData.outline || [],
+      chapters: userData.chapters || [],
     };
 
-    // Set the user data
-    this.setUserData(userData);
+    this.initialized = true;
     console.log("Session initialized successfully with data from parent");
   }
 
@@ -4699,11 +4852,15 @@ import {
   FileTextIcon,
   Home,
   DownloadIcon,
+  LayoutDashboard,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import config from "@/lib/config";
 import Link from "next/link";
 import { useVideoProjectStore } from "@/data/store";
+import { useRouter } from "next/navigation";
+import { useCallback } from "react";
+import sessionManager from "@/app/session-manager";
 
 export default function Header({
   openKeyDialog,
@@ -4713,6 +4870,28 @@ export default function Header({
   const setExportDialogOpen = useVideoProjectStore(
     (s) => s.setExportDialogOpen,
   );
+  const router = useRouter();
+
+  // Handle navigation to storyboard with session data
+  const navigateToStoryboard = useCallback(() => {
+    // The session data is already in sessionManager
+    const userData = sessionManager.getUserData();
+
+    if (userData) {
+      // Just back it up to localStorage without any complex manipulation
+      try {
+        localStorage.setItem(
+          "videoProjectSessionData",
+          JSON.stringify(userData),
+        );
+      } catch (error) {
+        console.error("Error saving to localStorage:", error);
+      }
+    }
+
+    // We just need to navigate while preserving it
+    router.push("/");
+  }, [router]);
 
   return (
     <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism">
@@ -4732,6 +4911,11 @@ export default function Header({
         >
           <DownloadIcon className="w-4 h-4 mr-1" />
           <span className="hidden sm:inline">Export</span>
+        </Button>
+
+        <Button variant="ghost" size="sm" onClick={navigateToStoryboard}>
+          <LayoutDashboard className="w-4 h-4 mr-1" />
+          <span className="hidden sm:inline">Storyboard</span>
         </Button>
 
         <Button variant="ghost" size="sm" asChild>
