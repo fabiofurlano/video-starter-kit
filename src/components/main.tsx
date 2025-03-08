@@ -19,7 +19,7 @@ import { Toaster } from "./ui/toaster";
 import { ExportDialog } from "./export-dialog";
 import LeftPanel from "./left-panel";
 import { KeyDialog } from "./key-dialog";
-import { StoryboardPanel } from './storyboard-panel';
+import { StoryboardPanel } from "./storyboard-panel";
 import { fal } from "@/lib/fal";
 
 type AppProps = {
@@ -55,7 +55,7 @@ export function App({ projectId }: AppProps) {
   const handleGenerateImage = async (prompt: string) => {
     try {
       // Call Fal.ai to generate the image
-      const result = await fal.subscribe("fal-ai/flux", {
+      const result = (await fal.subscribe("fal-ai/flux", {
         input: {
           prompt,
           image_size: "1024x768",
@@ -63,7 +63,7 @@ export function App({ projectId }: AppProps) {
           guidance_scale: 3.5,
           enable_safety_checker: true,
         },
-      }) as unknown as {
+      })) as unknown as {
         images: Array<{ url: string }>;
       };
 
@@ -82,8 +82,11 @@ export function App({ projectId }: AppProps) {
   const handleSaveToMediaManager = async (imageUrl: string) => {
     // Get the store from the existing projectStore instead of using the hook again
     const setGenerateData = useStore(projectStore, (s) => s.setGenerateData);
-    const openGenerateDialog = useStore(projectStore, (s) => s.openGenerateDialog);
-    
+    const openGenerateDialog = useStore(
+      projectStore,
+      (s) => s.openGenerateDialog,
+    );
+
     setGenerateData({
       type: "image",
       image: imageUrl,
@@ -91,7 +94,7 @@ export function App({ projectId }: AppProps) {
         source: "storyboard",
       },
     });
-    
+
     openGenerateDialog("image");
   };
 
@@ -100,7 +103,7 @@ export function App({ projectId }: AppProps) {
       <QueryClientProvider client={queryClient}>
         <VideoProjectStoreContext.Provider value={projectStore}>
           <div className="flex flex-col relative overflow-x-hidden h-screen bg-background">
-            <StoryboardPanel 
+            <StoryboardPanel
               onGenerateImage={handleGenerateImage}
               onSaveToMediaManager={handleSaveToMediaManager}
             />

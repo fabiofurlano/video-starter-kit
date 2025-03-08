@@ -26,7 +26,9 @@ export default function IndexPage() {
   const [expandedChapters, setExpandedChapters] = useState<
     Record<number, boolean>
   >({});
-  const [slideSelections, setSlideSelections] = useState<Record<number, string>>({});
+  const [slideSelections, setSlideSelections] = useState<
+    Record<number, string>
+  >({});
   const router = useRouter();
 
   const toggleChapter = (index: number) => {
@@ -37,25 +39,27 @@ export default function IndexPage() {
   };
 
   const handleSlideCountChange = (index: number, value: string) => {
-    setSlideSelections(prev => ({
+    setSlideSelections((prev) => ({
       ...prev,
-      [index]: value
+      [index]: value,
     }));
   };
-  
+
   const generateStoryboard = (index: number) => {
     // Check if a slide count is selected
     if (!slideSelections[index] || slideSelections[index] === "") {
       alert("Please select the number of slides first");
       return;
     }
-    
+
     const chapter = userData?.chapters?.[index];
     if (!chapter) return;
-    
+
     const slideCount = parseInt(slideSelections[index]);
-    console.log(`Generating ${slideCount} slides for chapter ${chapter.number}`);
-    
+    console.log(
+      `Generating ${slideCount} slides for chapter ${chapter.number}`,
+    );
+
     // Generate prompts for each slide
     const slides = Array.from({ length: slideCount }, (_, i) => {
       // Create different prompts for different parts of the chapter
@@ -64,26 +68,29 @@ export default function IndexPage() {
       const startPos = i * segmentSize;
       const endPos = Math.min(startPos + segmentSize, contentLength);
       const segmentContent = chapter.content.substring(startPos, endPos);
-      
+
       // Create a prompt that focuses on different parts of the chapter
       return {
         chapterNumber: chapter.number,
         prompt: `Create a visual representation for chapter ${chapter.number}: ${chapter.title}. Scene description based on the following excerpt: ${segmentContent.substring(0, 200)}...`,
-        imageUrl: undefined
+        imageUrl: undefined,
       };
     });
-    
+
     // Store storyboard data in localStorage
     const storyboardData = { slides };
     try {
-      localStorage.setItem('storyboardData', JSON.stringify(storyboardData));
-      console.log('Successfully stored storyboard data in localStorage:', storyboardData);
-      
+      localStorage.setItem("storyboardData", JSON.stringify(storyboardData));
+      console.log(
+        "Successfully stored storyboard data in localStorage:",
+        storyboardData,
+      );
+
       // Redirect to the video editor app with a clear URL indicator
-      router.push('/app?storyboard=true');
+      router.push("/app?storyboard=true");
     } catch (error) {
-      console.error('Error storing storyboard data:', error);
-      alert('Error preparing storyboard data. Please try again.');
+      console.error("Error storing storyboard data:", error);
+      alert("Error preparing storyboard data. Please try again.");
     }
   };
 
@@ -96,14 +103,17 @@ export default function IndexPage() {
 
     // Check for storyboard data in localStorage
     try {
-      const storyboardData = localStorage.getItem('storyboardData');
+      const storyboardData = localStorage.getItem("storyboardData");
       if (storyboardData) {
-        console.log('Found storyboard data in localStorage in page.tsx:', storyboardData);
+        console.log(
+          "Found storyboard data in localStorage in page.tsx:",
+          storyboardData,
+        );
       } else {
-        console.log('No storyboard data found in localStorage in page.tsx');
+        console.log("No storyboard data found in localStorage in page.tsx");
       }
     } catch (error) {
-      console.error('Error checking storyboard data:', error);
+      console.error("Error checking storyboard data:", error);
     }
 
     // Check for session data first
@@ -468,12 +478,14 @@ export default function IndexPage() {
                         >
                           {expandedChapters[index] ? "Show Less" : "Show More"}
                         </button>
-                        
+
                         <div className="flex items-center mt-3 space-x-2">
-                          <select 
+                          <select
                             className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             value={slideSelections[index] || ""}
-                            onChange={(e) => handleSlideCountChange(index, e.target.value)}
+                            onChange={(e) =>
+                              handleSlideCountChange(index, e.target.value)
+                            }
                           >
                             <option value="">Slides</option>
                             <option value="1">1 Slide</option>
@@ -482,13 +494,22 @@ export default function IndexPage() {
                             <option value="4">4 Slides</option>
                             <option value="5">5 Slides</option>
                           </select>
-                          
+
                           <button
                             onClick={() => generateStoryboard(index)}
                             className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
                           >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                              <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4a.5.5 0 01-.5-.5V5.5A.5.5 0 014 5h12a.5.5 0 01.5.5v9a.5.5 0 01-.5.5z" clipRule="evenodd" />
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3.5 w-3.5 mr-1"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4a.5.5 0 01-.5-.5V5.5A.5.5 0 014 5h12a.5.5 0 01.5.5v9a.5.5 0 01-.5.5z"
+                                clipRule="evenodd"
+                              />
                               <path d="M6 7a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
                             </svg>
                             Generate Storyboard
