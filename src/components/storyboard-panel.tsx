@@ -541,9 +541,9 @@ export function StoryboardPanel({
                   />
                 </div>
 
-                <Button 
-                  variant="outline" 
-                  size="sm" 
+                <Button
+                  variant="outline"
+                  size="sm"
                   className="w-full mb-3 group"
                   onClick={() => handleRegeneratePrompt(index)}
                   disabled={isGeneratingPrompts}
