@@ -14,8 +14,7 @@ export type LlmModelType =
   | "meta-llama/llama-3.1-8b-instruct"
   | "meta-llama/llama-3.1-70b-instruct"
   | "openai/gpt-4o-mini"
-  | "openai/gpt-4o"
-  | "deepseek/deepseek-r1";
+  | "openai/gpt-4o";
 
 type EnhancePromptOptions = {
   type: "image" | "video" | "music" | "voiceover";

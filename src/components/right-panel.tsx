@@ -113,18 +113,10 @@ function LlmModelPicker({
       <SelectContent>
         <SelectGroup>
           <SelectLabel>Meta Llama Models</SelectLabel>
-          <SelectItem value="meta-llama/llama-3.2-1b-instruct">
-            Llama 3.2 1B
-          </SelectItem>
-          <SelectItem value="meta-llama/llama-3.2-3b-instruct">
-            Llama 3.2 3B
-          </SelectItem>
-          <SelectItem value="meta-llama/llama-3.1-8b-instruct">
-            Llama 3.1 8B
-          </SelectItem>
-          <SelectItem value="meta-llama/llama-3.1-70b-instruct">
-            Llama 3.1 70B
-          </SelectItem>
+          <SelectItem value="meta-llama/llama-3.2-1b-instruct">Llama 3.2 1B</SelectItem>
+          <SelectItem value="meta-llama/llama-3.2-3b-instruct">Llama 3.2 3B</SelectItem>
+          <SelectItem value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</SelectItem>
+          <SelectItem value="meta-llama/llama-3.1-70b-instruct">Llama 3.1 70B</SelectItem>
         </SelectGroup>
         <SelectGroup>
           <SelectLabel>OpenAI Models</SelectLabel>
@@ -133,29 +125,15 @@ function LlmModelPicker({
         </SelectGroup>
         <SelectGroup>
           <SelectLabel>Anthropic Models</SelectLabel>
-          <SelectItem value="anthropic/claude-3.5-sonnet">
-            Claude 3.5 Sonnet
-          </SelectItem>
-          <SelectItem value="anthropic/claude-3-5-haiku">
-            Claude 3.5 Haiku
-          </SelectItem>
-          <SelectItem value="anthropic/claude-3-haiku">
-            Claude 3 Haiku
-          </SelectItem>
+          <SelectItem value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</SelectItem>
+          <SelectItem value="anthropic/claude-3-5-haiku">Claude 3.5 Haiku</SelectItem>
+          <SelectItem value="anthropic/claude-3-haiku">Claude 3 Haiku</SelectItem>
         </SelectGroup>
         <SelectGroup>
           <SelectLabel>Google Models</SelectLabel>
           <SelectItem value="google/gemini-pro-1.5">Gemini Pro 1.5</SelectItem>
-          <SelectItem value="google/gemini-flash-1.5">
-            Gemini Flash 1.5
-          </SelectItem>
-          <SelectItem value="google/gemini-flash-1.5-8b">
-            Gemini Flash 1.5 8B
-          </SelectItem>
-        </SelectGroup>
-        <SelectGroup>
-          <SelectLabel>Other Models</SelectLabel>
-          <SelectItem value="deepseek/deepseek-r1">DeepSeek R1</SelectItem>
+          <SelectItem value="google/gemini-flash-1.5">Gemini Flash 1.5</SelectItem>
+          <SelectItem value="google/gemini-flash-1.5-8b">Gemini Flash 1.5 8B</SelectItem>
         </SelectGroup>
       </SelectContent>
     </Select>
