@@ -47,14 +47,22 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "./ui/select";
-import { enhancePrompt } from "@/lib/prompt";
+import { enhancePrompt, LlmModelType } from "@/lib/prompt";
 import { WithTooltip } from "./ui/tooltip";
 import { Label } from "./ui/label";
 import { VoiceSelector } from "./playht/voice-selector";
 import { LoadingIcon } from "./ui/icons";
 import { getMediaMetadata } from "@/lib/ffmpeg";
 import CameraMovement from "./camera-control";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from "./ui/sheet";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -88,6 +96,59 @@ function ModelEndpointPicker({
   );
 }
 
+type LlmModelPickerProps = {
+  selectedModel: LlmModelType;
+  onValueChange: (value: LlmModelType) => void;
+} & Parameters<typeof Select>[0];
+
+function LlmModelPicker({
+  selectedModel,
+  onValueChange,
+  ...props
+}: LlmModelPickerProps) {
+  return (
+    <Select
+      defaultValue={selectedModel}
+      onValueChange={onValueChange}
+      {...props}
+    >
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select LLM Model" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Meta Llama Models</SelectLabel>
+          <SelectItem value="meta-llama/llama-3.2-1b-instruct">Llama 3.2 1B</SelectItem>
+          <SelectItem value="meta-llama/llama-3.2-3b-instruct">Llama 3.2 3B</SelectItem>
+          <SelectItem value="meta-llama/llama-3.1-8b-instruct">Llama 3.1 8B</SelectItem>
+          <SelectItem value="meta-llama/llama-3.1-70b-instruct">Llama 3.1 70B</SelectItem>
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>OpenAI Models</SelectLabel>
+          <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini</SelectItem>
+          <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>Anthropic Models</SelectLabel>
+          <SelectItem value="anthropic/claude-3.5-sonnet">Claude 3.5 Sonnet</SelectItem>
+          <SelectItem value="anthropic/claude-3-5-haiku">Claude 3.5 Haiku</SelectItem>
+          <SelectItem value="anthropic/claude-3-haiku">Claude 3 Haiku</SelectItem>
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>Google Models</SelectLabel>
+          <SelectItem value="google/gemini-pro-1.5">Gemini Pro 1.5</SelectItem>
+          <SelectItem value="google/gemini-flash-1.5">Gemini Flash 1.5</SelectItem>
+          <SelectItem value="google/gemini-flash-1.5-8b">Gemini Flash 1.5 8B</SelectItem>
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>Other Models</SelectLabel>
+          <SelectItem value="deepseek/deepseek-r1">DeepSeek R1</SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
 export default function RightPanel({
   onOpenChange,
 }: {
@@ -112,24 +173,30 @@ export default function RightPanel({
   );
   const queryClient = useQueryClient();
 
+  const [open, setOpen] = useState(false);
+
   const handleOnOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
     if (!isOpen) {
       closeGenerateDialog();
       resetGenerateData();
       return;
     }
-    onOpenChange?.(isOpen);
+    if (onOpenChange) {
+      onOpenChange(isOpen);
+    }
     openGenerateDialog();
   };
 
   const { data: project } = useProject(projectId);
 
   const { toast } = useToast();
-  const enhance = useMutation({
+  const enhancePromptMutation = useMutation({
     mutationFn: async () => {
       return enhancePrompt(generateData.prompt, {
-        type: mediaType,
-        project,
+        type: mediaType as any,
+        project: project,
+        model: llmModel,
       });
     },
     onSuccess: (enhancedPrompt) => {
@@ -147,6 +214,8 @@ export default function RightPanel({
   const { data: mediaItems = [] } = useProjectMediaItems(projectId);
   const mediaType = useVideoProjectStore((s) => s.generateMediaType);
   const setMediaType = useVideoProjectStore((s) => s.setGenerateMediaType);
+  const llmModel = useVideoProjectStore((s) => s.llmModel);
+  const setLlmModel = useVideoProjectStore((s) => s.setLlmModel);
 
   const endpoint = useMemo(
     () =>
@@ -361,6 +430,10 @@ export default function RightPanel({
     }
   };
 
+  const handleLlmModelChange = (model: LlmModelType) => {
+    setLlmModel(model);
+  };
+
   return (
     <div
       className={cn(
@@ -446,6 +519,17 @@ export default function RightPanel({
                 setGenerateData({ ...initialInput });
               }}
             />
+            
+            <div className="mt-2">
+              <div className="text-muted-foreground">LLM Model for Prompt Enhancement</div>
+              <LlmModelPicker
+                selectedModel={llmModel}
+                onValueChange={handleLlmModelChange}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Select the LLM model to use for enhancing prompts. More powerful models may produce better results but may cost more credits.
+              </p>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-2 relative">
@@ -575,11 +659,11 @@ export default function RightPanel({
               <div className="absolute bottom-2 right-2">
                 <Button
                   variant="secondary"
-                  disabled={enhance.isPending}
+                  disabled={enhancePromptMutation.isPending}
                   className="bg-purple-400/10 text-purple-400 text-xs rounded-full h-6 px-3"
-                  onClick={() => enhance.mutate()}
+                  onClick={() => enhancePromptMutation.mutate()}
                 >
-                  {enhance.isPending ? (
+                  {enhancePromptMutation.isPending ? (
                     <LoadingIcon />
                   ) : (
                     <WandSparklesIcon className="opacity-50" />
@@ -642,7 +726,7 @@ export default function RightPanel({
             <div className="flex flex-row gap-2">
               <Button
                 className="w-full"
-                disabled={enhance.isPending || createJob.isPending}
+                disabled={enhancePromptMutation.isPending || createJob.isPending}
                 onClick={handleOnGenerate}
               >
                 Generate

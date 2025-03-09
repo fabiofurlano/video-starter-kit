@@ -1,6 +1,7 @@
 "use client";
 
 import { AVAILABLE_ENDPOINTS } from "@/lib/fal";
+import { LlmModelType } from "@/lib/prompt";
 import type { PlayerRef } from "@remotion/player";
 import { createContext, useContext } from "react";
 import { createStore } from "zustand";
@@ -33,6 +34,7 @@ interface VideoProjectProps {
   generateData: GenerateData;
   exportDialogOpen: boolean;
   endpointId: string;
+  llmModel: LlmModelType;
 }
 
 interface VideoProjectState extends VideoProjectProps {
@@ -50,6 +52,7 @@ interface VideoProjectState extends VideoProjectProps {
   setGenerateData: (generateData: Partial<GenerateData>) => void;
   setExportDialogOpen: (open: boolean) => void;
   setEndpointId: (endpointId: string) => void;
+  setLlmModel: (model: LlmModelType) => void;
   onGenerate: () => void;
 }
 
@@ -73,6 +76,7 @@ const DEFAULT_PROPS: VideoProjectProps = {
     audio_url: null,
   },
   exportDialogOpen: false,
+  llmModel: "meta-llama/llama-3.2-1b-instruct",
 };
 
 type VideoProjectStore = ReturnType<typeof createVideoProjectStore>;
@@ -132,6 +136,7 @@ export const createVideoProjectStore = (
     },
     setExportDialogOpen: (exportDialogOpen: boolean) =>
       set({ exportDialogOpen }),
+    setLlmModel: (model: LlmModelType) => set({ llmModel: model }),
   }));
 };
 

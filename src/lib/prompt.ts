@@ -1,9 +1,26 @@
 import type { VideoProject } from "@/data/schema";
 import { fal } from "./fal";
 
+// Define the allowed LLM model types based on the Fal.ai API schema
+export type LlmModelType = 
+  | "anthropic/claude-3.5-sonnet"
+  | "anthropic/claude-3-5-haiku"
+  | "anthropic/claude-3-haiku"
+  | "google/gemini-pro-1.5"
+  | "google/gemini-flash-1.5"
+  | "google/gemini-flash-1.5-8b"
+  | "meta-llama/llama-3.2-1b-instruct"
+  | "meta-llama/llama-3.2-3b-instruct"
+  | "meta-llama/llama-3.1-8b-instruct"
+  | "meta-llama/llama-3.1-70b-instruct"
+  | "openai/gpt-4o-mini"
+  | "openai/gpt-4o"
+  | "deepseek/deepseek-r1";
+
 type EnhancePromptOptions = {
   type: "image" | "video" | "music" | "voiceover";
   project?: VideoProject;
+  model?: LlmModelType; // Use the defined type
 };
 
 const SYSTEM_PROMPT = `
@@ -29,7 +46,7 @@ export async function enhancePrompt(
 ) {
   console.log("🔍 Starting enhancePrompt with:", { prompt, options });
 
-  const { type, project } = options;
+  const { type, project, model = "meta-llama/llama-3.2-1b-instruct" } = options;
   const projectInfo = !project
     ? ""
     : `
@@ -63,7 +80,7 @@ export async function enhancePrompt(
           ${projectInfo}
           ${promptInfo}
         `.trim(),
-        model: "meta-llama/llama-3.2-1b-instruct",
+        model,
       },
     });
 
