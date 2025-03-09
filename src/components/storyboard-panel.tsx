@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { RotateCcw } from "lucide-react";
 
 // Image style options
 const IMAGE_STYLES = [
@@ -533,12 +534,25 @@ export function StoryboardPanel({
                   </Label>
                   <Textarea
                     id={`prompt-${index}`}
+                    className="h-28 mb-3 bg-background/50 text-sm shadow-inner border-gray-700/30"
+                    placeholder="Edit this prompt to customize the image generation"
                     value={slide.prompt}
                     onChange={(e) => handlePromptEdit(index, e.target.value)}
-                    className="resize-none h-28 mb-3 bg-background/50 text-sm shadow-inner border-gray-700/30"
-                    placeholder="Edit this prompt to customize the image generation"
                   />
                 </div>
+
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full mb-3 group"
+                  onClick={() => handleRegeneratePrompt(index)}
+                  disabled={isGeneratingPrompts}
+                >
+                  <span className="flex items-center">
+                    <RotateCcw className="mr-1.5 w-3.5 h-3.5 group-hover:rotate-180 transition-transform duration-300" />
+                    Regenerate Prompt
+                  </span>
+                </Button>
 
                 {slide.imageUrl ? (
                   <img
@@ -571,61 +585,6 @@ export function StoryboardPanel({
                 )}
 
                 <div className="space-y-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="w-full flex items-center justify-center group transition-colors"
-                    onClick={() => handleRegeneratePrompt(index)}
-                    disabled={isLoading[index]}
-                  >
-                    {isLoading[index] ? (
-                      <span className="flex items-center">
-                        <svg
-                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-500"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                          ></circle>
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
-                        Regenerating...
-                      </span>
-                    ) : (
-                      <span className="flex items-center">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          width="14"
-                          height="14"
-                          viewBox="0 0 24 24"
-                          fill="none"
-                          stroke="currentColor"
-                          strokeWidth="2"
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          className="mr-1.5 group-hover:rotate-180 transition-transform duration-300"
-                        >
-                          <path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
-                          <path d="M3 3v5h5" />
-                          <path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16" />
-                          <path d="M16 21h5v-5" />
-                        </svg>
-                        Regenerate Prompt
-                      </span>
-                    )}
-                  </Button>
-
                   <Button
                     variant="default"
                     size="sm"
