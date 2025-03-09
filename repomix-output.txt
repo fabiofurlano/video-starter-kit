@@ -122,6 +122,7 @@ src/
     novel-vision-logo.tsx
     project-dialog.tsx
     right-panel.tsx
+    storyboard-panel.tsx
     theme-provider.tsx
     theme-toggle.tsx
     video-controls.tsx
@@ -1039,7 +1040,7 @@ File: src/app/page.tsx
 ================
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { UserData } from "./session-manager";
 import sessionManager from "./session-manager";
 import Link from "next/link";
@@ -1056,6 +1057,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import config from "@/lib/config";
+import { useRouter } from "next/navigation";
 
 export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -1064,6 +1066,10 @@ export default function IndexPage() {
   const [expandedChapters, setExpandedChapters] = useState<
     Record<number, boolean>
   >({});
+  const [slideSelections, setSlideSelections] = useState<
+    Record<number, string>
+  >({});
+  const router = useRouter();
 
   const toggleChapter = (index: number) => {
     setExpandedChapters((prev) => ({
@@ -1072,12 +1078,83 @@ export default function IndexPage() {
     }));
   };
 
+  const handleSlideCountChange = (index: number, value: string) => {
+    setSlideSelections((prev) => ({
+      ...prev,
+      [index]: value,
+    }));
+  };
+
+  const generateStoryboard = (index: number) => {
+    // Check if a slide count is selected
+    if (!slideSelections[index] || slideSelections[index] === "") {
+      alert("Please select the number of slides first");
+      return;
+    }
+
+    const chapter = userData?.chapters?.[index];
+    if (!chapter) return;
+
+    const slideCount = parseInt(slideSelections[index]);
+    console.log(
+      `Generating ${slideCount} slides for chapter ${chapter.number}`,
+    );
+
+    // Generate prompts for each slide
+    const slides = Array.from({ length: slideCount }, (_, i) => {
+      // Create different prompts for different parts of the chapter
+      const contentLength = chapter.content.length;
+      const segmentSize = Math.floor(contentLength / slideCount);
+      const startPos = i * segmentSize;
+      const endPos = Math.min(startPos + segmentSize, contentLength);
+      const segmentContent = chapter.content.substring(startPos, endPos);
+
+      // Create a prompt that focuses on different parts of the chapter
+      return {
+        chapterNumber: chapter.number,
+        prompt: `Create a visual representation for chapter ${chapter.number}: ${chapter.title}. Scene description based on the following excerpt: ${segmentContent.substring(0, 200)}...`,
+        imageUrl: undefined,
+      };
+    });
+
+    // Store storyboard data in localStorage
+    const storyboardData = { slides };
+    try {
+      localStorage.setItem("storyboardData", JSON.stringify(storyboardData));
+      console.log(
+        "Successfully stored storyboard data in localStorage:",
+        storyboardData,
+      );
+
+      // Redirect to the video editor app with a clear URL indicator
+      router.push("/app?storyboard=true");
+    } catch (error) {
+      console.error("Error storing storyboard data:", error);
+      alert("Error preparing storyboard data. Please try again.");
+    }
+  };
+
   // Listen for messages from the parent page
   useEffect(() => {
     console.log(
       "IndexPage component mounted - setting up postMessage listener",
     );
     setDebugInfo("Setting up message listener...");
+
+    // Check for storyboard data in localStorage
+    try {
+      const storyboardData = localStorage.getItem("storyboardData");
+      if (storyboardData) {
+        console.log(
+          "Found storyboard data in localStorage in page.tsx:",
+          storyboardData,
+        );
+      } else {
+        console.log("No storyboard data found in localStorage in page.tsx");
+      }
+    } catch (error) {
+      console.error("Error checking storyboard data:", error);
+    }
 
     // Check for session data first
     const currentData = sessionManager.getUserData();
@@ -1257,7 +1334,7 @@ export default function IndexPage() {
     window.addEventListener("message", handleMessage);
     setDebugInfo("Message listener active, waiting for messages...");
     return () => window.removeEventListener("message", handleMessage);
-  }, []);
+  }, [router]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-black to-[#0A0F23] text-white relative">
@@ -1441,6 +1518,43 @@ export default function IndexPage() {
                         >
                           {expandedChapters[index] ? "Show Less" : "Show More"}
                         </button>
+
+                        <div className="flex items-center mt-3 space-x-2">
+                          <select
+                            className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            value={slideSelections[index] || ""}
+                            onChange={(e) =>
+                              handleSlideCountChange(index, e.target.value)
+                            }
+                          >
+                            <option value="">Slides</option>
+                            <option value="1">1 Slide</option>
+                            <option value="2">2 Slides</option>
+                            <option value="3">3 Slides</option>
+                            <option value="4">4 Slides</option>
+                            <option value="5">5 Slides</option>
+                          </select>
+
+                          <button
+                            onClick={() => generateStoryboard(index)}
+                            className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
+                          >
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              className="h-3.5 w-3.5 mr-1"
+                              viewBox="0 0 20 20"
+                              fill="currentColor"
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4a.5.5 0 01-.5-.5V5.5A.5.5 0 014 5h12a.5.5 0 01.5.5v9a.5.5 0 01-.5.5z"
+                                clipRule="evenodd"
+                              />
+                              <path d="M6 7a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
+                            </svg>
+                            Generate Storyboard
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -5695,6 +5809,7 @@ import VideoPreview from "@/components/video-preview";
 import {
   VideoProjectStoreContext,
   createVideoProjectStore,
+  useVideoProjectStore,
 } from "@/data/store";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -5706,6 +5821,8 @@ import { Toaster } from "./ui/toaster";
 import { ExportDialog } from "./export-dialog";
 import LeftPanel from "./left-panel";
 import { KeyDialog } from "./key-dialog";
+import { StoryboardPanel } from "./storyboard-panel";
+import { fal } from "@/lib/fal";
 
 type AppProps = {
   projectId: string;
@@ -5736,11 +5853,62 @@ export function App({ projectId }: AppProps) {
     projectStore,
     (s) => s.setExportDialogOpen,
   );
+
+  const handleGenerateImage = async (prompt: string) => {
+    try {
+      // Call Fal.ai to generate the image
+      const result = (await fal.subscribe("fal-ai/flux", {
+        input: {
+          prompt,
+          image_size: "1024x768",
+          num_inference_steps: 28,
+          guidance_scale: 3.5,
+          enable_safety_checker: true,
+        },
+      })) as unknown as {
+        images: Array<{ url: string }>;
+      };
+
+      if (result.images?.[0]?.url) {
+        // Get the image URL from the result
+        const imageUrl = result.images[0].url;
+        console.log("Generated image URL:", imageUrl);
+        return imageUrl;
+      }
+    } catch (error) {
+      console.error("Failed to generate image:", error);
+      throw error;
+    }
+  };
+
+  const handleSaveToMediaManager = async (imageUrl: string) => {
+    // Get the store from the existing projectStore instead of using the hook again
+    const setGenerateData = useStore(projectStore, (s) => s.setGenerateData);
+    const openGenerateDialog = useStore(
+      projectStore,
+      (s) => s.openGenerateDialog,
+    );
+
+    setGenerateData({
+      type: "image",
+      image: imageUrl,
+      metadata: {
+        source: "storyboard",
+      },
+    });
+
+    openGenerateDialog("image");
+  };
+
   return (
     <ToastProvider>
       <QueryClientProvider client={queryClient}>
         <VideoProjectStoreContext.Provider value={projectStore}>
           <div className="flex flex-col relative overflow-x-hidden h-screen bg-background">
+            <StoryboardPanel
+              onGenerateImage={handleGenerateImage}
+              onSaveToMediaManager={handleSaveToMediaManager}
+            />
             <Header openKeyDialog={() => setKeyDialog(true)} />
             <main className="flex overflow-hidden h-full w-screen">
               <div className="w-[400px] min-w-[400px]">
@@ -6871,14 +7039,17 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "./ui/select";
-import { enhancePrompt } from "@/lib/prompt";
+import { enhancePrompt, LlmModelType } from "@/lib/prompt";
 import { WithTooltip } from "./ui/tooltip";
 import { Label } from "./ui/label";
 import { VoiceSelector } from "./playht/voice-selector";
 import { LoadingIcon } from "./ui/icons";
 import { getMediaMetadata } from "@/lib/ffmpeg";
 import CameraMovement from "./camera-control";
+import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "./ui/sheet";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -6912,6 +7083,73 @@ function ModelEndpointPicker({
   );
 }
 
+type LlmModelPickerProps = {
+  selectedModel: LlmModelType;
+  onValueChange: (value: LlmModelType) => void;
+} & Parameters<typeof Select>[0];
+
+function LlmModelPicker({
+  selectedModel,
+  onValueChange,
+  ...props
+}: LlmModelPickerProps) {
+  return (
+    <Select
+      defaultValue={selectedModel}
+      onValueChange={onValueChange}
+      {...props}
+    >
+      <SelectTrigger className="w-full">
+        <SelectValue placeholder="Select LLM Model" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectGroup>
+          <SelectLabel>Meta Llama Models</SelectLabel>
+          <SelectItem value="meta-llama/llama-3.2-1b-instruct">
+            Llama 3.2 1B
+          </SelectItem>
+          <SelectItem value="meta-llama/llama-3.2-3b-instruct">
+            Llama 3.2 3B
+          </SelectItem>
+          <SelectItem value="meta-llama/llama-3.1-8b-instruct">
+            Llama 3.1 8B
+          </SelectItem>
+          <SelectItem value="meta-llama/llama-3.1-70b-instruct">
+            Llama 3.1 70B
+          </SelectItem>
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>OpenAI Models</SelectLabel>
+          <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini</SelectItem>
+          <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>Anthropic Models</SelectLabel>
+          <SelectItem value="anthropic/claude-3.5-sonnet">
+            Claude 3.5 Sonnet
+          </SelectItem>
+          <SelectItem value="anthropic/claude-3-5-haiku">
+            Claude 3.5 Haiku
+          </SelectItem>
+          <SelectItem value="anthropic/claude-3-haiku">
+            Claude 3 Haiku
+          </SelectItem>
+        </SelectGroup>
+        <SelectGroup>
+          <SelectLabel>Google Models</SelectLabel>
+          <SelectItem value="google/gemini-pro-1.5">Gemini Pro 1.5</SelectItem>
+          <SelectItem value="google/gemini-flash-1.5">
+            Gemini Flash 1.5
+          </SelectItem>
+          <SelectItem value="google/gemini-flash-1.5-8b">
+            Gemini Flash 1.5 8B
+          </SelectItem>
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  );
+}
+
 export default function RightPanel({
   onOpenChange,
 }: {
@@ -6936,24 +7174,30 @@ export default function RightPanel({
   );
   const queryClient = useQueryClient();
 
+  const [open, setOpen] = useState(false);
+
   const handleOnOpenChange = (isOpen: boolean) => {
+    setOpen(isOpen);
     if (!isOpen) {
       closeGenerateDialog();
       resetGenerateData();
       return;
     }
-    onOpenChange?.(isOpen);
+    if (onOpenChange) {
+      onOpenChange(isOpen);
+    }
     openGenerateDialog();
   };
 
   const { data: project } = useProject(projectId);
 
   const { toast } = useToast();
-  const enhance = useMutation({
+  const enhancePromptMutation = useMutation({
     mutationFn: async () => {
       return enhancePrompt(generateData.prompt, {
-        type: mediaType,
-        project,
+        type: mediaType as any,
+        project: project,
+        model: llmModel,
       });
     },
     onSuccess: (enhancedPrompt) => {
@@ -6971,6 +7215,8 @@ export default function RightPanel({
   const { data: mediaItems = [] } = useProjectMediaItems(projectId);
   const mediaType = useVideoProjectStore((s) => s.generateMediaType);
   const setMediaType = useVideoProjectStore((s) => s.setGenerateMediaType);
+  const llmModel = useVideoProjectStore((s) => s.llmModel);
+  const setLlmModel = useVideoProjectStore((s) => s.setLlmModel);
 
   const endpoint = useMemo(
     () =>
@@ -7185,6 +7431,10 @@ export default function RightPanel({
     }
   };
 
+  const handleLlmModelChange = (model: LlmModelType) => {
+    setLlmModel(model);
+  };
+
   return (
     <div
       className={cn(
@@ -7270,6 +7520,20 @@ export default function RightPanel({
                 setGenerateData({ ...initialInput });
               }}
             />
+
+            <div className="mt-2">
+              <div className="text-muted-foreground">
+                LLM Model for Prompt Enhancement
+              </div>
+              <LlmModelPicker
+                selectedModel={llmModel}
+                onValueChange={handleLlmModelChange}
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Select the LLM model to use for enhancing prompts. More powerful
+                models may produce better results but may cost more credits.
+              </p>
+            </div>
           </div>
         </div>
         <div className="flex flex-col gap-2 relative">
@@ -7399,11 +7663,11 @@ export default function RightPanel({
               <div className="absolute bottom-2 right-2">
                 <Button
                   variant="secondary"
-                  disabled={enhance.isPending}
+                  disabled={enhancePromptMutation.isPending}
                   className="bg-purple-400/10 text-purple-400 text-xs rounded-full h-6 px-3"
-                  onClick={() => enhance.mutate()}
+                  onClick={() => enhancePromptMutation.mutate()}
                 >
-                  {enhance.isPending ? (
+                  {enhancePromptMutation.isPending ? (
                     <LoadingIcon />
                   ) : (
                     <WandSparklesIcon className="opacity-50" />
@@ -7466,7 +7730,9 @@ export default function RightPanel({
             <div className="flex flex-row gap-2">
               <Button
                 className="w-full"
-                disabled={enhance.isPending || createJob.isPending}
+                disabled={
+                  enhancePromptMutation.isPending || createJob.isPending
+                }
                 onClick={handleOnGenerate}
               >
                 Generate
@@ -7529,6 +7795,284 @@ const SelectedAssetPreview = ({
     </>
   );
 };
+
+================
+File: src/components/storyboard-panel.tsx
+================
+import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import { useVideoProjectStore } from "@/data/store";
+
+interface StoryboardPanelProps {
+  onGenerateImage: (prompt: string) => Promise<string | undefined>;
+  onSaveToMediaManager: (imageUrl: string) => void;
+}
+
+export function StoryboardPanel({
+  onGenerateImage,
+  onSaveToMediaManager,
+}: StoryboardPanelProps) {
+  const [isExpanded, setIsExpanded] = useState(true);
+  const [slides, setSlides] = useState<
+    Array<{
+      chapterNumber: string;
+      prompt: string;
+      imageUrl?: string;
+    }>
+  >([]);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isLoading, setIsLoading] = useState<Record<number, boolean>>({});
+
+  const sessionData = useVideoProjectStore((state) => state.generateData);
+
+  // Immediate check on mount for console debugging
+  console.log("StoryboardPanel initial render", {
+    hasLocalStorage: !!localStorage.getItem("storyboardData"),
+    hasSession: !!sessionData,
+  });
+
+  useEffect(() => {
+    console.log("StoryboardPanel mounted - checking for storyboard data");
+
+    // Use a slight delay to ensure localStorage is available
+    setTimeout(() => {
+      checkForStoryboardData();
+    }, 200);
+
+    // Also listen for postMessage events as a fallback
+    const handleMessage = (event: MessageEvent) => {
+      console.log("Received message event:", event.data);
+      if (event.data.type === "STORYBOARD_DATA") {
+        const { slides } = event.data;
+        console.log("Received storyboard data via postMessage:", slides);
+        setSlides(slides);
+        setTimeout(() => {
+          console.log("Setting isVisible to true from postMessage");
+          setIsVisible(true);
+        }, 500);
+      }
+    };
+
+    window.addEventListener("message", handleMessage);
+    return () => window.removeEventListener("message", handleMessage);
+  }, []);
+
+  // Function to check for storyboard data
+  const checkForStoryboardData = () => {
+    try {
+      const storedData = localStorage.getItem("storyboardData");
+      if (storedData) {
+        console.log("Found storyboard data in localStorage:", storedData);
+        const parsedData = JSON.parse(storedData);
+        if (parsedData.slides && Array.isArray(parsedData.slides)) {
+          console.log(
+            "Valid slides array found, setting slides:",
+            parsedData.slides.length,
+          );
+          setSlides(parsedData.slides);
+
+          // Use a staggered timing for better animation
+          setTimeout(() => {
+            console.log("Setting isVisible to true");
+            setIsVisible(true);
+          }, 300);
+
+          // Clear localStorage to avoid loading it again on refresh
+          // Use a delay to ensure it's processed first
+          setTimeout(() => {
+            localStorage.removeItem("storyboardData");
+            console.log("Cleared storyboardData from localStorage");
+          }, 1000);
+        } else {
+          console.log("Invalid slides data structure:", parsedData);
+        }
+      } else {
+        console.log("No storyboard data found in localStorage");
+      }
+    } catch (error) {
+      console.error("Error loading storyboard data from localStorage:", error);
+    }
+  };
+
+  const handleGenerateImage = async (index: number) => {
+    try {
+      // Set loading state for this slide
+      setIsLoading((prev) => ({ ...prev, [index]: true }));
+
+      const slide = slides[index];
+      const imageUrl = await onGenerateImage(slide.prompt);
+
+      if (imageUrl) {
+        setSlides(slides.map((s, i) => (i === index ? { ...s, imageUrl } : s)));
+      }
+    } catch (error) {
+      console.error("Failed to generate image:", error);
+    } finally {
+      // Clear loading state
+      setIsLoading((prev) => ({ ...prev, [index]: false }));
+    }
+  };
+
+  // Only show the panel if we have slides
+  if (slides.length === 0) {
+    return null;
+  }
+
+  return (
+    <div
+      className={`w-full transition-all duration-500 ease-in-out ${
+        isVisible ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-full"
+      }`}
+    >
+      <Collapsible
+        open={isExpanded}
+        onOpenChange={setIsExpanded}
+        className="w-full bg-background border-b"
+      >
+        <CollapsibleTrigger className="flex items-center justify-between w-full p-4 hover:bg-accent">
+          <div className="flex items-center">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5 mr-2"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+            </svg>
+            <h2 className="text-lg font-semibold">Storyboard Editor</h2>
+            <span className="ml-2 bg-blue-600/70 text-xs px-2 py-0.5 rounded-full">
+              {slides.length} Slides
+            </span>
+          </div>
+          <span>{isExpanded ? "▼" : "▲"}</span>
+        </CollapsibleTrigger>
+
+        <CollapsibleContent className="p-4">
+          <div className="flex gap-4 overflow-x-auto pb-4">
+            {slides.map((slide, index) => (
+              <div
+                key={index}
+                className="min-w-[250px] p-4 space-y-4 bg-card rounded-lg border shadow-sm"
+              >
+                <h3 className="font-medium flex items-center">
+                  <span className="mr-2">Chapter {slide.chapterNumber}</span>
+                  <span className="bg-gray-700/50 text-xs px-2 py-0.5 rounded-full">
+                    Slide {index + 1}
+                  </span>
+                </h3>
+                <p className="text-sm text-muted-foreground">{slide.prompt}</p>
+
+                {slide.imageUrl ? (
+                  <img
+                    src={slide.imageUrl}
+                    alt={`Chapter ${slide.chapterNumber} visualization`}
+                    className="w-full h-40 object-cover rounded-md"
+                  />
+                ) : (
+                  <div className="w-full h-40 bg-gray-800/30 rounded-md flex items-center justify-center">
+                    <span className="text-gray-500 text-sm">
+                      No image generated yet
+                    </span>
+                  </div>
+                )}
+
+                <div className="space-y-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => handleGenerateImage(index)}
+                    disabled={isLoading[index]}
+                  >
+                    {isLoading[index] ? (
+                      <span className="flex items-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-blue-500"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Regenerating...
+                      </span>
+                    ) : (
+                      "Regenerate Prompt"
+                    )}
+                  </Button>
+
+                  <Button
+                    variant="default"
+                    size="sm"
+                    className="w-full"
+                    onClick={() => handleGenerateImage(index)}
+                    disabled={isLoading[index]}
+                  >
+                    {isLoading[index] ? (
+                      <span className="flex items-center">
+                        <svg
+                          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        Generating...
+                      </span>
+                    ) : (
+                      "Generate Image"
+                    )}
+                  </Button>
+
+                  {slide.imageUrl && (
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => onSaveToMediaManager(slide.imageUrl!)}
+                    >
+                      Save to Media Manager
+                    </Button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+}
 
 ================
 File: src/components/theme-provider.tsx
@@ -8899,6 +9443,7 @@ File: src/data/store.ts
 "use client";
 
 import { AVAILABLE_ENDPOINTS } from "@/lib/fal";
+import { LlmModelType } from "@/lib/prompt";
 import type { PlayerRef } from "@remotion/player";
 import { createContext, useContext } from "react";
 import { createStore } from "zustand";
@@ -8931,6 +9476,7 @@ interface VideoProjectProps {
   generateData: GenerateData;
   exportDialogOpen: boolean;
   endpointId: string;
+  llmModel: LlmModelType;
 }
 
 interface VideoProjectState extends VideoProjectProps {
@@ -8948,6 +9494,7 @@ interface VideoProjectState extends VideoProjectProps {
   setGenerateData: (generateData: Partial<GenerateData>) => void;
   setExportDialogOpen: (open: boolean) => void;
   setEndpointId: (endpointId: string) => void;
+  setLlmModel: (model: LlmModelType) => void;
   onGenerate: () => void;
 }
 
@@ -8971,6 +9518,7 @@ const DEFAULT_PROPS: VideoProjectProps = {
     audio_url: null,
   },
   exportDialogOpen: false,
+  llmModel: "meta-llama/llama-3.2-1b-instruct",
 };
 
 type VideoProjectStore = ReturnType<typeof createVideoProjectStore>;
@@ -9030,6 +9578,7 @@ export const createVideoProjectStore = (
     },
     setExportDialogOpen: (exportDialogOpen: boolean) =>
       set({ exportDialogOpen }),
+    setLlmModel: (model: LlmModelType) => set({ llmModel: model }),
   }));
 };
 
@@ -9663,9 +10212,25 @@ File: src/lib/prompt.ts
 import type { VideoProject } from "@/data/schema";
 import { fal } from "./fal";
 
+// Define the allowed LLM model types based on the Fal.ai API schema
+export type LlmModelType =
+  | "anthropic/claude-3.5-sonnet"
+  | "anthropic/claude-3-5-haiku"
+  | "anthropic/claude-3-haiku"
+  | "google/gemini-pro-1.5"
+  | "google/gemini-flash-1.5"
+  | "google/gemini-flash-1.5-8b"
+  | "meta-llama/llama-3.2-1b-instruct"
+  | "meta-llama/llama-3.2-3b-instruct"
+  | "meta-llama/llama-3.1-8b-instruct"
+  | "meta-llama/llama-3.1-70b-instruct"
+  | "openai/gpt-4o-mini"
+  | "openai/gpt-4o";
+
 type EnhancePromptOptions = {
   type: "image" | "video" | "music" | "voiceover";
   project?: VideoProject;
+  model?: LlmModelType; // Use the defined type
 };
 
 const SYSTEM_PROMPT = `
@@ -9691,7 +10256,7 @@ export async function enhancePrompt(
 ) {
   console.log("🔍 Starting enhancePrompt with:", { prompt, options });
 
-  const { type, project } = options;
+  const { type, project, model = "meta-llama/llama-3.2-1b-instruct" } = options;
   const projectInfo = !project
     ? ""
     : `
@@ -9725,7 +10290,7 @@ export async function enhancePrompt(
           ${projectInfo}
           ${promptInfo}
         `.trim(),
-        model: "meta-llama/llama-3.2-1b-instruct",
+        model,
       },
     });
 
