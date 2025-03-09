@@ -57,23 +57,23 @@ export function App({ projectId }: AppProps) {
       // Direct submission using the fal client
       const endpoint = modelId || "fal-ai/flux";
       console.log(`Generating image with endpoint: ${endpoint}`);
-      
+
       const result = await fal.run(endpoint, {
         input: {
           prompt,
           image_size: "landscape_16_9",
           num_inference_steps: 12,
           guidance_scale: 3.5,
-          enable_safety_checker: true
-        }
+          enable_safety_checker: true,
+        },
       });
-      
+
       console.log("Image generation result:", result);
-      
+
       // Based on the actual response structure, extract the image URL
       // @ts-ignore - The result structure might vary depending on the endpoint
       const imageUrl = result?.data?.images?.[0]?.url;
-      
+
       if (imageUrl) {
         console.log("Generated image URL:", imageUrl);
         return imageUrl;
