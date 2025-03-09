@@ -2,7 +2,7 @@ import type { VideoProject } from "@/data/schema";
 import { fal } from "./fal";
 
 // Define the allowed LLM model types based on the Fal.ai API schema
-export type LlmModelType = 
+export type LlmModelType =
   | "anthropic/claude-3.5-sonnet"
   | "anthropic/claude-3-5-haiku"
   | "anthropic/claude-3-haiku"
