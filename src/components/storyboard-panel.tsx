@@ -52,7 +52,9 @@ export function StoryboardPanel({
   const [isVisible, setIsVisible] = useState(false);
   const [isLoading, setIsLoading] = useState<Record<number, boolean>>({});
   const [isGeneratingPrompts, setIsGeneratingPrompts] = useState(false);
-  const [selectedLlmModel, setSelectedLlmModel] = useState<LlmModelType>("meta-llama/llama-3.2-1b-instruct");
+  const [selectedLlmModel, setSelectedLlmModel] = useState<LlmModelType>(
+    "meta-llama/llama-3.2-1b-instruct",
+  );
   const [selectedImageStyle, setSelectedImageStyle] = useState("fantasy");
   const [customStyle, setCustomStyle] = useState("");
 
@@ -130,21 +132,23 @@ export function StoryboardPanel({
   // Function to generate AI prompts for all slides
   const generateAIPrompts = async () => {
     if (slides.length === 0) return;
-    
+
     try {
       setIsGeneratingPrompts(true);
-      
+
       // Generate new prompts for each slide using the selected LLM and style
       const updatedSlides = [...slides];
-      
+
       for (let i = 0; i < updatedSlides.length; i++) {
         const slide = updatedSlides[i];
-        
+
         // Get the style text to embed
-        const styleText = selectedImageStyle === 'custom' 
-          ? customStyle 
-          : IMAGE_STYLES.find(style => style.value === selectedImageStyle)?.label || 'Fantasy';
-          
+        const styleText =
+          selectedImageStyle === "custom"
+            ? customStyle
+            : IMAGE_STYLES.find((style) => style.value === selectedImageStyle)
+                ?.label || "Fantasy";
+
         // Create a context-specific prompt for the LLM
         const promptContext = `
           Generate a detailed and creative image description for a story slide.
@@ -158,14 +162,14 @@ export function StoryboardPanel({
           create a compelling visual representation of this scene. Focus on the important elements, 
           mood, lighting, characters, and setting. Be specific about visual details.
         `;
-        
+
         try {
           // Use the enhancePrompt function with the selected LLM model
           const enhancedPrompt = await enhancePrompt(promptContext, {
             type: "image",
-            model: selectedLlmModel
+            model: selectedLlmModel,
           });
-          
+
           // Update the slide with the new AI-generated prompt
           updatedSlides[i] = {
             ...slide,
@@ -175,10 +179,9 @@ export function StoryboardPanel({
           console.error(`Failed to generate prompt for slide ${i}:`, error);
         }
       }
-      
+
       // Update all slides with their new prompts
       setSlides(updatedSlides);
-      
     } catch (error) {
       console.error("Failed to generate AI prompts:", error);
     } finally {
@@ -209,14 +212,16 @@ export function StoryboardPanel({
   const handleRegeneratePrompt = async (index: number) => {
     try {
       setIsLoading((prev) => ({ ...prev, [index]: true }));
-      
+
       const slide = slides[index];
-      
+
       // Get the style text to embed
-      const styleText = selectedImageStyle === 'custom' 
-        ? customStyle 
-        : IMAGE_STYLES.find(style => style.value === selectedImageStyle)?.label || 'Fantasy';
-        
+      const styleText =
+        selectedImageStyle === "custom"
+          ? customStyle
+          : IMAGE_STYLES.find((style) => style.value === selectedImageStyle)
+              ?.label || "Fantasy";
+
       // Create a context-specific prompt for the LLM
       const promptContext = `
         Generate a detailed and creative image description for a story slide.
@@ -230,16 +235,20 @@ export function StoryboardPanel({
         create a compelling visual representation of this scene. Focus on the important elements, 
         mood, lighting, characters, and setting. Be specific about visual details.
       `;
-      
+
       try {
         // Use the enhancePrompt function with the selected LLM model
         const enhancedPrompt = await enhancePrompt(promptContext, {
           type: "image",
-          model: selectedLlmModel
+          model: selectedLlmModel,
         });
-        
+
         // Update just this slide with the new prompt
-        setSlides(slides.map((s, i) => i === index ? { ...s, prompt: enhancedPrompt } : s));
+        setSlides(
+          slides.map((s, i) =>
+            i === index ? { ...s, prompt: enhancedPrompt } : s,
+          ),
+        );
       } catch (error) {
         console.error(`Failed to regenerate prompt for slide ${index}:`, error);
       }
@@ -252,7 +261,9 @@ export function StoryboardPanel({
 
   // Function to handle prompt editing
   const handlePromptEdit = (index: number, newPrompt: string) => {
-    setSlides(slides.map((s, i) => i === index ? { ...s, prompt: newPrompt } : s));
+    setSlides(
+      slides.map((s, i) => (i === index ? { ...s, prompt: newPrompt } : s)),
+    );
   };
 
   // Only show the panel if we have slides
@@ -293,14 +304,16 @@ export function StoryboardPanel({
           {/* AI Prompt Generation Controls */}
           <div className="mb-6 p-4 border rounded-lg bg-card/50">
             <h3 className="text-md font-medium mb-3">AI Prompt Generation</h3>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               {/* LLM Model Selector */}
               <div>
                 <Label htmlFor="llm-model">LLM Model</Label>
                 <Select
                   value={selectedLlmModel}
-                  onValueChange={(value) => setSelectedLlmModel(value as LlmModelType)}
+                  onValueChange={(value) =>
+                    setSelectedLlmModel(value as LlmModelType)
+                  }
                 >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select LLM Model" />
@@ -323,7 +336,9 @@ export function StoryboardPanel({
                     </SelectGroup>
                     <SelectGroup>
                       <SelectLabel>OpenAI Models</SelectLabel>
-                      <SelectItem value="openai/gpt-4o-mini">GPT-4o Mini</SelectItem>
+                      <SelectItem value="openai/gpt-4o-mini">
+                        GPT-4o Mini
+                      </SelectItem>
                       <SelectItem value="openai/gpt-4o">GPT-4o</SelectItem>
                     </SelectGroup>
                     <SelectGroup>
@@ -340,7 +355,9 @@ export function StoryboardPanel({
                     </SelectGroup>
                     <SelectGroup>
                       <SelectLabel>Google Models</SelectLabel>
-                      <SelectItem value="google/gemini-pro-1.5">Gemini Pro 1.5</SelectItem>
+                      <SelectItem value="google/gemini-pro-1.5">
+                        Gemini Pro 1.5
+                      </SelectItem>
                       <SelectItem value="google/gemini-flash-1.5">
                         Gemini Flash 1.5
                       </SelectItem>
@@ -348,7 +365,7 @@ export function StoryboardPanel({
                   </SelectContent>
                 </Select>
               </div>
-              
+
               {/* Image Style Selector */}
               <div>
                 <Label htmlFor="image-style">Image Style</Label>
@@ -369,9 +386,9 @@ export function StoryboardPanel({
                 </Select>
               </div>
             </div>
-            
+
             {/* Custom Style Input (shown only when "Custom" is selected) */}
-            {selectedImageStyle === 'custom' && (
+            {selectedImageStyle === "custom" && (
               <div className="mb-4">
                 <Label htmlFor="custom-style">Custom Style Description</Label>
                 <Textarea
@@ -383,9 +400,9 @@ export function StoryboardPanel({
                 />
               </div>
             )}
-            
+
             {/* Generate Button */}
-            <Button 
+            <Button
               onClick={generateAIPrompts}
               disabled={isGeneratingPrompts}
               className="w-full"
@@ -432,7 +449,7 @@ export function StoryboardPanel({
                     Slide {index + 1}
                   </span>
                 </h3>
-                
+
                 {/* Editable Prompt Text Area */}
                 <div>
                   <Label htmlFor={`prompt-${index}`}>Prompt</Label>
