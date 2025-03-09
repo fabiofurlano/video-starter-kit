@@ -18,8 +18,9 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Maximize2 } from "lucide-react";
 import { AVAILABLE_ENDPOINTS } from "@/lib/fal";
+import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
 
 // Image style options
 const IMAGE_STYLES = [
@@ -103,6 +104,8 @@ export function StoryboardPanel({
       ? imageEndpoints[0].endpointId
       : "fal-ai/fast-sdxl";
   });
+  // Add state for expanded image
+  const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
   const sessionData = useVideoProjectStore((state) => state.generateData);
 
@@ -617,11 +620,33 @@ export function StoryboardPanel({
                 </Button>
 
                 {slide.imageUrl ? (
-                  <img
-                    src={slide.imageUrl}
-                    alt={`Chapter ${slide.chapterNumber} visualization`}
-                    className="w-full h-40 object-cover rounded-md shadow-sm"
-                  />
+                  <div className="relative">
+                    <img
+                      src={slide.imageUrl}
+                      alt={`Chapter ${slide.chapterNumber} visualization`}
+                      className="w-full h-40 object-cover rounded-md shadow-sm cursor-pointer hover:opacity-95 transition-opacity"
+                      onClick={() => {
+                        if (slide.imageUrl) {
+                          setExpandedImage(slide.imageUrl);
+                        }
+                      }}
+                    />
+                    <div className="absolute top-2 right-2 flex gap-1">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="w-7 h-7 rounded-full bg-background/70 backdrop-blur-sm hover:bg-background/90"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          if (slide.imageUrl) {
+                            setExpandedImage(slide.imageUrl);
+                          }
+                        }}
+                      >
+                        <Maximize2 className="h-3.5 w-3.5" />
+                      </Button>
+                    </div>
+                  </div>
                 ) : (
                   <div className="w-full h-40 bg-gradient-to-br from-gray-800/10 to-gray-800/25 rounded-md flex flex-col items-center justify-center border border-gray-700/20 shadow-inner">
                     <svg
@@ -732,6 +757,25 @@ export function StoryboardPanel({
           </div>
         </CollapsibleContent>
       </Collapsible>
+
+      {/* Image Expansion Dialog */}
+      <Dialog
+        open={!!expandedImage}
+        onOpenChange={(open) => !open && setExpandedImage(null)}
+      >
+        <DialogContent className="max-w-4xl">
+          {expandedImage && (
+            <img
+              src={expandedImage}
+              alt="Expanded view"
+              className="w-full object-contain"
+            />
+          )}
+          <DialogClose asChild>
+            <Button className="mt-4">Close</Button>
+          </DialogClose>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
