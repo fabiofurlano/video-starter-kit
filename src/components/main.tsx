@@ -52,26 +52,34 @@ export function App({ projectId }: AppProps) {
     (s) => s.setExportDialogOpen,
   );
 
-  const handleGenerateImage = async (prompt: string) => {
+  const handleGenerateImage = async (prompt: string, modelId?: string) => {
     try {
-      // Call Fal.ai to generate the image
-      const result = (await fal.subscribe("fal-ai/flux", {
+      // Direct submission using the fal client
+      const endpoint = modelId || "fal-ai/flux";
+      console.log(`Generating image with endpoint: ${endpoint}`);
+      
+      const result = await fal.run(endpoint, {
         input: {
           prompt,
-          image_size: "1024x768",
-          num_inference_steps: 28,
+          image_size: "landscape_16_9",
+          num_inference_steps: 12,
           guidance_scale: 3.5,
-          enable_safety_checker: true,
-        },
-      })) as unknown as {
-        images: Array<{ url: string }>;
-      };
-
-      if (result.images?.[0]?.url) {
-        // Get the image URL from the result
-        const imageUrl = result.images[0].url;
+          enable_safety_checker: true
+        }
+      });
+      
+      console.log("Image generation result:", result);
+      
+      // Based on the actual response structure, extract the image URL
+      // @ts-ignore - The result structure might vary depending on the endpoint
+      const imageUrl = result?.data?.images?.[0]?.url;
+      
+      if (imageUrl) {
         console.log("Generated image URL:", imageUrl);
         return imageUrl;
+      } else {
+        console.error("No image URL in response:", result);
+        throw new Error("Image generation failed");
       }
     } catch (error) {
       console.error("Failed to generate image:", error);

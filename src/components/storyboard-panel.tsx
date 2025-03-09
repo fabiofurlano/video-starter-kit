@@ -598,7 +598,6 @@ export function StoryboardPanel({
                     Image Model
                   </Label>
                   <ImageModelPicker
-                    id={`image-model-${index}`}
                     value={selectedImageModel}
                     onValueChange={setSelectedImageModel}
                   />
