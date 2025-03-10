@@ -21,6 +21,11 @@ import { Label } from "@/components/ui/label";
 import { RotateCcw, Maximize2 } from "lucide-react";
 import { AVAILABLE_ENDPOINTS } from "@/lib/fal";
 import { Dialog, DialogContent, DialogClose } from "@/components/ui/dialog";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { db } from "@/data/db";
+import { useProjectId } from "@/data/store";
+import { queryKeys } from "@/data/queries";
+import { useToast } from "@/hooks/use-toast";
 
 // Image style options
 const IMAGE_STYLES = [
@@ -108,6 +113,9 @@ export function StoryboardPanel({
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
 
   const sessionData = useVideoProjectStore((state) => state.generateData);
+  const projectId = useProjectId();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   // Immediate check on mount for console debugging
   console.log("StoryboardPanel initial render", {
@@ -317,6 +325,68 @@ export function StoryboardPanel({
     setSlides(
       slides.map((s, i) => (i === index ? { ...s, prompt: newPrompt } : s)),
     );
+  };
+
+  // Add this mutation for saving media
+  const saveMediaMutation = useMutation({
+    mutationFn: async (imageUrl: string) => {
+      // Find the slide with this image
+      const slide = slides.find(s => s.imageUrl === imageUrl);
+      
+      // Create properly structured media data
+      const mediaData = {
+        projectId,
+        kind: "generated" as "generated" | "uploaded",
+        mediaType: "image" as "image" | "video" | "music" | "voiceover",
+        status: "completed" as "pending" | "running" | "completed" | "failed",
+        createdAt: Date.now(),
+        endpointId: selectedImageModel,
+        input: {
+          prompt: slide?.prompt || ""
+        },
+        // Add the output structure with images array - this is critical
+        output: {
+          images: [
+            {
+              url: imageUrl,
+              // Include any other metadata available
+              width: 1024,
+              height: 1024,
+            }
+          ]
+        }
+      };
+      
+      try {
+        const mediaId = await db.media.create(mediaData);
+        console.log("Created media with ID:", mediaId);
+        return mediaId;
+      } catch (error) {
+        console.error("Failed to save to media gallery:", error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: queryKeys.projectMediaItems(projectId)
+      });
+      toast({
+        title: "Image saved to media gallery",
+        description: "The image has been added to your media library"
+      });
+    },
+    onError: (error) => {
+      console.error("Error saving media:", error);
+      toast({
+        title: "Failed to save image",
+        description: "There was an error adding the image to your media library"
+      });
+    }
+  });
+
+  // Update the onSaveToMediaManager usage
+  const handleSaveToMediaManager = (imageUrl: string) => {
+    saveMediaMutation.mutate(imageUrl);
   };
 
   // Only show the panel if we have slides
@@ -731,24 +801,53 @@ export function StoryboardPanel({
                       variant="secondary"
                       size="sm"
                       className="w-full flex items-center justify-center"
-                      onClick={() => onSaveToMediaManager(slide.imageUrl!)}
+                      onClick={() => handleSaveToMediaManager(slide.imageUrl!)}
+                      disabled={saveMediaMutation.isPending}
                     >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="14"
-                        height="14"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        className="mr-1.5"
-                      >
-                        <path d="M5 12h14" />
-                        <path d="M12 5v14" />
-                      </svg>
-                      Save to Media Manager
+                      {saveMediaMutation.isPending ? (
+                        <span className="flex items-center">
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
+                          </svg>
+                          Saving...
+                        </span>
+                      ) : (
+                        <span className="flex items-center">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="14"
+                            height="14"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            className="mr-1.5"
+                          >
+                            <path d="M5 12h14" />
+                            <path d="M12 5v14" />
+                          </svg>
+                          Save to Media Manager
+                        </span>
+                      )}
                     </Button>
                   )}
                 </div>
