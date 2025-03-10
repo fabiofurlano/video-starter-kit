@@ -331,8 +331,8 @@ export function StoryboardPanel({
   const saveMediaMutation = useMutation({
     mutationFn: async (imageUrl: string) => {
       // Find the slide with this image
-      const slide = slides.find(s => s.imageUrl === imageUrl);
-      
+      const slide = slides.find((s) => s.imageUrl === imageUrl);
+
       // Create properly structured media data
       const mediaData = {
         projectId,
@@ -342,7 +342,7 @@ export function StoryboardPanel({
         createdAt: Date.now(),
         endpointId: selectedImageModel,
         input: {
-          prompt: slide?.prompt || ""
+          prompt: slide?.prompt || "",
         },
         // Add the output structure with images array - this is critical
         output: {
@@ -352,11 +352,11 @@ export function StoryboardPanel({
               // Include any other metadata available
               width: 1024,
               height: 1024,
-            }
-          ]
-        }
+            },
+          ],
+        },
       };
-      
+
       try {
         const mediaId = await db.media.create(mediaData);
         console.log("Created media with ID:", mediaId);
@@ -368,20 +368,21 @@ export function StoryboardPanel({
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: queryKeys.projectMediaItems(projectId)
+        queryKey: queryKeys.projectMediaItems(projectId),
       });
       toast({
         title: "Image saved to media gallery",
-        description: "The image has been added to your media library"
+        description: "The image has been added to your media library",
       });
     },
     onError: (error) => {
       console.error("Error saving media:", error);
       toast({
         title: "Failed to save image",
-        description: "There was an error adding the image to your media library"
+        description:
+          "There was an error adding the image to your media library",
       });
-    }
+    },
   });
 
   // Update the onSaveToMediaManager usage
