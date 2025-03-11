@@ -84,10 +84,10 @@ export class SessionManager {
 
     this.initialized = true;
     console.log("Session initialized successfully with data from parent");
-    
+
     // Notify listeners of data update
     this.notifyUpdateListeners();
-    
+
     // Set up a ping interval to check for updates
     this.setupPingInterval();
   }
@@ -114,7 +114,7 @@ export class SessionManager {
           type: "SDK_REQUEST_DATA",
           message: "Request for updated data",
         },
-        "*"
+        "*",
       );
     } catch (error) {
       console.error("Error requesting data update:", error);
@@ -163,7 +163,7 @@ export class SessionManager {
     if (data.falaiApiKey) {
       this.saveFalApiKey(data.falaiApiKey);
     }
-    
+
     // Notify listeners of data update
     this.notifyUpdateListeners();
   }

@@ -64,16 +64,19 @@ export default function IndexPage() {
     // Split content by paragraphs (double newlines)
     const paragraphs = chapter.content.split(/\n\s*\n/);
     const contentLength = chapter.content.length;
-    
+
     // Determine segmentation approach
     let segments: string[] = [];
-    
+
     if (paragraphs.length >= slideCount) {
       // If we have enough paragraphs, group them evenly
       const paragraphsPerSlide = Math.ceil(paragraphs.length / slideCount);
       for (let j = 0; j < slideCount; j++) {
         const startIdx = j * paragraphsPerSlide;
-        const endIdx = Math.min(startIdx + paragraphsPerSlide, paragraphs.length);
+        const endIdx = Math.min(
+          startIdx + paragraphsPerSlide,
+          paragraphs.length,
+        );
         segments.push(paragraphs.slice(startIdx, endIdx).join("\n\n"));
       }
     } else {
@@ -85,17 +88,19 @@ export default function IndexPage() {
         segments.push(chapter.content.substring(startPos, endPos));
       }
     }
-    
+
     console.log(`Created ${segments.length} segments for ${slideCount} slides`);
 
     // Generate prompts for each slide
     const slides = Array.from({ length: slideCount }, (_, i) => {
       // Get the current segment for this slide
-      const segmentContent = segments[i] || chapter.content.substring(0, Math.min(500, contentLength));
-      
+      const segmentContent =
+        segments[i] ||
+        chapter.content.substring(0, Math.min(500, contentLength));
+
       // Create a more detailed prompt with more content (up to 500 chars)
       const promptContent = segmentContent.substring(0, 500);
-      
+
       return {
         chapterNumber: chapter.number,
         prompt: `Create a visual representation for chapter ${chapter.number}: ${chapter.title}. Scene description based on the following excerpt: ${promptContent}`,
@@ -293,7 +298,7 @@ export default function IndexPage() {
 
     window.addEventListener("message", handleMessage);
     setDebugInfo("Message listener active, waiting for messages...");
-    
+
     // Clean up event listeners when component unmounts
     return () => {
       window.removeEventListener("message", handleMessage);
