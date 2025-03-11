@@ -113,7 +113,9 @@ export function StoryboardPanel({
   // Add state for expanded image
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
   // Add state for storyboard metadata
-  const [storyboardSource, setStoryboardSource] = useState<"chapter" | "custom">("chapter");
+  const [storyboardSource, setStoryboardSource] = useState<
+    "chapter" | "custom"
+  >("chapter");
   const [storyboardMetadata, setStoryboardMetadata] = useState<any>({});
   const [storyboardTitle, setStoryboardTitle] = useState("Storyboard Editor");
 
@@ -143,11 +145,11 @@ export function StoryboardPanel({
         const { slides, metadata } = event.data;
         console.log("Received storyboard data via postMessage:", slides);
         setSlides(slides);
-        
+
         if (metadata) {
           processStoryboardMetadata(metadata);
         }
-        
+
         setTimeout(() => {
           console.log("Setting isVisible to true from postMessage");
           setIsVisible(true);
@@ -163,21 +165,23 @@ export function StoryboardPanel({
   const processStoryboardMetadata = (metadata: any) => {
     console.log("Processing storyboard metadata:", metadata);
     setStoryboardMetadata(metadata);
-    
+
     // Set source
     if (metadata.source) {
       setStoryboardSource(metadata.source);
     }
-    
+
     // Set image style from metadata if available
     if (metadata.style) {
       console.log("Setting image style from metadata:", metadata.style);
       setSelectedImageStyle(metadata.style);
     }
-    
+
     // Set title based on source
     if (metadata.source === "chapter" && metadata.chapterNumber) {
-      setStoryboardTitle(`Storyboard: Chapter ${metadata.chapterNumber}${metadata.chapterTitle ? ` - ${metadata.chapterTitle}` : ''}`);
+      setStoryboardTitle(
+        `Storyboard: Chapter ${metadata.chapterNumber}${metadata.chapterTitle ? ` - ${metadata.chapterTitle}` : ""}`,
+      );
     } else if (metadata.source === "custom") {
       setStoryboardTitle("Custom Storyboard");
     }
@@ -241,22 +245,22 @@ export function StoryboardPanel({
           ? customStyle
           : IMAGE_STYLES.find((style) => style.value === selectedImageStyle)
               ?.label || "Fantasy";
-              
+
       // Get the full story or chapter content
       const fullStory = storyboardMetadata?.fullStory || "";
       const location = storyboardMetadata?.location || "";
       const timeline = storyboardMetadata?.timeline || "";
-      
+
       // Different prompt formats based on source
       let promptContext = "";
-      
+
       if (storyboardSource === "chapter") {
         // Format for chapter-based storyboards
         promptContext = `
           You are an expert storyboard generator for AI-based image creation. Your task is to enhance the provided prompts to make them more detailed and visually compelling. Follow these instructions internally, and output only the final image prompts.
 
           1. Analyze the current slide prompt:
-             "${slides.map(slide => slide.prompt).join("\n")}"
+             "${slides.map((slide) => slide.prompt).join("\n")}"
           
           2. Since this is from a chapter, integrate location: "${location}" and timeline: "${timeline}" from memory to maintain continuity and setting accuracy.
 
@@ -272,7 +276,7 @@ export function StoryboardPanel({
           1. Analyze the following narrative and current prompts:
              Full Story: "${fullStory}"
              Current Prompts:
-             "${slides.map(slide => slide.prompt).join("\n")}"
+             "${slides.map((slide) => slide.prompt).join("\n")}"
           
           2. Since this is a "Start from Scratch" mode, do NOT use location or timeline unless explicitly mentioned in the provided text. Instead, infer the necessary scene details from the given input.
 
@@ -285,7 +289,7 @@ export function StoryboardPanel({
       // Process each slide individually to enhance its prompt
       for (let i = 0; i < updatedSlides.length; i++) {
         const slide = updatedSlides[i];
-        
+
         // Create a slide-specific prompt for the LLM
         const slidePromptContext = `
           ${promptContext}
@@ -304,15 +308,16 @@ export function StoryboardPanel({
           });
 
           // Generate a preview version for display
-          const promptPreview = enhancedPrompt.length > 200 
-            ? enhancedPrompt.substring(0, 200) + "..." 
-            : enhancedPrompt;
+          const promptPreview =
+            enhancedPrompt.length > 200
+              ? enhancedPrompt.substring(0, 200) + "..."
+              : enhancedPrompt;
 
           // Update the slide with the new AI-generated prompt
           updatedSlides[i] = {
             ...slide,
             prompt: enhancedPrompt,
-            promptPreview
+            promptPreview,
           };
         } catch (error) {
           console.error(`Failed to generate prompt for slide ${i}:`, error);
@@ -373,15 +378,15 @@ export function StoryboardPanel({
           ? customStyle
           : IMAGE_STYLES.find((style) => style.value === selectedImageStyle)
               ?.label || "Fantasy";
-      
+
       // Get relevant metadata
       const fullStory = storyboardMetadata?.fullStory || "";
       const location = storyboardMetadata?.location || "";
       const timeline = storyboardMetadata?.timeline || "";
-      
+
       // Create prompt context based on source
       let promptContext = "";
-      
+
       if (storyboardSource === "chapter") {
         promptContext = `
           You are an expert storyboard generator for AI-based image creation. Your task is to create a detailed image prompt based on a chapter segment.
@@ -419,9 +424,10 @@ export function StoryboardPanel({
         });
 
         // Generate a preview version for display
-        const promptPreview = enhancedPrompt.length > 200 
-          ? enhancedPrompt.substring(0, 200) + "..." 
-          : enhancedPrompt;
+        const promptPreview =
+          enhancedPrompt.length > 200
+            ? enhancedPrompt.substring(0, 200) + "..."
+            : enhancedPrompt;
 
         // Update just this slide with the new prompt
         setSlides(
@@ -448,13 +454,14 @@ export function StoryboardPanel({
             ...s,
             prompt: newPrompt,
             // If we had a preview, update it with a truncated version of the new prompt
-            promptPreview: newPrompt.length > 200 
-              ? newPrompt.substring(0, 200) + "..." 
-              : newPrompt
+            promptPreview:
+              newPrompt.length > 200
+                ? newPrompt.substring(0, 200) + "..."
+                : newPrompt,
           };
         }
         return s;
-      })
+      }),
     );
   };
 
@@ -756,7 +763,9 @@ export function StoryboardPanel({
                       <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
                       <path d="M10 2v20" />
                     </svg>
-                    {storyboardSource === "chapter" ? `Chapter ${slide.chapterNumber}` : "Scene"}
+                    {storyboardSource === "chapter"
+                      ? `Chapter ${slide.chapterNumber}`
+                      : "Scene"}
                   </span>
                   <span className="bg-blue-600/20 text-blue-500 text-xs px-2 py-0.5 rounded-full font-medium">
                     Slide {index + 1}

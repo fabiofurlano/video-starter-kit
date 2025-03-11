@@ -22,7 +22,12 @@ import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -34,13 +39,13 @@ export default function IndexPage() {
   const [slideSelections, setSlideSelections] = useState<
     Record<number, string>
   >({});
-  
+
   // New state for storyboard from scratch feature
   const [storyInput, setStoryInput] = useState("");
   const [customSlideCount, setCustomSlideCount] = useState("3");
   const [customImageStyle, setCustomImageStyle] = useState("fantasy");
   const [inputError, setInputError] = useState("");
-  
+
   const router = useRouter();
 
   const toggleChapter = (index: number) => {
@@ -62,16 +67,20 @@ export default function IndexPage() {
     // Check if text is too short (minimum 20 words)
     const wordCount = text.trim().split(/\s+/).length;
     if (wordCount < 20) {
-      setInputError("Your story is too short! Please add more details for better visuals.");
+      setInputError(
+        "Your story is too short! Please add more details for better visuals.",
+      );
       return false;
     }
-    
+
     // Check if text is too vague (very basic check)
     if (text.length < 100) {
-      setInputError("This text is too vague. Try adding names, locations, and actions.");
+      setInputError(
+        "This text is too vague. Try adding names, locations, and actions.",
+      );
       return false;
     }
-    
+
     // Clear any previous errors
     setInputError("");
     return true;
@@ -103,9 +112,10 @@ export default function IndexPage() {
       const segmentContent = chapter.content.substring(startPos, endPos);
 
       // Create a preview version for UI display, but keep the full content in the prompt
-      const previewText = segmentContent.length > 200 
-        ? segmentContent.substring(0, 200) + "..." 
-        : segmentContent;
+      const previewText =
+        segmentContent.length > 200
+          ? segmentContent.substring(0, 200) + "..."
+          : segmentContent;
 
       // Create a prompt that focuses on different parts of the chapter
       return {
@@ -117,7 +127,7 @@ export default function IndexPage() {
     });
 
     // Store storyboard data in localStorage
-    const storyboardData = { 
+    const storyboardData = {
       slides,
       metadata: {
         source: "chapter",
@@ -125,15 +135,15 @@ export default function IndexPage() {
         chapterTitle: chapter.title,
         style: "fantasy", // Default style for chapter-based storyboards
         location: userData?.location || "",
-        timeline: userData?.timeline || ""
-      }
+        timeline: userData?.timeline || "",
+      },
     };
-    
+
     try {
       localStorage.setItem("storyboardData", JSON.stringify(storyboardData));
       console.log(
         "Successfully stored chapter storyboard data in localStorage:",
-        storyboardData
+        storyboardData,
       );
 
       // Redirect to the video editor app with a clear URL indicator
@@ -163,16 +173,17 @@ export default function IndexPage() {
     // This will be enhanced by the AI in storyboard-panel.tsx
     const contentLength = storyInput.length;
     const segmentSize = Math.floor(contentLength / slideCount);
-    
+
     const slides = Array.from({ length: slideCount }, (_, i) => {
       const startPos = i * segmentSize;
       const endPos = Math.min(startPos + segmentSize, contentLength);
       const segmentContent = storyInput.substring(startPos, endPos);
 
       // Create a visual preview for UI that's truncated, but keep full content in prompt
-      const previewText = segmentContent.length > 200 
-        ? segmentContent.substring(0, 200) + "..." 
-        : segmentContent;
+      const previewText =
+        segmentContent.length > 200
+          ? segmentContent.substring(0, 200) + "..."
+          : segmentContent;
 
       return {
         chapterNumber: "Custom", // Mark as custom to differentiate from chapter-based slides
@@ -183,25 +194,25 @@ export default function IndexPage() {
     });
 
     // Store storyboard data in localStorage
-    const storyboardData = { 
+    const storyboardData = {
       slides,
       metadata: {
         source: "custom",
         style: customImageStyle,
-        fullStory: storyInput
-      }
+        fullStory: storyInput,
+      },
     };
-    
+
     try {
       localStorage.setItem("storyboardData", JSON.stringify(storyboardData));
       console.log(
         "Successfully stored custom storyboard data in localStorage:",
-        storyboardData
+        storyboardData,
       );
 
       // Also store the original input for reference
       localStorage.setItem("story_input", storyInput);
-      
+
       // Redirect to the video editor app
       router.push("/app?storyboard=true");
     } catch (error) {
@@ -555,14 +566,16 @@ export default function IndexPage() {
 
             {/* New Storyboard Creation Section */}
             <div className="glassmorphism p-6 border-gray-800 mt-6">
-              <h2 className="text-2xl font-bold mb-6 text-white">Create Storyboard</h2>
-              
+              <h2 className="text-2xl font-bold mb-6 text-white">
+                Create Storyboard
+              </h2>
+
               <Tabs defaultValue="chapters" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
                   <TabsTrigger value="chapters">From Chapters</TabsTrigger>
                   <TabsTrigger value="scratch">Start from Scratch</TabsTrigger>
                 </TabsList>
-                
+
                 <TabsContent value="chapters">
                   {/* Existing Chapters Panel */}
                   {userData.chapters && userData.chapters.length > 0 ? (
@@ -588,7 +601,8 @@ export default function IndexPage() {
                                   <div
                                     dangerouslySetInnerHTML={{
                                       __html:
-                                        chapter.content.substring(0, 250) + "...",
+                                        chapter.content.substring(0, 250) +
+                                        "...",
                                     }}
                                   />
                                 ) : (
@@ -601,7 +615,9 @@ export default function IndexPage() {
                               onClick={() => toggleChapter(index)}
                               className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
                             >
-                              {expandedChapters[index] ? "Show Less" : "Show More"}
+                              {expandedChapters[index]
+                                ? "Show Less"
+                                : "Show More"}
                             </button>
 
                             <div className="flex items-center mt-3 space-x-2">
@@ -647,18 +663,19 @@ export default function IndexPage() {
                     </div>
                   ) : (
                     <p className="text-gray-400 text-center py-6">
-                      No chapters found. Try creating a storyboard from scratch instead.
+                      No chapters found. Try creating a storyboard from scratch
+                      instead.
                     </p>
                   )}
                 </TabsContent>
-                
+
                 <TabsContent value="scratch">
                   {/* New Start from Scratch UI */}
                   <div className="space-y-5">
                     <div className="bg-gray-900/50 p-5 rounded-lg border border-gray-800">
                       <div className="flex justify-between items-start mb-2">
-                        <Label 
-                          htmlFor="story-input" 
+                        <Label
+                          htmlFor="story-input"
                           className="text-sm font-medium flex items-center"
                         >
                           Your Story
@@ -666,17 +683,23 @@ export default function IndexPage() {
                             <Tooltip>
                               <TooltipTrigger asChild>
                                 <span className="ml-1.5 cursor-help">
-                                  <AlertCircle size={14} className="text-gray-400" />
+                                  <AlertCircle
+                                    size={14}
+                                    className="text-gray-400"
+                                  />
                                 </span>
                               </TooltipTrigger>
                               <TooltipContent className="max-w-xs">
-                                <p>For best results, describe what happens, where it happens, and any important details.</p>
+                                <p>
+                                  For best results, describe what happens, where
+                                  it happens, and any important details.
+                                </p>
                               </TooltipContent>
                             </Tooltip>
                           </TooltipProvider>
                         </Label>
                       </div>
-                      
+
                       <Textarea
                         id="story-input"
                         placeholder="Write a short story or scene description. Include actions, characters, and locations."
@@ -688,27 +711,35 @@ export default function IndexPage() {
                           if (inputError) setInputError("");
                         }}
                       />
-                      
+
                       {inputError && (
                         <div className="bg-red-900/30 border border-red-700/50 p-3 rounded-md mb-4">
                           <p className="text-red-200 text-sm flex items-center">
-                            <AlertCircle size={14} className="mr-1.5 flex-shrink-0" />
+                            <AlertCircle
+                              size={14}
+                              className="mr-1.5 flex-shrink-0"
+                            />
                             {inputError}
                           </p>
                         </div>
                       )}
-                      
+
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                         {/* Slide Count Selection */}
                         <div>
-                          <Label htmlFor="slide-count" className="text-sm font-medium mb-1.5 block">
+                          <Label
+                            htmlFor="slide-count"
+                            className="text-sm font-medium mb-1.5 block"
+                          >
                             Number of Slides
                           </Label>
                           <select
                             id="slide-count"
                             className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             value={customSlideCount}
-                            onChange={(e) => setCustomSlideCount(e.target.value)}
+                            onChange={(e) =>
+                              setCustomSlideCount(e.target.value)
+                            }
                           >
                             <option value="1">1 Slide</option>
                             <option value="2">2 Slides</option>
@@ -718,17 +749,22 @@ export default function IndexPage() {
                             <option value="6">6 Slides</option>
                           </select>
                         </div>
-                        
+
                         {/* Image Style Selection */}
                         <div>
-                          <Label htmlFor="image-style" className="text-sm font-medium mb-1.5 block">
+                          <Label
+                            htmlFor="image-style"
+                            className="text-sm font-medium mb-1.5 block"
+                          >
                             Image Style
                           </Label>
                           <select
                             id="image-style"
                             className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             value={customImageStyle}
-                            onChange={(e) => setCustomImageStyle(e.target.value)}
+                            onChange={(e) =>
+                              setCustomImageStyle(e.target.value)
+                            }
                           >
                             <option value="fantasy">Fantasy</option>
                             <option value="cyberpunk">Cyberpunk</option>
@@ -741,7 +777,7 @@ export default function IndexPage() {
                           </select>
                         </div>
                       </div>
-                      
+
                       <Button
                         onClick={generateStoryboardFromScratch}
                         className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500"
