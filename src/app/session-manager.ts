@@ -45,10 +45,9 @@ export interface ParentPostMessageData {
 }
 
 // Define the global session state
-export class SessionManager {
+class SessionManager {
   private userData: UserData | null = null;
   private initialized: boolean = false;
-  private updateListeners: Array<() => void> = [];
 
   /**
    * Initialize the SDK session with user data
@@ -84,70 +83,6 @@ export class SessionManager {
 
     this.initialized = true;
     console.log("Session initialized successfully with data from parent");
-
-    // Notify listeners of data update
-    this.notifyUpdateListeners();
-
-    // Set up a ping interval to check for updates
-    this.setupPingInterval();
-  }
-
-  /**
-   * Set up a ping interval to request data updates from the parent
-   */
-  private setupPingInterval(): void {
-    // Request data updates every 10 seconds
-    setInterval(() => {
-      this.requestDataUpdate();
-    }, 10000);
-  }
-
-  /**
-   * Request a data update from the parent page
-   */
-  requestDataUpdate(): void {
-    console.log("Requesting data update from parent");
-    try {
-      // Send a message to the parent window requesting updated data
-      window.parent.postMessage(
-        {
-          type: "SDK_REQUEST_DATA",
-          message: "Request for updated data",
-        },
-        "*",
-      );
-    } catch (error) {
-      console.error("Error requesting data update:", error);
-    }
-  }
-
-  /**
-   * Add a listener for data updates
-   * @param listener The listener function to call when data is updated
-   */
-  addUpdateListener(listener: () => void): void {
-    this.updateListeners.push(listener);
-  }
-
-  /**
-   * Remove a listener for data updates
-   * @param listener The listener function to remove
-   */
-  removeUpdateListener(listener: () => void): void {
-    this.updateListeners = this.updateListeners.filter((l) => l !== listener);
-  }
-
-  /**
-   * Notify all listeners of a data update
-   */
-  private notifyUpdateListeners(): void {
-    this.updateListeners.forEach((listener) => {
-      try {
-        listener();
-      } catch (error) {
-        console.error("Error in update listener:", error);
-      }
-    });
   }
 
   /**
@@ -163,9 +98,6 @@ export class SessionManager {
     if (data.falaiApiKey) {
       this.saveFalApiKey(data.falaiApiKey);
     }
-
-    // Notify listeners of data update
-    this.notifyUpdateListeners();
   }
 
   /**

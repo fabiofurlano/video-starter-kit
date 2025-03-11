@@ -18,7 +18,6 @@ import {
 } from "lucide-react";
 import config from "@/lib/config";
 import { useRouter } from "next/navigation";
-import { App } from "@/components/main";
 
 export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -61,49 +60,19 @@ export default function IndexPage() {
       `Generating ${slideCount} slides for chapter ${chapter.number}`,
     );
 
-    // Split content by paragraphs (double newlines)
-    const paragraphs = chapter.content.split(/\n\s*\n/);
-    const contentLength = chapter.content.length;
-
-    // Determine segmentation approach
-    let segments: string[] = [];
-
-    if (paragraphs.length >= slideCount) {
-      // If we have enough paragraphs, group them evenly
-      const paragraphsPerSlide = Math.ceil(paragraphs.length / slideCount);
-      for (let j = 0; j < slideCount; j++) {
-        const startIdx = j * paragraphsPerSlide;
-        const endIdx = Math.min(
-          startIdx + paragraphsPerSlide,
-          paragraphs.length,
-        );
-        segments.push(paragraphs.slice(startIdx, endIdx).join("\n\n"));
-      }
-    } else {
-      // Fall back to character-based segmentation if not enough paragraphs
-      const segmentSize = Math.floor(contentLength / slideCount);
-      for (let j = 0; j < slideCount; j++) {
-        const startPos = j * segmentSize;
-        const endPos = Math.min(startPos + segmentSize, contentLength);
-        segments.push(chapter.content.substring(startPos, endPos));
-      }
-    }
-
-    console.log(`Created ${segments.length} segments for ${slideCount} slides`);
-
     // Generate prompts for each slide
     const slides = Array.from({ length: slideCount }, (_, i) => {
-      // Get the current segment for this slide
-      const segmentContent =
-        segments[i] ||
-        chapter.content.substring(0, Math.min(500, contentLength));
+      // Create different prompts for different parts of the chapter
+      const contentLength = chapter.content.length;
+      const segmentSize = Math.floor(contentLength / slideCount);
+      const startPos = i * segmentSize;
+      const endPos = Math.min(startPos + segmentSize, contentLength);
+      const segmentContent = chapter.content.substring(startPos, endPos);
 
-      // Create a more detailed prompt with more content (up to 500 chars)
-      const promptContent = segmentContent.substring(0, 500);
-
+      // Create a prompt that focuses on different parts of the chapter
       return {
         chapterNumber: chapter.number,
-        prompt: `Create a visual representation for chapter ${chapter.number}: ${chapter.title}. Scene description based on the following excerpt: ${promptContent}`,
+        prompt: `Create a visual representation for chapter ${chapter.number}: ${chapter.title}. Scene description based on the following excerpt: ${segmentContent.substring(0, 200)}...`,
         imageUrl: undefined,
       };
     });
@@ -130,20 +99,46 @@ export default function IndexPage() {
     console.log(
       "IndexPage component mounted - setting up postMessage listener",
     );
+    setDebugInfo("Setting up message listener...");
 
-    // Add a listener for data updates
-    const handleDataUpdate = () => {
-      console.log("Data update detected, refreshing UI");
-      const updatedData = sessionManager.getUserData();
-      if (updatedData) {
-        setUserData(updatedData);
+    // Check for storyboard data in localStorage
+    try {
+      const storyboardData = localStorage.getItem("storyboardData");
+      if (storyboardData) {
+        console.log(
+          "Found storyboard data in localStorage in page.tsx:",
+          storyboardData,
+        );
+      } else {
+        console.log("No storyboard data found in localStorage in page.tsx");
       }
-    };
+    } catch (error) {
+      console.error("Error checking storyboard data:", error);
+    }
 
-    // Register the update listener
-    sessionManager.addUpdateListener(handleDataUpdate);
+    // Check for session data first
+    const currentData = sessionManager.getUserData();
+    if (!currentData) {
+      // Try to load from localStorage if no data in session
+      try {
+        const savedData = localStorage.getItem("videoProjectSessionData");
+        if (savedData) {
+          const parsedData = JSON.parse(savedData);
+          sessionManager.initializeSession(parsedData);
+          setUserData(sessionManager.getUserData());
+          setIsLoading(false);
+          setDebugInfo("Session data loaded from localStorage");
+        }
+      } catch (error) {
+        console.error("Error loading from localStorage:", error);
+      }
+    } else {
+      // We already have data in the session
+      setUserData(currentData);
+      setIsLoading(false);
+      setDebugInfo("Session data already available");
+    }
 
-    // Function to handle messages from the parent page
     function handleMessage(event: MessageEvent) {
       console.log(
         "Message received from:",
@@ -298,12 +293,7 @@ export default function IndexPage() {
 
     window.addEventListener("message", handleMessage);
     setDebugInfo("Message listener active, waiting for messages...");
-
-    // Clean up event listeners when component unmounts
-    return () => {
-      window.removeEventListener("message", handleMessage);
-      sessionManager.removeUpdateListener(handleDataUpdate);
-    };
+    return () => window.removeEventListener("message", handleMessage);
   }, [router]);
 
   return (
