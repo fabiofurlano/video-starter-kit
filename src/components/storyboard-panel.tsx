@@ -88,6 +88,7 @@ export function StoryboardPanel({
     Array<{
       chapterNumber: string;
       prompt: string;
+      promptPreview?: string;
       imageUrl?: string;
     }>
   >([]);
@@ -111,6 +112,10 @@ export function StoryboardPanel({
   });
   // Add state for expanded image
   const [expandedImage, setExpandedImage] = useState<string | null>(null);
+  // Add state for storyboard metadata
+  const [storyboardSource, setStoryboardSource] = useState<"chapter" | "custom">("chapter");
+  const [storyboardMetadata, setStoryboardMetadata] = useState<any>({});
+  const [storyboardTitle, setStoryboardTitle] = useState("Storyboard Editor");
 
   const sessionData = useVideoProjectStore((state) => state.generateData);
   const projectId = useProjectId();
@@ -135,9 +140,14 @@ export function StoryboardPanel({
     const handleMessage = (event: MessageEvent) => {
       console.log("Received message event:", event.data);
       if (event.data.type === "STORYBOARD_DATA") {
-        const { slides } = event.data;
+        const { slides, metadata } = event.data;
         console.log("Received storyboard data via postMessage:", slides);
         setSlides(slides);
+        
+        if (metadata) {
+          processStoryboardMetadata(metadata);
+        }
+        
         setTimeout(() => {
           console.log("Setting isVisible to true from postMessage");
           setIsVisible(true);
@@ -148,6 +158,30 @@ export function StoryboardPanel({
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, []);
+
+  // Function to process storyboard metadata
+  const processStoryboardMetadata = (metadata: any) => {
+    console.log("Processing storyboard metadata:", metadata);
+    setStoryboardMetadata(metadata);
+    
+    // Set source
+    if (metadata.source) {
+      setStoryboardSource(metadata.source);
+    }
+    
+    // Set image style from metadata if available
+    if (metadata.style) {
+      console.log("Setting image style from metadata:", metadata.style);
+      setSelectedImageStyle(metadata.style);
+    }
+    
+    // Set title based on source
+    if (metadata.source === "chapter" && metadata.chapterNumber) {
+      setStoryboardTitle(`Storyboard: Chapter ${metadata.chapterNumber}${metadata.chapterTitle ? ` - ${metadata.chapterTitle}` : ''}`);
+    } else if (metadata.source === "custom") {
+      setStoryboardTitle("Custom Storyboard");
+    }
+  };
 
   // Function to check for storyboard data
   const checkForStoryboardData = () => {
@@ -162,6 +196,11 @@ export function StoryboardPanel({
             parsedData.slides.length,
           );
           setSlides(parsedData.slides);
+
+          // Process metadata if available
+          if (parsedData.metadata) {
+            processStoryboardMetadata(parsedData.metadata);
+          }
 
           // Use a staggered timing for better animation
           setTimeout(() => {
@@ -196,41 +235,84 @@ export function StoryboardPanel({
       // Generate new prompts for each slide using the selected LLM and style
       const updatedSlides = [...slides];
 
+      // Create a comprehensive context for the entire storyboard
+      const styleText =
+        selectedImageStyle === "custom"
+          ? customStyle
+          : IMAGE_STYLES.find((style) => style.value === selectedImageStyle)
+              ?.label || "Fantasy";
+              
+      // Get the full story or chapter content
+      const fullStory = storyboardMetadata?.fullStory || "";
+      const location = storyboardMetadata?.location || "";
+      const timeline = storyboardMetadata?.timeline || "";
+      
+      // Different prompt formats based on source
+      let promptContext = "";
+      
+      if (storyboardSource === "chapter") {
+        // Format for chapter-based storyboards
+        promptContext = `
+          You are an expert storyboard generator for AI-based image creation. Your task is to enhance the provided prompts to make them more detailed and visually compelling. Follow these instructions internally, and output only the final image prompts.
+
+          1. Analyze the current slide prompt:
+             "${slides.map(slide => slide.prompt).join("\n")}"
+          
+          2. Since this is from a chapter, integrate location: "${location}" and timeline: "${timeline}" from memory to maintain continuity and setting accuracy.
+
+          3. For each prompt, create a comprehensive image generation prompt. Each prompt must be a complete sentence that vividly describes the scene with details such as setting, characters, actions, and cinematic elements. Ensure you integrate the selected art style: "${styleText}".
+
+          4. Output only the enhanced prompts. Do not include numbering, explanations, or any other text.
+        `;
+      } else {
+        // Format for custom story input
+        promptContext = `
+          You are an expert storyboard generator for AI-based image creation. Your task is to enhance the provided prompts to make them more detailed and visually compelling. Follow these instructions internally, and output only the final image prompts.
+
+          1. Analyze the following narrative and current prompts:
+             Full Story: "${fullStory}"
+             Current Prompts:
+             "${slides.map(slide => slide.prompt).join("\n")}"
+          
+          2. Since this is a "Start from Scratch" mode, do NOT use location or timeline unless explicitly mentioned in the provided text. Instead, infer the necessary scene details from the given input.
+
+          3. For each prompt, create a comprehensive image generation prompt. Each prompt must be a complete sentence that vividly describes the scene with details such as setting, characters, actions, and cinematic elements. Ensure you integrate the selected art style: "${styleText}".
+
+          4. Output only the enhanced prompts. Do not include numbering, explanations, or any other text.
+        `;
+      }
+
+      // Process each slide individually to enhance its prompt
       for (let i = 0; i < updatedSlides.length; i++) {
         const slide = updatedSlides[i];
-
-        // Get the style text to embed
-        const styleText =
-          selectedImageStyle === "custom"
-            ? customStyle
-            : IMAGE_STYLES.find((style) => style.value === selectedImageStyle)
-                ?.label || "Fantasy";
-
-        // Create a context-specific prompt for the LLM
-        const promptContext = `
-          Generate a detailed and creative image description for a story slide.
+        
+        // Create a slide-specific prompt for the LLM
+        const slidePromptContext = `
+          ${promptContext}
           
-          Chapter Context: Chapter ${slide.chapterNumber}
-          Current Slide Content: ${slide.prompt}
+          Current slide to enhance:
+          "${slide.prompt}"
           
-          The image should be in ${styleText} style.
-          
-          Your task is to create a vivid, detailed prompt that would help an AI image generator 
-          create a compelling visual representation of this scene. Focus on the important elements, 
-          mood, lighting, characters, and setting. Be specific about visual details.
+          Output only the enhanced prompt for this specific slide. Make it rich in visual details, cinematic quality, and incorporate the ${styleText} style. Do not include any explanations or numbering.
         `;
 
         try {
           // Use the enhancePrompt function with the selected LLM model
-          const enhancedPrompt = await enhancePrompt(promptContext, {
+          const enhancedPrompt = await enhancePrompt(slidePromptContext, {
             type: "image",
             model: selectedLlmModel,
           });
+
+          // Generate a preview version for display
+          const promptPreview = enhancedPrompt.length > 200 
+            ? enhancedPrompt.substring(0, 200) + "..." 
+            : enhancedPrompt;
 
           // Update the slide with the new AI-generated prompt
           updatedSlides[i] = {
             ...slide,
             prompt: enhancedPrompt,
+            promptPreview
           };
         } catch (error) {
           console.error(`Failed to generate prompt for slide ${i}:`, error);
@@ -243,6 +325,15 @@ export function StoryboardPanel({
       console.error("Failed to generate AI prompts:", error);
     } finally {
       setIsGeneratingPrompts(false);
+    }
+  };
+
+  // Function to get the StoryboardPanel title based on source
+  const getStoryboardTitle = () => {
+    if (storyboardSource === "chapter") {
+      return `Storyboard: Chapter ${storyboardMetadata.chapterNumber || ""}`;
+    } else {
+      return "Custom Storyboard";
     }
   };
 
@@ -282,20 +373,43 @@ export function StoryboardPanel({
           ? customStyle
           : IMAGE_STYLES.find((style) => style.value === selectedImageStyle)
               ?.label || "Fantasy";
+      
+      // Get relevant metadata
+      const fullStory = storyboardMetadata?.fullStory || "";
+      const location = storyboardMetadata?.location || "";
+      const timeline = storyboardMetadata?.timeline || "";
+      
+      // Create prompt context based on source
+      let promptContext = "";
+      
+      if (storyboardSource === "chapter") {
+        promptContext = `
+          You are an expert storyboard generator for AI-based image creation. Your task is to create a detailed image prompt based on a chapter segment.
 
-      // Create a context-specific prompt for the LLM
-      const promptContext = `
-        Generate a detailed and creative image description for a story slide.
-        
-        Chapter Context: Chapter ${slide.chapterNumber}
-        Current Slide Content: ${slide.prompt}
-        
-        The image should be in ${styleText} style.
-        
-        Your task is to create a vivid, detailed prompt that would help an AI image generator 
-        create a compelling visual representation of this scene. Focus on the important elements, 
-        mood, lighting, characters, and setting. Be specific about visual details.
-      `;
+          1. Analyze the following chapter content:
+             "Chapter ${slide.chapterNumber}, with location "${location}" and timeline "${timeline}""
+             
+          2. The current prompt is: "${slide.prompt}"
+          
+          3. Create a comprehensive, visually rich image generation prompt that captures this scene. Include details about setting, characters, actions, mood, lighting, and cinematic elements. The image should be in ${styleText} style.
+          
+          4. Output ONLY the enhanced prompt, with no additional text, explanations, or numbering.
+        `;
+      } else {
+        // For custom story input
+        promptContext = `
+          You are an expert storyboard generator for AI-based image creation. Your task is to create a detailed image prompt based on a story segment.
+
+          1. Analyze the following story segment:
+             "${slide.prompt}"
+             
+          2. If helpful, here's more context from the full story: "${fullStory.substring(0, 300)}..."
+          
+          3. Create a comprehensive, visually rich image generation prompt that captures this scene. Include details about setting, characters, actions, mood, lighting, and cinematic elements. The image should be in ${styleText} style.
+          
+          4. Output ONLY the enhanced prompt, with no additional text, explanations, or numbering.
+        `;
+      }
 
       try {
         // Use the enhancePrompt function with the selected LLM model
@@ -304,10 +418,15 @@ export function StoryboardPanel({
           model: selectedLlmModel,
         });
 
+        // Generate a preview version for display
+        const promptPreview = enhancedPrompt.length > 200 
+          ? enhancedPrompt.substring(0, 200) + "..." 
+          : enhancedPrompt;
+
         // Update just this slide with the new prompt
         setSlides(
           slides.map((s, i) =>
-            i === index ? { ...s, prompt: enhancedPrompt } : s,
+            i === index ? { ...s, prompt: enhancedPrompt, promptPreview } : s,
           ),
         );
       } catch (error) {
@@ -320,10 +439,22 @@ export function StoryboardPanel({
     }
   };
 
-  // Function to handle prompt editing
+  // Update the handlePromptEdit function to handle full prompt text
   const handlePromptEdit = (index: number, newPrompt: string) => {
     setSlides(
-      slides.map((s, i) => (i === index ? { ...s, prompt: newPrompt } : s)),
+      slides.map((s, i) => {
+        if (i === index) {
+          return {
+            ...s,
+            prompt: newPrompt,
+            // If we had a preview, update it with a truncated version of the new prompt
+            promptPreview: newPrompt.length > 200 
+              ? newPrompt.substring(0, 200) + "..." 
+              : newPrompt
+          };
+        }
+        return s;
+      })
     );
   };
 
@@ -416,7 +547,7 @@ export function StoryboardPanel({
             >
               <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
             </svg>
-            <h2 className="text-lg font-semibold">Storyboard Editor</h2>
+            <h2 className="text-lg font-semibold">{storyboardTitle}</h2>
             <span className="ml-2 bg-blue-600/70 text-xs px-2 py-0.5 rounded-full">
               {slides.length} Slides
             </span>
@@ -625,7 +756,7 @@ export function StoryboardPanel({
                       <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-2.5-2.5Z" />
                       <path d="M10 2v20" />
                     </svg>
-                    Chapter {slide.chapterNumber}
+                    {storyboardSource === "chapter" ? `Chapter ${slide.chapterNumber}` : "Scene"}
                   </span>
                   <span className="bg-blue-600/20 text-blue-500 text-xs px-2 py-0.5 rounded-full font-medium">
                     Slide {index + 1}

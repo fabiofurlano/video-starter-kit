@@ -15,9 +15,14 @@ import {
   Home,
   DownloadIcon,
   LayoutDashboard,
+  AlertCircle,
 } from "lucide-react";
 import config from "@/lib/config";
 import { useRouter } from "next/navigation";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 export default function IndexPage() {
   const [userData, setUserData] = useState<UserData | null>(null);
@@ -29,6 +34,13 @@ export default function IndexPage() {
   const [slideSelections, setSlideSelections] = useState<
     Record<number, string>
   >({});
+  
+  // New state for storyboard from scratch feature
+  const [storyInput, setStoryInput] = useState("");
+  const [customSlideCount, setCustomSlideCount] = useState("3");
+  const [customImageStyle, setCustomImageStyle] = useState("fantasy");
+  const [inputError, setInputError] = useState("");
+  
   const router = useRouter();
 
   const toggleChapter = (index: number) => {
@@ -45,6 +57,27 @@ export default function IndexPage() {
     }));
   };
 
+  // Function to validate text input
+  const validateStoryInput = (text: string) => {
+    // Check if text is too short (minimum 20 words)
+    const wordCount = text.trim().split(/\s+/).length;
+    if (wordCount < 20) {
+      setInputError("Your story is too short! Please add more details for better visuals.");
+      return false;
+    }
+    
+    // Check if text is too vague (very basic check)
+    if (text.length < 100) {
+      setInputError("This text is too vague. Try adding names, locations, and actions.");
+      return false;
+    }
+    
+    // Clear any previous errors
+    setInputError("");
+    return true;
+  };
+
+  // Function to generate storyboard from chapters (original function)
   const generateStoryboard = (index: number) => {
     // Check if a slide count is selected
     if (!slideSelections[index] || slideSelections[index] === "") {
@@ -69,21 +102,38 @@ export default function IndexPage() {
       const endPos = Math.min(startPos + segmentSize, contentLength);
       const segmentContent = chapter.content.substring(startPos, endPos);
 
+      // Create a preview version for UI display, but keep the full content in the prompt
+      const previewText = segmentContent.length > 200 
+        ? segmentContent.substring(0, 200) + "..." 
+        : segmentContent;
+
       // Create a prompt that focuses on different parts of the chapter
       return {
         chapterNumber: chapter.number,
-        prompt: `Create a visual representation for chapter ${chapter.number}: ${chapter.title}. Scene description based on the following excerpt: ${segmentContent.substring(0, 200)}...`,
+        prompt: `Create a visual representation for chapter ${chapter.number}: ${chapter.title}. Scene description based on the following excerpt: ${segmentContent}`,
+        promptPreview: `Create a visual representation for chapter ${chapter.number}: ${chapter.title}. Scene description based on the following excerpt: ${previewText}`,
         imageUrl: undefined,
       };
     });
 
     // Store storyboard data in localStorage
-    const storyboardData = { slides };
+    const storyboardData = { 
+      slides,
+      metadata: {
+        source: "chapter",
+        chapterNumber: chapter.number,
+        chapterTitle: chapter.title,
+        style: "fantasy", // Default style for chapter-based storyboards
+        location: userData?.location || "",
+        timeline: userData?.timeline || ""
+      }
+    };
+    
     try {
       localStorage.setItem("storyboardData", JSON.stringify(storyboardData));
       console.log(
-        "Successfully stored storyboard data in localStorage:",
-        storyboardData,
+        "Successfully stored chapter storyboard data in localStorage:",
+        storyboardData
       );
 
       // Redirect to the video editor app with a clear URL indicator
@@ -91,6 +141,72 @@ export default function IndexPage() {
     } catch (error) {
       console.error("Error storing storyboard data:", error);
       alert("Error preparing storyboard data. Please try again.");
+    }
+  };
+
+  // Function to generate storyboard from custom text
+  const generateStoryboardFromScratch = () => {
+    // Validate the input first
+    if (!validateStoryInput(storyInput)) {
+      return;
+    }
+
+    if (!customSlideCount || customSlideCount === "") {
+      setInputError("Please select the number of slides first");
+      return;
+    }
+
+    const slideCount = parseInt(customSlideCount);
+    console.log(`Generating ${slideCount} slides from custom story`);
+
+    // Generate basic slide descriptions from the input text
+    // This will be enhanced by the AI in storyboard-panel.tsx
+    const contentLength = storyInput.length;
+    const segmentSize = Math.floor(contentLength / slideCount);
+    
+    const slides = Array.from({ length: slideCount }, (_, i) => {
+      const startPos = i * segmentSize;
+      const endPos = Math.min(startPos + segmentSize, contentLength);
+      const segmentContent = storyInput.substring(startPos, endPos);
+
+      // Create a visual preview for UI that's truncated, but keep full content in prompt
+      const previewText = segmentContent.length > 200 
+        ? segmentContent.substring(0, 200) + "..." 
+        : segmentContent;
+
+      return {
+        chapterNumber: "Custom", // Mark as custom to differentiate from chapter-based slides
+        prompt: `Create a visual representation for the following scene: ${segmentContent}`,
+        promptPreview: `Create a visual representation for the following scene: ${previewText}`,
+        imageUrl: undefined,
+      };
+    });
+
+    // Store storyboard data in localStorage
+    const storyboardData = { 
+      slides,
+      metadata: {
+        source: "custom",
+        style: customImageStyle,
+        fullStory: storyInput
+      }
+    };
+    
+    try {
+      localStorage.setItem("storyboardData", JSON.stringify(storyboardData));
+      console.log(
+        "Successfully stored custom storyboard data in localStorage:",
+        storyboardData
+      );
+
+      // Also store the original input for reference
+      localStorage.setItem("story_input", storyInput);
+      
+      // Redirect to the video editor app
+      router.push("/app?storyboard=true");
+    } catch (error) {
+      console.error("Error storing storyboard data:", error);
+      setInputError("Error preparing storyboard data. Please try again.");
     }
   };
 
@@ -437,97 +553,217 @@ export default function IndexPage() {
               )}
             </div>
 
-            {/* Chapters Panel */}
+            {/* New Storyboard Creation Section */}
             <div className="glassmorphism p-6 border-gray-800 mt-6">
-              <h2 className="text-2xl font-bold mb-6 text-white">Chapters</h2>
-              {userData.chapters && userData.chapters.length > 0 ? (
-                <div className="grid grid-cols-1 gap-6">
-                  {userData.chapters.map((chapter, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
-                    >
-                      <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-700/50 pb-2">
-                        Chapter {chapter.number}: {chapter.title}
-                      </h1>
-                      <div className="text-sm mt-3 text-gray-300 leading-relaxed">
-                        {expandedChapters[index] ? (
-                          <div
-                            dangerouslySetInnerHTML={{
-                              __html: chapter.content || "No content",
-                            }}
-                          />
-                        ) : (
-                          <div className="line-clamp-4">
-                            {chapter.content ? (
+              <h2 className="text-2xl font-bold mb-6 text-white">Create Storyboard</h2>
+              
+              <Tabs defaultValue="chapters" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="chapters">From Chapters</TabsTrigger>
+                  <TabsTrigger value="scratch">Start from Scratch</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="chapters">
+                  {/* Existing Chapters Panel */}
+                  {userData.chapters && userData.chapters.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6">
+                      {userData.chapters.map((chapter, index) => (
+                        <div
+                          key={index}
+                          className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
+                        >
+                          <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-700/50 pb-2">
+                            Chapter {chapter.number}: {chapter.title}
+                          </h1>
+                          <div className="text-sm mt-3 text-gray-300 leading-relaxed">
+                            {expandedChapters[index] ? (
                               <div
                                 dangerouslySetInnerHTML={{
-                                  __html:
-                                    chapter.content.substring(0, 250) + "...",
+                                  __html: chapter.content || "No content",
                                 }}
                               />
                             ) : (
-                              "No content"
+                              <div className="line-clamp-4">
+                                {chapter.content ? (
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html:
+                                        chapter.content.substring(0, 250) + "...",
+                                    }}
+                                  />
+                                ) : (
+                                  "No content"
+                                )}
+                              </div>
                             )}
+
+                            <button
+                              onClick={() => toggleChapter(index)}
+                              className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
+                            >
+                              {expandedChapters[index] ? "Show Less" : "Show More"}
+                            </button>
+
+                            <div className="flex items-center mt-3 space-x-2">
+                              <select
+                                className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                value={slideSelections[index] || ""}
+                                onChange={(e) =>
+                                  handleSlideCountChange(index, e.target.value)
+                                }
+                              >
+                                <option value="">Slides</option>
+                                <option value="1">1 Slide</option>
+                                <option value="2">2 Slides</option>
+                                <option value="3">3 Slides</option>
+                                <option value="4">4 Slides</option>
+                                <option value="5">5 Slides</option>
+                                <option value="6">6 Slides</option>
+                              </select>
+
+                              <button
+                                onClick={() => generateStoryboard(index)}
+                                className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-3.5 w-3.5 mr-1"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4a.5.5 0 01-.5-.5V5.5A.5.5 0 014 5h12a.5.5 0 01.5.5v9a.5.5 0 01-.5.5z"
+                                    clipRule="evenodd"
+                                  />
+                                  <path d="M6 7a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
+                                </svg>
+                                Generate Storyboard
+                              </button>
+                            </div>
                           </div>
-                        )}
-
-                        <button
-                          onClick={() => toggleChapter(index)}
-                          className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 text-center py-6">
+                      No chapters found. Try creating a storyboard from scratch instead.
+                    </p>
+                  )}
+                </TabsContent>
+                
+                <TabsContent value="scratch">
+                  {/* New Start from Scratch UI */}
+                  <div className="space-y-5">
+                    <div className="bg-gray-900/50 p-5 rounded-lg border border-gray-800">
+                      <div className="flex justify-between items-start mb-2">
+                        <Label 
+                          htmlFor="story-input" 
+                          className="text-sm font-medium flex items-center"
                         >
-                          {expandedChapters[index] ? "Show Less" : "Show More"}
-                        </button>
-
-                        <div className="flex items-center mt-3 space-x-2">
+                          Your Story
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="ml-1.5 cursor-help">
+                                  <AlertCircle size={14} className="text-gray-400" />
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>For best results, describe what happens, where it happens, and any important details.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </Label>
+                      </div>
+                      
+                      <Textarea
+                        id="story-input"
+                        placeholder="Write a short story or scene description. Include actions, characters, and locations."
+                        className="h-48 resize-none mb-3 bg-gray-800/50 border-gray-700"
+                        value={storyInput}
+                        onChange={(e) => {
+                          setStoryInput(e.target.value);
+                          // Clear error when user starts typing
+                          if (inputError) setInputError("");
+                        }}
+                      />
+                      
+                      {inputError && (
+                        <div className="bg-red-900/30 border border-red-700/50 p-3 rounded-md mb-4">
+                          <p className="text-red-200 text-sm flex items-center">
+                            <AlertCircle size={14} className="mr-1.5 flex-shrink-0" />
+                            {inputError}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        {/* Slide Count Selection */}
+                        <div>
+                          <Label htmlFor="slide-count" className="text-sm font-medium mb-1.5 block">
+                            Number of Slides
+                          </Label>
                           <select
-                            className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                            value={slideSelections[index] || ""}
-                            onChange={(e) =>
-                              handleSlideCountChange(index, e.target.value)
-                            }
+                            id="slide-count"
+                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            value={customSlideCount}
+                            onChange={(e) => setCustomSlideCount(e.target.value)}
                           >
-                            <option value="">Slides</option>
                             <option value="1">1 Slide</option>
                             <option value="2">2 Slides</option>
                             <option value="3">3 Slides</option>
                             <option value="4">4 Slides</option>
                             <option value="5">5 Slides</option>
+                            <option value="6">6 Slides</option>
                           </select>
-
-                          <button
-                            onClick={() => generateStoryboard(index)}
-                            className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
+                        </div>
+                        
+                        {/* Image Style Selection */}
+                        <div>
+                          <Label htmlFor="image-style" className="text-sm font-medium mb-1.5 block">
+                            Image Style
+                          </Label>
+                          <select
+                            id="image-style"
+                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            value={customImageStyle}
+                            onChange={(e) => setCustomImageStyle(e.target.value)}
                           >
-                            <svg
-                              xmlns="http://www.w3.org/2000/svg"
-                              className="h-3.5 w-3.5 mr-1"
-                              viewBox="0 0 20 20"
-                              fill="currentColor"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4a.5.5 0 01-.5-.5V5.5A.5.5 0 014 5h12a.5.5 0 01.5.5v9a.5.5 0 01-.5.5z"
-                                clipRule="evenodd"
-                              />
-                              <path d="M6 7a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
-                            </svg>
-                            Generate Storyboard
-                          </button>
+                            <option value="fantasy">Fantasy</option>
+                            <option value="cyberpunk">Cyberpunk</option>
+                            <option value="gothic">Gothic</option>
+                            <option value="historical">Historical</option>
+                            <option value="surreal">Surreal</option>
+                            <option value="anime">Anime</option>
+                            <option value="scifi">SciFi</option>
+                            <option value="watercolor">Watercolor</option>
+                          </select>
                         </div>
                       </div>
+                      
+                      <Button
+                        onClick={generateStoryboardFromScratch}
+                        className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 mr-2"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                          <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                        </svg>
+                        Create Storyboard
+                      </Button>
                     </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-400 text-center py-6">
-                  No chapters found. You can create visual content without
-                  defined chapters.
-                </p>
-              )}
+                  </div>
+                </TabsContent>
+              </Tabs>
             </div>
 
-            {/* Direct Video Studio Button (replacing the grid of project actions) */}
+            {/* Direct Video Studio Button */}
             <div className="flex justify-center my-10">
               <Link href="/app" className="block w-full max-w-xl">
                 <div className="glassmorphism bg-gradient-to-br from-blue-900/50 to-purple-900/50 hover:from-blue-800/50 hover:to-purple-800/50 p-8 rounded-xl text-center transition-all duration-300 shadow-lg border border-indigo-800/50 hover:border-indigo-600">
