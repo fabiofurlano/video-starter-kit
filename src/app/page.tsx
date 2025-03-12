@@ -495,13 +495,11 @@ export default function IndexPage() {
           <div className="space-y-8">
             {/* Tabs Only Section at Top */}
             <div className="glassmorphism p-6 border-gray-800">
-              <h2 className="text-2xl font-bold mb-6 text-white">
-                Create Storyboard
-              </h2>
+              <h2 className="text-2xl font-bold mb-6 text-white">Create Storyboard</h2>
               <Tabs defaultValue="chapters" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="chapters">From Chapters</TabsTrigger>
-                  <TabsTrigger value="scratch">Start from Scratch</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-gray-800/70 rounded-lg">
+                  <TabsTrigger value="chapters" className="transition-all duration-200 hover:bg-gray-700/50 data-[state=active]:bg-blue-600/70 data-[state=active]:text-white rounded-md py-2">From Chapters</TabsTrigger>
+                  <TabsTrigger value="scratch" className="transition-all duration-200 hover:bg-gray-700/50 data-[state=active]:bg-blue-600/70 data-[state=active]:text-white rounded-md py-2">Start from Scratch</TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="chapters">
@@ -546,7 +544,7 @@ export default function IndexPage() {
                       <Textarea
                         id="story-input"
                         placeholder="Write a short story or scene description. Include actions, characters, and locations."
-                        className="h-48 resize-none mb-3 bg-gray-800/50 border-gray-700"
+                        className="h-48 resize-none mb-3 bg-gray-800/70 border-gray-700 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                         value={storyInput}
                         onChange={(e) => {
                           setStoryInput(e.target.value);
@@ -576,7 +574,7 @@ export default function IndexPage() {
                           </Label>
                           <select
                             id="slide-count"
-                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 hover:border-blue-400"
                             value={customSlideCount}
                             onChange={(e) => setCustomSlideCount(e.target.value)}
                           >
@@ -598,7 +596,7 @@ export default function IndexPage() {
                           </Label>
                           <select
                             id="image-style"
-                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 hover:border-blue-400"
                             value={customImageStyle}
                             onChange={(e) => setCustomImageStyle(e.target.value)}
                           >
@@ -616,7 +614,7 @@ export default function IndexPage() {
 
                       <Button
                         onClick={generateStoryboardFromScratch}
-                        className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500"
+                        className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 transition-all duration-300"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -771,7 +769,7 @@ export default function IndexPage() {
 
                               <button
                                 onClick={() => generateStoryboard(index)}
-                                className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
+                                className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
