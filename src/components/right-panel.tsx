@@ -549,7 +549,7 @@ export default function RightPanel({
             <div key={getAssetType(asset)} className="flex w-full">
               <div className="flex flex-col w-full" key={getAssetType(asset)}>
                 <div className="flex justify-between">
-                  <h4 className="capitalize text-muted-foreground mb-2">
+                  <h4 className="capitalize text-muted-foreground mb-1 text-sm">
                     {getAssetType(asset)} Reference
                   </h4>
                   {tab === `asset-${getAssetType(asset)}` && (
@@ -566,14 +566,14 @@ export default function RightPanel({
                   tab !== `asset-${getAssetType(asset)}`) && (
                   <>
                     {!generateData[getAssetKey(asset)] && (
-                      <div className="flex flex-col gap-2 justify-between">
+                      <div className="flex gap-2 justify-between mb-3">
                         <Button
                           variant="ghost"
                           onClick={() => {
                             setTab(`asset-${getAssetType(asset)}`);
                             setAssetMediaType(getAssetType(asset) ?? "all");
                           }}
-                          className="cursor-pointer min-h-[30px] flex flex-col items-center justify-center border border-dashed border-border rounded-md px-4"
+                          className="cursor-pointer min-h-[30px] flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-md px-2"
                         >
                           <span className="text-muted-foreground text-xs text-center text-nowrap">
                             Select
@@ -583,7 +583,7 @@ export default function RightPanel({
                           variant="ghost"
                           size="sm"
                           disabled={isUploading}
-                          className="cursor-pointer min-h-[30px] flex flex-col items-center justify-center border border-dashed border-border rounded-md px-4"
+                          className="cursor-pointer min-h-[30px] flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-md px-2"
                           asChild
                         >
                           <label htmlFor="assetUploadButton">
@@ -608,7 +608,7 @@ export default function RightPanel({
                       </div>
                     )}
                     {generateData[getAssetKey(asset)] && (
-                      <div className="cursor-pointer overflow-hidden relative w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md">
+                      <div className="cursor-pointer overflow-hidden relative w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md bg-black/10 p-1">
                         <WithTooltip tooltip="Remove media">
                           <button
                             type="button"
@@ -659,9 +659,9 @@ export default function RightPanel({
               </div>
             </div>
           ))}
-          <div className="relative bg-border rounded-lg pb-10 placeholder:text-base w-full  resize-none">
+          <div className="relative bg-border rounded-lg pb-10 placeholder:text-base w-full resize-none">
             <Textarea
-              className="text-base shadow-none focus:!ring-0 placeholder:text-base w-full h-32 resize-none"
+              className="text-base shadow-none focus:!ring-0 placeholder:text-base w-full h-24 resize-none"
               placeholder="Imagine..."
               value={generateData.prompt}
               rows={3}
@@ -748,7 +748,6 @@ export default function RightPanel({
             </div>
           </div>
         )}
-        <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-background to-transparent via-background via-60% h-8 pointer-events-none" />
       </div>
     </div>
   );
@@ -776,6 +775,7 @@ const SelectedAssetPreview = ({
               : data[assetKey] || ""
           }
           controls={true}
+          className="w-full max-w-full"
         />
       )}
       {assetType === "video" && (
@@ -787,18 +787,22 @@ const SelectedAssetPreview = ({
           }
           controls={false}
           style={{ pointerEvents: "none" }}
+          className="w-full max-h-[240px] object-contain"
         />
       )}
       {assetType === "image" && (
-        <img
-          id="image-preview"
-          src={
-            data[assetKey] && typeof data[assetKey] !== "string"
-              ? URL.createObjectURL(data[assetKey])
-              : data[assetKey] || ""
-          }
-          alt="Media Preview"
-        />
+        <div className="w-full flex justify-center items-center p-2">
+          <img
+            id="image-preview"
+            src={
+              data[assetKey] && typeof data[assetKey] !== "string"
+                ? URL.createObjectURL(data[assetKey])
+                : data[assetKey] || ""
+            }
+            alt="Media Preview"
+            className="max-h-[240px] object-contain rounded-md"
+          />
+        </div>
       )}
     </>
   );
