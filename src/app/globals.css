@@ -60,27 +60,27 @@ body {
   }
   .dark {
     /* Dark mode variables */
-    --background: 220 20% 5.4%;
-    --background-dark: 220 20% 3.9%;
-    --background-light: 220 20% 8%;
-    --foreground: 220 20% 98%;
-    --card: 220 20% 8%;
+    --background: 240 10% 3.9%;
+    --background-light: 240 10% 5%;
+    --background-dark: 240 10% 3%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
     --card-foreground: 0 0% 98%;
-    --popover: 220 20% 8%;
+    --popover: 240 10% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 220 85% 57%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 220 20% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 220 20% 14.9%;
-    --muted-foreground: 220 20% 63.9%;
-    --accent: 220 20% 14.9%;
-    --accent-foreground: 0 0% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 220 20% 20%;
-    --input: 220 20% 14.9%;
-    --ring: 220 85% 57%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -116,6 +116,24 @@ body {
   background: rgba(26, 26, 26, 0.75);
   border-color: rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Enhanced UI Elements */
+.panel-shadow {
+  box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.3);
+}
+
+.dark .panel-shadow {
+  box-shadow: 0 10px 30px -15px rgba(0, 0, 0, 0.5);
+}
+
+.hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.3);
 }
 
 /* Button Styling */

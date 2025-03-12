@@ -446,7 +446,7 @@ export default function RightPanel({
   return (
     <div
       className={cn(
-        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto bg-black/90 backdrop-blur-sm",
+        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto glassmorphism",
         generateDialogOpen ? "right-0" : "-right-[400px]",
       )}
     >
@@ -459,7 +459,7 @@ export default function RightPanel({
             variant="ghost"
             size="icon"
             onClick={() => handleOnOpenChange(false)}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 hover:bg-white/10 transition-colors"
           >
             <XIcon className="w-6 h-6" />
           </Button>
