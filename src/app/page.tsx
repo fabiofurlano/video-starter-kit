@@ -484,7 +484,6 @@ export default function IndexPage() {
       <main className="max-w-7xl mx-auto p-6">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center min-h-screen">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500 mb-4"></div>
             <h2 className="text-xl font-bold mb-2">
               Initializing AI Visual Studio...
             </h2>
@@ -797,34 +796,6 @@ export default function IndexPage() {
                   </div>
                 </TabsContent>
               </Tabs>
-            </div>
-
-            {/* Direct Video Studio Button */}
-            <div className="flex justify-center my-10">
-              <Link href="/app" className="block w-full max-w-xl">
-                <div className="glassmorphism bg-gradient-to-br from-blue-900/50 to-purple-900/50 hover:from-blue-800/50 hover:to-purple-800/50 p-8 rounded-xl text-center transition-all duration-300 shadow-lg border border-indigo-800/50 hover:border-indigo-600">
-                  <svg
-                    className="w-16 h-16 mx-auto mb-4 text-indigo-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <h3 className="text-2xl font-bold mb-2 text-white">
-                    Open Video Studio
-                  </h3>
-                  <p className="text-lg text-gray-300">
-                    Generate AI videos based on your story elements
-                  </p>
-                </div>
-              </Link>
             </div>
           </div>
         ) : (
