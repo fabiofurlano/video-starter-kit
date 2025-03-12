@@ -240,25 +240,33 @@ export function MediaItemRow({
                     try {
                       const response = await fetch(mediaUrl);
                       const blob = await response.blob();
-                      
+
                       const blobUrl = window.URL.createObjectURL(blob);
-                      
-                      const fileExt = data.mediaType === "video" ? "mp4" : data.mediaType === "image" ? "png" : "mp3";
-                      
+
+                      const fileExt =
+                        data.mediaType === "video"
+                          ? "mp4"
+                          : data.mediaType === "image"
+                            ? "png"
+                            : "mp3";
+
                       const a = document.createElement("a");
                       a.href = blobUrl;
                       a.download = `novelvision-${data.mediaType}-${mediaId}.${fileExt}`;
-                      
+
                       document.body.appendChild(a);
                       a.click();
-                      
+
                       window.URL.revokeObjectURL(blobUrl);
                       document.body.removeChild(a);
                     } catch (error) {
-                      console.error(`Error downloading ${data.mediaType}:`, error);
+                      console.error(
+                        `Error downloading ${data.mediaType}:`,
+                        error,
+                      );
                     }
                   };
-                  
+
                   handleDownload();
                 }}
                 title="Download"

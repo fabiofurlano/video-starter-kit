@@ -21,6 +21,7 @@ import LeftPanel from "./left-panel";
 import { KeyDialog } from "./key-dialog";
 import { StoryboardPanel } from "./storyboard-panel";
 import { fal } from "@/lib/fal";
+import Footer from "@/components/footer";
 
 type AppProps = {
   projectId: string;
@@ -120,13 +121,13 @@ export function App({ projectId }: AppProps) {
     <ToastProvider>
       <QueryClientProvider client={queryClient}>
         <VideoProjectStoreContext.Provider value={projectStore}>
-          <div className="flex flex-col relative overflow-x-hidden h-screen bg-background">
+          <div className="flex flex-col relative min-h-screen overflow-auto bg-background">
             <StoryboardPanel
               onGenerateImage={handleGenerateImage}
               onSaveToMediaManager={handleSaveToMediaManager}
             />
             <Header openKeyDialog={() => setKeyDialog(true)} />
-            <main className="flex overflow-hidden h-full w-screen">
+            <main className="flex overflow-x-auto flex-1 w-full">
               <div className="w-[400px] min-w-[400px]">
                 <LeftPanel />
               </div>
@@ -136,6 +137,7 @@ export function App({ projectId }: AppProps) {
               </div>
             </main>
             <RightPanel />
+            <Footer />
           </div>
           <Toaster />
           <ProjectDialog open={projectDialogOpen} />

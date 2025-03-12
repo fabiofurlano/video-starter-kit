@@ -446,11 +446,11 @@ export default function RightPanel({
   return (
     <div
       className={cn(
-        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 absolute top-0 h-full bg-black",
+        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto bg-black/90 backdrop-blur-sm",
         generateDialogOpen ? "right-0" : "-right-[400px]",
       )}
     >
-      <div className="flex-1 p-4 flex flex-col gap-4 border-b border-border h-full overflow-hidden relative">
+      <div className="flex-1 p-4 flex flex-col gap-4 border-b border-border h-full overflow-y-auto relative">
         <div className="flex flex-row items-center justify-between">
           <h2 className="text-sm text-muted-foreground font-semibold flex-1">
             Generate Media

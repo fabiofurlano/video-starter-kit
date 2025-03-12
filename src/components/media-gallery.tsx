@@ -337,41 +337,47 @@ export function MediaGallerySheet({
                 <ImagesIcon className="w-4 h-4 opacity-50" />
                 Re-run
               </Button>
-              {mediaUrl && (selectedMedia.mediaType === "image" || selectedMedia.mediaType === "video") && (
-                <Button
-                  variant="secondary"
-                  disabled={deleteMedia.isPending}
-                  onClick={() => {
-                    const handleDownload = async () => {
-                      try {
-                        const response = await fetch(mediaUrl);
-                        const blob = await response.blob();
-                        
-                        const blobUrl = window.URL.createObjectURL(blob);
-                        
-                        const fileExtension = selectedMedia.mediaType === "video" ? "mp4" : "png";
-                        
-                        const a = document.createElement("a");
-                        a.href = blobUrl;
-                        a.download = `novelvision-media-${selectedMedia.id}.${fileExtension}`;
-                        
-                        document.body.appendChild(a);
-                        a.click();
-                        
-                        window.URL.revokeObjectURL(blobUrl);
-                        document.body.removeChild(a);
-                      } catch (error) {
-                        console.error(`Error downloading ${selectedMedia.mediaType}:`, error);
-                      }
-                    };
-                    
-                    handleDownload();
-                  }}
-                >
-                  <DownloadIcon className="mr-1 h-4 w-4 opacity-70" />
-                  Download
-                </Button>
-              )}
+              {mediaUrl &&
+                (selectedMedia.mediaType === "image" ||
+                  selectedMedia.mediaType === "video") && (
+                  <Button
+                    variant="secondary"
+                    disabled={deleteMedia.isPending}
+                    onClick={() => {
+                      const handleDownload = async () => {
+                        try {
+                          const response = await fetch(mediaUrl);
+                          const blob = await response.blob();
+
+                          const blobUrl = window.URL.createObjectURL(blob);
+
+                          const fileExtension =
+                            selectedMedia.mediaType === "video" ? "mp4" : "png";
+
+                          const a = document.createElement("a");
+                          a.href = blobUrl;
+                          a.download = `novelvision-media-${selectedMedia.id}.${fileExtension}`;
+
+                          document.body.appendChild(a);
+                          a.click();
+
+                          window.URL.revokeObjectURL(blobUrl);
+                          document.body.removeChild(a);
+                        } catch (error) {
+                          console.error(
+                            `Error downloading ${selectedMedia.mediaType}:`,
+                            error,
+                          );
+                        }
+                      };
+
+                      handleDownload();
+                    }}
+                  >
+                    <DownloadIcon className="mr-1 h-4 w-4 opacity-70" />
+                    Download
+                  </Button>
+                )}
               <Button
                 variant="secondary"
                 disabled={deleteMedia.isPending}
