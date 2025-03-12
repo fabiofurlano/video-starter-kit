@@ -507,7 +507,8 @@ export default function IndexPage() {
                 <TabsContent value="chapters">
                   <div className="text-center py-4">
                     <p className="text-gray-300">
-                      Scroll down to view your chapters and create storyboards from them.
+                      Scroll down to view your chapters and create storyboards
+                      from them.
                     </p>
                   </div>
                 </TabsContent>
@@ -578,7 +579,9 @@ export default function IndexPage() {
                             id="slide-count"
                             className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             value={customSlideCount}
-                            onChange={(e) => setCustomSlideCount(e.target.value)}
+                            onChange={(e) =>
+                              setCustomSlideCount(e.target.value)
+                            }
                           >
                             <option value="1">1 Slide</option>
                             <option value="2">2 Slides</option>
@@ -600,7 +603,9 @@ export default function IndexPage() {
                             id="image-style"
                             className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
                             value={customImageStyle}
-                            onChange={(e) => setCustomImageStyle(e.target.value)}
+                            onChange={(e) =>
+                              setCustomImageStyle(e.target.value)
+                            }
                           >
                             <option value="fantasy">Fantasy</option>
                             <option value="cyberpunk">Cyberpunk</option>
