@@ -75,6 +75,7 @@ interface StoryboardPanelProps {
   onGenerateImage: (
     prompt: string,
     modelId?: string,
+    aspectRatio?: string,
   ) => Promise<string | undefined>;
   onSaveToMediaManager: (imageUrl: string) => void;
 }
@@ -118,6 +119,8 @@ export function StoryboardPanel({
   >("chapter");
   const [storyboardMetadata, setStoryboardMetadata] = useState<any>({});
   const [storyboardTitle, setStoryboardTitle] = useState("Storyboard Editor");
+  // Add state for aspect ratio
+  const [aspectRatio, setAspectRatio] = useState<"16:9" | "9:16">("16:9");
 
   const sessionData = useVideoProjectStore((state) => state.generateData);
   const projectId = useProjectId();
@@ -348,10 +351,10 @@ export function StoryboardPanel({
       setIsLoading((prev) => ({ ...prev, [index]: true }));
 
       const slide = slides[index];
-      console.log("Generating image with model:", selectedImageModel);
+      console.log("Generating image with model:", selectedImageModel, "aspect ratio:", aspectRatio);
 
-      // Pass both the prompt and the selected model ID
-      const imageUrl = await onGenerateImage(slide.prompt, selectedImageModel);
+      // Pass the prompt, model ID, and now the aspect ratio
+      const imageUrl = await onGenerateImage(slide.prompt, selectedImageModel, aspectRatio);
 
       if (imageUrl) {
         console.log("Image generated successfully:", imageUrl);
@@ -817,6 +820,36 @@ export function StoryboardPanel({
                   />
                 </div>
 
+                {/* Add Aspect Ratio selector */}
+                <div className="mb-3">
+                  <Label
+                    htmlFor={`aspect-ratio-${index}`}
+                    className="text-sm font-medium mb-1.5 block"
+                  >
+                    Aspect Ratio
+                  </Label>
+                  <div className="flex flex-row gap-2">
+                    <Button
+                      id={`aspect-ratio-16-9-${index}`}
+                      variant={aspectRatio === "16:9" ? "secondary" : "outline"}
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => setAspectRatio("16:9")}
+                    >
+                      16:9
+                    </Button>
+                    <Button
+                      id={`aspect-ratio-9-16-${index}`}
+                      variant={aspectRatio === "9:16" ? "secondary" : "outline"}
+                      size="sm"
+                      className="flex-1"
+                      onClick={() => setAspectRatio("9:16")}
+                    >
+                      9:16
+                    </Button>
+                  </div>
+                </div>
+
                 <Button
                   variant="outline"
                   size="sm"
@@ -835,7 +868,7 @@ export function StoryboardPanel({
                     <img
                       src={slide.imageUrl}
                       alt={`Chapter ${slide.chapterNumber} visualization`}
-                      className="w-full h-40 object-cover rounded-md shadow-sm cursor-pointer hover:opacity-95 transition-opacity"
+                      className={`w-full ${aspectRatio === "16:9" ? "h-40" : "h-48"} object-cover rounded-md shadow-sm cursor-pointer hover:opacity-95 transition-opacity`}
                       onClick={() => {
                         if (slide.imageUrl) {
                           setExpandedImage(slide.imageUrl);
@@ -859,7 +892,7 @@ export function StoryboardPanel({
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full h-40 bg-gradient-to-br from-gray-800/10 to-gray-800/25 rounded-md flex flex-col items-center justify-center border border-gray-700/20 shadow-inner">
+                  <div className={`w-full ${aspectRatio === "16:9" ? "h-40" : "h-48"} bg-gradient-to-br from-gray-800/10 to-gray-800/25 rounded-md flex flex-col items-center justify-center border border-gray-700/20 shadow-inner`}>
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
@@ -878,6 +911,9 @@ export function StoryboardPanel({
                     </svg>
                     <span className="text-gray-500 text-sm font-medium">
                       Image will appear here
+                    </span>
+                    <span className="text-gray-400 text-xs mt-1">
+                      {aspectRatio === "16:9" ? "Landscape" : "Portrait"} format
                     </span>
                   </div>
                 )}
