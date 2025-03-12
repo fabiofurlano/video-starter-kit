@@ -495,17 +495,30 @@ export default function IndexPage() {
           <div className="space-y-8">
             {/* Tabs Only Section at Top */}
             <div className="glassmorphism p-6 border-gray-800">
-              <h2 className="text-2xl font-bold mb-6 text-white">Create Storyboard</h2>
+              <h2 className="text-2xl font-bold mb-6 text-white">
+                Create Storyboard
+              </h2>
               <Tabs defaultValue="chapters" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6 p-1 bg-gray-800/70 rounded-lg">
-                  <TabsTrigger value="chapters" className="transition-all duration-200 hover:bg-gray-700/50 data-[state=active]:bg-blue-600/70 data-[state=active]:text-white rounded-md py-2">From Chapters</TabsTrigger>
-                  <TabsTrigger value="scratch" className="transition-all duration-200 hover:bg-gray-700/50 data-[state=active]:bg-blue-600/70 data-[state=active]:text-white rounded-md py-2">Start from Scratch</TabsTrigger>
+                  <TabsTrigger
+                    value="chapters"
+                    className="transition-all duration-200 hover:bg-gray-700/50 data-[state=active]:bg-blue-600/70 data-[state=active]:text-white rounded-md py-2"
+                  >
+                    From Chapters
+                  </TabsTrigger>
+                  <TabsTrigger
+                    value="scratch"
+                    className="transition-all duration-200 hover:bg-gray-700/50 data-[state=active]:bg-blue-600/70 data-[state=active]:text-white rounded-md py-2"
+                  >
+                    Start from Scratch
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="chapters">
                   <div className="text-center py-4">
                     <p className="text-gray-300">
-                      Scroll down to view your chapters and create storyboards from them.
+                      Scroll down to view your chapters and create storyboards
+                      from them.
                     </p>
                   </div>
                 </TabsContent>
@@ -576,7 +589,9 @@ export default function IndexPage() {
                             id="slide-count"
                             className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 hover:border-blue-400"
                             value={customSlideCount}
-                            onChange={(e) => setCustomSlideCount(e.target.value)}
+                            onChange={(e) =>
+                              setCustomSlideCount(e.target.value)
+                            }
                           >
                             <option value="1">1 Slide</option>
                             <option value="2">2 Slides</option>
@@ -598,7 +613,9 @@ export default function IndexPage() {
                             id="image-style"
                             className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 hover:border-blue-400"
                             value={customImageStyle}
-                            onChange={(e) => setCustomImageStyle(e.target.value)}
+                            onChange={(e) =>
+                              setCustomImageStyle(e.target.value)
+                            }
                           >
                             <option value="fantasy">Fantasy</option>
                             <option value="cyberpunk">Cyberpunk</option>
@@ -640,25 +657,25 @@ export default function IndexPage() {
               </h2>
               {userData.title || userData.genre || userData.language ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
                     <h3 className="text-gray-400 text-sm mb-1">Title</h3>
                     <p className="text-lg font-medium">
                       {userData.title || "Untitled Story"}
                     </p>
                   </div>
-                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
                     <h3 className="text-gray-400 text-sm mb-1">Genre</h3>
                     <p className="text-lg font-medium">
                       {userData.genre || "Not specified"}
                     </p>
                   </div>
-                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
                     <h3 className="text-gray-400 text-sm mb-1">Language</h3>
                     <p className="text-lg font-medium">
                       {userData.language || "Not specified"}
                     </p>
                   </div>
-                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
                     <h3 className="text-gray-400 text-sm mb-1">Location</h3>
                     <p className="text-lg font-medium">
                       {userData.location || "Not specified"}
@@ -683,7 +700,7 @@ export default function IndexPage() {
                   {userData.characters.map((character, index) => (
                     <div
                       key={index}
-                      className="bg-gray-900/50 p-5 rounded-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
+                      className="bg-gray-900/50 p-5 rounded-lg border border-gray-800 hover:border-blue-500/50 transition-all duration-300"
                     >
                       <h3 className="font-bold text-white">{character.name}</h3>
                       <p className="text-sm text-blue-300 mt-1">
@@ -713,7 +730,7 @@ export default function IndexPage() {
                       {userData.chapters.map((chapter, index) => (
                         <div
                           key={index}
-                          className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
+                          className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-500/50 transition-all duration-300"
                         >
                           <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-700/50 pb-2">
                             Chapter {chapter.number}: {chapter.title}
@@ -743,7 +760,7 @@ export default function IndexPage() {
 
                             <button
                               onClick={() => toggleChapter(index)}
-                              className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
+                              className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors duration-200 text-xs"
                             >
                               {expandedChapters[index]
                                 ? "Show Less"
@@ -752,7 +769,7 @@ export default function IndexPage() {
 
                             <div className="flex items-center mt-3 space-x-2">
                               <select
-                                className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 hover:border-blue-400"
                                 value={slideSelections[index] || ""}
                                 onChange={(e) =>
                                   handleSlideCountChange(index, e.target.value)
@@ -769,7 +786,7 @@ export default function IndexPage() {
 
                               <button
                                 onClick={() => generateStoryboard(index)}
-                                className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
+                                className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1 transition-all duration-200"
                               >
                                 <svg
                                   xmlns="http://www.w3.org/2000/svg"
@@ -793,7 +810,8 @@ export default function IndexPage() {
                     </div>
                   ) : (
                     <p className="text-gray-400 text-center py-6">
-                      No chapters found. Try creating a storyboard from scratch instead.
+                      No chapters found. Try creating a storyboard from scratch
+                      instead.
                     </p>
                   )}
                 </TabsContent>
