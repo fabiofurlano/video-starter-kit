@@ -1039,7 +1039,7 @@ export function StoryboardPanel({
                       )}
                     </Button>
                   )}
-                  
+
                   {slide.imageUrl && (
                     <DownloadButton
                       imageUrl={slide.imageUrl}

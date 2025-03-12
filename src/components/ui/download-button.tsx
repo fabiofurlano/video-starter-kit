@@ -5,7 +5,13 @@ interface DownloadButtonProps {
   imageUrl: string;
   filename: string;
   className?: string;
-  variant?: "default" | "destructive" | "outline" | "secondary" | "ghost" | "link";
+  variant?:
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link";
   size?: "default" | "sm" | "lg" | "icon";
   buttonText?: string;
 }
@@ -18,25 +24,24 @@ export function DownloadButton({
   size = "sm",
   buttonText = "Download Image",
 }: DownloadButtonProps) {
-  
   const handleDownload = async () => {
     try {
       // Fetch the image as a blob
       const response = await fetch(imageUrl);
       const blob = await response.blob();
-      
+
       // Create a blob URL and use it to trigger a proper save dialog
       const blobUrl = window.URL.createObjectURL(blob);
-      
+
       // Create a temporary link element
       const a = document.createElement("a");
       a.href = blobUrl;
       a.download = filename;
-      
+
       // This is important to trigger the actual download dialog on the PC
       document.body.appendChild(a);
       a.click();
-      
+
       // Clean up
       window.URL.revokeObjectURL(blobUrl);
       document.body.removeChild(a);
@@ -73,4 +78,4 @@ export function DownloadButton({
       </span>
     </Button>
   );
-} 
+}
