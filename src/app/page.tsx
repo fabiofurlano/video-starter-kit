@@ -493,6 +493,148 @@ export default function IndexPage() {
           </div>
         ) : userData ? (
           <div className="space-y-8">
+            {/* Tabs Only Section at Top */}
+            <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-6 text-white">
+                Create Storyboard
+              </h2>
+              <Tabs defaultValue="chapters" className="w-full">
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="chapters">From Chapters</TabsTrigger>
+                  <TabsTrigger value="scratch">Start from Scratch</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="chapters">
+                  <div className="text-center py-4">
+                    <p className="text-gray-300">
+                      Scroll down to view your chapters and create storyboards from them.
+                    </p>
+                  </div>
+                </TabsContent>
+
+                <TabsContent value="scratch">
+                  {/* Start from Scratch UI */}
+                  <div className="space-y-5">
+                    <div className="bg-gray-900/50 p-5 rounded-lg border border-gray-800">
+                      <div className="flex justify-between items-start mb-2">
+                        <Label
+                          htmlFor="story-input"
+                          className="text-sm font-medium flex items-center"
+                        >
+                          Your Story
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger asChild>
+                                <span className="ml-1.5 cursor-help">
+                                  <AlertCircle
+                                    size={14}
+                                    className="text-gray-400"
+                                  />
+                                </span>
+                              </TooltipTrigger>
+                              <TooltipContent className="max-w-xs">
+                                <p>
+                                  For best results, describe what happens, where
+                                  it happens, and any important details.
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+                        </Label>
+                      </div>
+
+                      <Textarea
+                        id="story-input"
+                        placeholder="Write a short story or scene description. Include actions, characters, and locations."
+                        className="h-48 resize-none mb-3 bg-gray-800/50 border-gray-700"
+                        value={storyInput}
+                        onChange={(e) => {
+                          setStoryInput(e.target.value);
+                          if (inputError) setInputError("");
+                        }}
+                      />
+
+                      {inputError && (
+                        <div className="bg-red-900/30 border border-red-700/50 p-3 rounded-md mb-4">
+                          <p className="text-red-200 text-sm flex items-center">
+                            <AlertCircle
+                              size={14}
+                              className="mr-1.5 flex-shrink-0"
+                            />
+                            {inputError}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                        <div>
+                          <Label
+                            htmlFor="slide-count"
+                            className="text-sm font-medium mb-1.5 block"
+                          >
+                            Number of Slides
+                          </Label>
+                          <select
+                            id="slide-count"
+                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            value={customSlideCount}
+                            onChange={(e) => setCustomSlideCount(e.target.value)}
+                          >
+                            <option value="1">1 Slide</option>
+                            <option value="2">2 Slides</option>
+                            <option value="3">3 Slides</option>
+                            <option value="4">4 Slides</option>
+                            <option value="5">5 Slides</option>
+                            <option value="6">6 Slides</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <Label
+                            htmlFor="image-style"
+                            className="text-sm font-medium mb-1.5 block"
+                          >
+                            Image Style
+                          </Label>
+                          <select
+                            id="image-style"
+                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                            value={customImageStyle}
+                            onChange={(e) => setCustomImageStyle(e.target.value)}
+                          >
+                            <option value="fantasy">Fantasy</option>
+                            <option value="cyberpunk">Cyberpunk</option>
+                            <option value="gothic">Gothic</option>
+                            <option value="historical">Historical</option>
+                            <option value="surreal">Surreal</option>
+                            <option value="anime">Anime</option>
+                            <option value="scifi">SciFi</option>
+                            <option value="watercolor">Watercolor</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={generateStoryboardFromScratch}
+                        className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-4 w-4 mr-2"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
+                          <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
+                        </svg>
+                        Create Storyboard
+                      </Button>
+                    </div>
+                  </div>
+                </TabsContent>
+              </Tabs>
+            </div>
+
             {/* Story Info Panel */}
             <div className="glassmorphism p-6 border-gray-800">
               <h2 className="text-2xl font-bold mb-4 text-white">
@@ -563,18 +705,9 @@ export default function IndexPage() {
               )}
             </div>
 
-            {/* New Storyboard Creation Section */}
-            <div className="glassmorphism p-6 border-gray-800 mt-6">
-              <h2 className="text-2xl font-bold mb-6 text-white">
-                Create Storyboard
-              </h2>
-
+            {/* Full Storyboard Creation Section with Content */}
+            <div className="glassmorphism p-6 border-gray-800">
               <Tabs defaultValue="chapters" className="w-full">
-                <TabsList className="grid w-full grid-cols-2 mb-6">
-                  <TabsTrigger value="chapters">From Chapters</TabsTrigger>
-                  <TabsTrigger value="scratch">Start from Scratch</TabsTrigger>
-                </TabsList>
-
                 <TabsContent value="chapters">
                   {/* Existing Chapters Panel */}
                   {userData.chapters && userData.chapters.length > 0 ? (
@@ -666,134 +799,6 @@ export default function IndexPage() {
                       instead.
                     </p>
                   )}
-                </TabsContent>
-
-                <TabsContent value="scratch">
-                  {/* New Start from Scratch UI */}
-                  <div className="space-y-5">
-                    <div className="bg-gray-900/50 p-5 rounded-lg border border-gray-800">
-                      <div className="flex justify-between items-start mb-2">
-                        <Label
-                          htmlFor="story-input"
-                          className="text-sm font-medium flex items-center"
-                        >
-                          Your Story
-                          <TooltipProvider>
-                            <Tooltip>
-                              <TooltipTrigger asChild>
-                                <span className="ml-1.5 cursor-help">
-                                  <AlertCircle
-                                    size={14}
-                                    className="text-gray-400"
-                                  />
-                                </span>
-                              </TooltipTrigger>
-                              <TooltipContent className="max-w-xs">
-                                <p>
-                                  For best results, describe what happens, where
-                                  it happens, and any important details.
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          </TooltipProvider>
-                        </Label>
-                      </div>
-
-                      <Textarea
-                        id="story-input"
-                        placeholder="Write a short story or scene description. Include actions, characters, and locations."
-                        className="h-48 resize-none mb-3 bg-gray-800/50 border-gray-700"
-                        value={storyInput}
-                        onChange={(e) => {
-                          setStoryInput(e.target.value);
-                          // Clear error when user starts typing
-                          if (inputError) setInputError("");
-                        }}
-                      />
-
-                      {inputError && (
-                        <div className="bg-red-900/30 border border-red-700/50 p-3 rounded-md mb-4">
-                          <p className="text-red-200 text-sm flex items-center">
-                            <AlertCircle
-                              size={14}
-                              className="mr-1.5 flex-shrink-0"
-                            />
-                            {inputError}
-                          </p>
-                        </div>
-                      )}
-
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                        {/* Slide Count Selection */}
-                        <div>
-                          <Label
-                            htmlFor="slide-count"
-                            className="text-sm font-medium mb-1.5 block"
-                          >
-                            Number of Slides
-                          </Label>
-                          <select
-                            id="slide-count"
-                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                            value={customSlideCount}
-                            onChange={(e) =>
-                              setCustomSlideCount(e.target.value)
-                            }
-                          >
-                            <option value="1">1 Slide</option>
-                            <option value="2">2 Slides</option>
-                            <option value="3">3 Slides</option>
-                            <option value="4">4 Slides</option>
-                            <option value="5">5 Slides</option>
-                            <option value="6">6 Slides</option>
-                          </select>
-                        </div>
-
-                        {/* Image Style Selection */}
-                        <div>
-                          <Label
-                            htmlFor="image-style"
-                            className="text-sm font-medium mb-1.5 block"
-                          >
-                            Image Style
-                          </Label>
-                          <select
-                            id="image-style"
-                            className="w-full bg-gray-800/70 border border-gray-700 text-gray-200 text-sm py-2 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                            value={customImageStyle}
-                            onChange={(e) =>
-                              setCustomImageStyle(e.target.value)
-                            }
-                          >
-                            <option value="fantasy">Fantasy</option>
-                            <option value="cyberpunk">Cyberpunk</option>
-                            <option value="gothic">Gothic</option>
-                            <option value="historical">Historical</option>
-                            <option value="surreal">Surreal</option>
-                            <option value="anime">Anime</option>
-                            <option value="scifi">SciFi</option>
-                            <option value="watercolor">Watercolor</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      <Button
-                        onClick={generateStoryboardFromScratch}
-                        className="w-full mt-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500"
-                      >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          className="h-4 w-4 mr-2"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                        >
-                          <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-                          <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-                        </svg>
-                        Create Storyboard
-                      </Button>
-                    </div>
-                  </div>
                 </TabsContent>
               </Tabs>
             </div>
