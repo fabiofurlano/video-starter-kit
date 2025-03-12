@@ -494,16 +494,181 @@ export default function IndexPage() {
           </div>
         ) : userData ? (
           <div className="space-y-8">
-            {/* Move this section to the top */}
+            {/* Story Info Panel */}
             <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-4 text-white">
+                Story Information
+              </h2>
+              {userData.title || userData.genre || userData.language ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Title</h3>
+                    <p className="text-lg font-medium">
+                      {userData.title || "Untitled Story"}
+                    </p>
+                  </div>
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Genre</h3>
+                    <p className="text-lg font-medium">
+                      {userData.genre || "Not specified"}
+                    </p>
+                  </div>
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Language</h3>
+                    <p className="text-lg font-medium">
+                      {userData.language || "Not specified"}
+                    </p>
+                  </div>
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
+                    <h3 className="text-gray-400 text-sm mb-1">Location</h3>
+                    <p className="text-lg font-medium">
+                      {userData.location || "Not specified"}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <p className="text-gray-300">
+                    No story details yet. You can start creating content from
+                    scratch!
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Characters Panel */}
+            <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-6 text-white">Characters</h2>
+              {userData.characters && userData.characters.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                  {userData.characters.map((character, index) => (
+                    <div
+                      key={index}
+                      className="bg-gray-900/50 p-5 rounded-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
+                    >
+                      <h3 className="font-bold text-white">{character.name}</h3>
+                      <p className="text-sm text-blue-300 mt-1">
+                        {character.role || "No role specified"}
+                      </p>
+                      <p className="text-xs mt-3 text-gray-400 line-clamp-3">
+                        {character.description || "No description"}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-gray-400 text-center py-6">
+                  No characters found. You can create visual content without
+                  defined characters.
+                </p>
+              )}
+            </div>
+
+            {/* New Storyboard Creation Section */}
+            <div className="glassmorphism p-6 border-gray-800 mt-6">
               <h2 className="text-2xl font-bold mb-6 text-white">
                 Create Storyboard
               </h2>
-              <Tabs defaultValue="chapters">
+
+              <Tabs defaultValue="chapters" className="w-full">
                 <TabsList className="grid w-full grid-cols-2 mb-6">
                   <TabsTrigger value="chapters">From Chapters</TabsTrigger>
                   <TabsTrigger value="scratch">Start from Scratch</TabsTrigger>
                 </TabsList>
+
+                <TabsContent value="chapters">
+                  {/* Existing Chapters Panel */}
+                  {userData.chapters && userData.chapters.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6">
+                      {userData.chapters.map((chapter, index) => (
+                        <div
+                          key={index}
+                          className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
+                        >
+                          <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-700/50 pb-2">
+                            Chapter {chapter.number}: {chapter.title}
+                          </h1>
+                          <div className="text-sm mt-3 text-gray-300 leading-relaxed">
+                            {expandedChapters[index] ? (
+                              <div
+                                dangerouslySetInnerHTML={{
+                                  __html: chapter.content || "No content",
+                                }}
+                              />
+                            ) : (
+                              <div className="line-clamp-4">
+                                {chapter.content ? (
+                                  <div
+                                    dangerouslySetInnerHTML={{
+                                      __html:
+                                        chapter.content.substring(0, 250) +
+                                        "...",
+                                    }}
+                                  />
+                                ) : (
+                                  "No content"
+                                )}
+                              </div>
+                            )}
+
+                            <button
+                              onClick={() => toggleChapter(index)}
+                              className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
+                            >
+                              {expandedChapters[index]
+                                ? "Show Less"
+                                : "Show More"}
+                            </button>
+
+                            <div className="flex items-center mt-3 space-x-2">
+                              <select
+                                className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                                value={slideSelections[index] || ""}
+                                onChange={(e) =>
+                                  handleSlideCountChange(index, e.target.value)
+                                }
+                              >
+                                <option value="">Slides</option>
+                                <option value="1">1 Slide</option>
+                                <option value="2">2 Slides</option>
+                                <option value="3">3 Slides</option>
+                                <option value="4">4 Slides</option>
+                                <option value="5">5 Slides</option>
+                                <option value="6">6 Slides</option>
+                              </select>
+
+                              <button
+                                onClick={() => generateStoryboard(index)}
+                                className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
+                              >
+                                <svg
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  className="h-3.5 w-3.5 mr-1"
+                                  viewBox="0 0 20 20"
+                                  fill="currentColor"
+                                >
+                                  <path
+                                    fillRule="evenodd"
+                                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4a.5.5 0 01-.5-.5V5.5A.5.5 0 014 5h12a.5.5 0 01.5.5v9a.5.5 0 01-.5.5z"
+                                    clipRule="evenodd"
+                                  />
+                                  <path d="M6 7a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
+                                </svg>
+                                Generate Storyboard
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 text-center py-6">
+                      No chapters found. Try creating a storyboard from scratch
+                      instead.
+                    </p>
+                  )}
+                </TabsContent>
+
                 <TabsContent value="scratch">
                   {/* New Start from Scratch UI */}
                   <div className="space-y-5">
@@ -631,169 +796,7 @@ export default function IndexPage() {
                     </div>
                   </div>
                 </TabsContent>
-                <TabsContent value="chapters">
-                  {/* Existing Chapters Panel */}
-                  {userData.chapters && userData.chapters.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-6">
-                      {userData.chapters.map((chapter, index) => (
-                        <div
-                          key={index}
-                          className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
-                        >
-                          <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-700/50 pb-2">
-                            Chapter {chapter.number}: {chapter.title}
-                          </h1>
-                          <div className="text-sm mt-3 text-gray-300 leading-relaxed">
-                            {expandedChapters[index] ? (
-                              <div
-                                dangerouslySetInnerHTML={{
-                                  __html: chapter.content || "No content",
-                                }}
-                              />
-                            ) : (
-                              <div className="line-clamp-4">
-                                {chapter.content ? (
-                                  <div
-                                    dangerouslySetInnerHTML={{
-                                      __html:
-                                        chapter.content.substring(0, 250) +
-                                        "...",
-                                    }}
-                                  />
-                                ) : (
-                                  "No content"
-                                )}
-                              </div>
-                            )}
-
-                            <button
-                              onClick={() => toggleChapter(index)}
-                              className="mt-2 px-3 py-1 bg-gray-800/50 hover:bg-gray-700/50 rounded-md text-blue-400 hover:text-blue-300 transition-colors text-xs"
-                            >
-                              {expandedChapters[index]
-                                ? "Show Less"
-                                : "Show More"}
-                            </button>
-
-                            <div className="flex items-center mt-3 space-x-2">
-                              <select
-                                className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-                                value={slideSelections[index] || ""}
-                                onChange={(e) =>
-                                  handleSlideCountChange(index, e.target.value)
-                                }
-                              >
-                                <option value="">Slides</option>
-                                <option value="1">1 Slide</option>
-                                <option value="2">2 Slides</option>
-                                <option value="3">3 Slides</option>
-                                <option value="4">4 Slides</option>
-                                <option value="5">5 Slides</option>
-                                <option value="6">6 Slides</option>
-                              </select>
-
-                              <button
-                                onClick={() => generateStoryboard(index)}
-                                className="px-3 py-1.5 bg-gradient-to-r from-blue-600/80 to-indigo-600/80 hover:from-blue-500/80 hover:to-indigo-500/80 rounded-lg text-white text-xs font-medium shadow-sm flex items-center space-x-1"
-                              >
-                                <svg
-                                  xmlns="http://www.w3.org/2000/svg"
-                                  className="h-3.5 w-3.5 mr-1"
-                                  viewBox="0 0 20 20"
-                                  fill="currentColor"
-                                >
-                                  <path
-                                    fillRule="evenodd"
-                                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4a.5.5 0 01-.5-.5V5.5A.5.5 0 014 5h12a.5.5 0 01.5.5v9a.5.5 0 01-.5.5z"
-                                    clipRule="evenodd"
-                                  />
-                                  <path d="M6 7a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
-                                </svg>
-                                Generate Storyboard
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <p className="text-gray-400 text-center py-6">
-                      No chapters found. Try creating a storyboard from scratch
-                      instead.
-                    </p>
-                  )}
-                </TabsContent>
               </Tabs>
-            </div>
-
-            {/* Story Info Panel */}
-            <div className="glassmorphism p-6 border-gray-800">
-              <h2 className="text-2xl font-bold mb-4 text-white">
-                Story Information
-              </h2>
-              {userData.title || userData.genre || userData.language ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
-                    <h3 className="text-gray-400 text-sm mb-1">Title</h3>
-                    <p className="text-lg font-medium">
-                      {userData.title || "Untitled Story"}
-                    </p>
-                  </div>
-                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
-                    <h3 className="text-gray-400 text-sm mb-1">Genre</h3>
-                    <p className="text-lg font-medium">
-                      {userData.genre || "Not specified"}
-                    </p>
-                  </div>
-                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
-                    <h3 className="text-gray-400 text-sm mb-1">Language</h3>
-                    <p className="text-lg font-medium">
-                      {userData.language || "Not specified"}
-                    </p>
-                  </div>
-                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800">
-                    <h3 className="text-gray-400 text-sm mb-1">Location</h3>
-                    <p className="text-lg font-medium">
-                      {userData.location || "Not specified"}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div className="text-center py-4">
-                  <p className="text-gray-300">
-                    No story details yet. You can start creating content from
-                    scratch!
-                  </p>
-                </div>
-              )}
-            </div>
-
-            {/* Characters Panel */}
-            <div className="glassmorphism p-6 border-gray-800">
-              <h2 className="text-2xl font-bold mb-6 text-white">Characters</h2>
-              {userData.characters && userData.characters.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                  {userData.characters.map((character, index) => (
-                    <div
-                      key={index}
-                      className="bg-gray-900/50 p-5 rounded-lg border border-gray-800 hover:border-blue-600 transition-all duration-300"
-                    >
-                      <h3 className="font-bold text-white">{character.name}</h3>
-                      <p className="text-sm text-blue-300 mt-1">
-                        {character.role || "No role specified"}
-                      </p>
-                      <p className="text-xs mt-3 text-gray-400 line-clamp-3">
-                        {character.description || "No description"}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-gray-400 text-center py-6">
-                  No characters found. You can create visual content without
-                  defined characters.
-                </p>
-              )}
             </div>
 
             {/* Direct Video Studio Button */}
