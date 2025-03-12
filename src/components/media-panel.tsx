@@ -8,6 +8,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import {
   CircleXIcon,
+  DownloadIcon,
   GripVerticalIcon,
   HourglassIcon,
   ImageIcon,
@@ -22,6 +23,7 @@ import {
   createElement,
 } from "react";
 import { Badge } from "./ui/badge";
+import { Button } from "./ui/button";
 import { LoadingIcon } from "./ui/icons";
 import { useToast } from "@/hooks/use-toast";
 import { getMediaMetadata } from "@/lib/ffmpeg";
@@ -226,6 +228,45 @@ export function MediaItemRow({
           <span className="text-xs text-muted-foreground">
             {formatDistanceToNow(data.createdAt, { addSuffix: true })}
           </span>
+          {data.status === "completed" && mediaUrl && (
+            <div className="flex gap-1">
+              <Button
+                variant="ghost"
+                size="icon"
+                className="w-6 h-6"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  const handleDownload = async () => {
+                    try {
+                      const response = await fetch(mediaUrl);
+                      const blob = await response.blob();
+                      
+                      const blobUrl = window.URL.createObjectURL(blob);
+                      
+                      const fileExt = data.mediaType === "video" ? "mp4" : data.mediaType === "image" ? "png" : "mp3";
+                      
+                      const a = document.createElement("a");
+                      a.href = blobUrl;
+                      a.download = `novelvision-${data.mediaType}-${mediaId}.${fileExt}`;
+                      
+                      document.body.appendChild(a);
+                      a.click();
+                      
+                      window.URL.revokeObjectURL(blobUrl);
+                      document.body.removeChild(a);
+                    } catch (error) {
+                      console.error(`Error downloading ${data.mediaType}:`, error);
+                    }
+                  };
+                  
+                  handleDownload();
+                }}
+                title="Download"
+              >
+                <DownloadIcon className="w-3.5 h-3.5" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
