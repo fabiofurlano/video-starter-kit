@@ -52,14 +52,21 @@ export function App({ projectId }: AppProps) {
     (s) => s.setExportDialogOpen,
   );
 
-  const handleGenerateImage = async (prompt: string, modelId?: string, aspectRatio?: string) => {
+  const handleGenerateImage = async (
+    prompt: string,
+    modelId?: string,
+    aspectRatio?: string,
+  ) => {
     try {
       // Direct submission using the fal client
       const endpoint = modelId || "fal-ai/flux";
-      console.log(`Generating image with endpoint: ${endpoint}, aspect ratio: ${aspectRatio || "16:9"}`);
+      console.log(
+        `Generating image with endpoint: ${endpoint}, aspect ratio: ${aspectRatio || "16:9"}`,
+      );
 
       // Determine image_size based on aspectRatio - fix portrait orientation format
-      const image_size = aspectRatio === "9:16" ? "portrait_16_9" : "landscape_16_9";
+      const image_size =
+        aspectRatio === "9:16" ? "portrait_16_9" : "landscape_16_9";
 
       const result = await fal.run(endpoint, {
         input: {

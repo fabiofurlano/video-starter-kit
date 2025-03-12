@@ -351,10 +351,19 @@ export function StoryboardPanel({
       setIsLoading((prev) => ({ ...prev, [index]: true }));
 
       const slide = slides[index];
-      console.log("Generating image with model:", selectedImageModel, "aspect ratio:", aspectRatio);
+      console.log(
+        "Generating image with model:",
+        selectedImageModel,
+        "aspect ratio:",
+        aspectRatio,
+      );
 
       // Pass the prompt, model ID, and now the aspect ratio
-      const imageUrl = await onGenerateImage(slide.prompt, selectedImageModel, aspectRatio);
+      const imageUrl = await onGenerateImage(
+        slide.prompt,
+        selectedImageModel,
+        aspectRatio,
+      );
 
       if (imageUrl) {
         console.log("Image generated successfully:", imageUrl);
@@ -892,7 +901,9 @@ export function StoryboardPanel({
                     </div>
                   </div>
                 ) : (
-                  <div className={`w-full ${aspectRatio === "16:9" ? "h-40" : "h-48"} bg-gradient-to-br from-gray-800/10 to-gray-800/25 rounded-md flex flex-col items-center justify-center border border-gray-700/20 shadow-inner`}>
+                  <div
+                    className={`w-full ${aspectRatio === "16:9" ? "h-40" : "h-48"} bg-gradient-to-br from-gray-800/10 to-gray-800/25 rounded-md flex flex-col items-center justify-center border border-gray-700/20 shadow-inner`}
+                  >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
                       width="24"
