@@ -26,6 +26,7 @@ import { db } from "@/data/db";
 import { useProjectId } from "@/data/store";
 import { queryKeys } from "@/data/queries";
 import { useToast } from "@/hooks/use-toast";
+import { DownloadButton } from "@/components/ui/download-button";
 
 // Image style options
 const IMAGE_STYLES = [
@@ -988,7 +989,7 @@ export function StoryboardPanel({
                     <Button
                       variant="secondary"
                       size="sm"
-                      className="w-full flex items-center justify-center"
+                      className="w-full flex items-center justify-center mb-2"
                       onClick={() => handleSaveToMediaManager(slide.imageUrl!)}
                       disabled={saveMediaMutation.isPending}
                     >
@@ -1037,6 +1038,13 @@ export function StoryboardPanel({
                         </span>
                       )}
                     </Button>
+                  )}
+                  
+                  {slide.imageUrl && (
+                    <DownloadButton
+                      imageUrl={slide.imageUrl}
+                      filename={`storyboard-image-${index + 1}.png`}
+                    />
                   )}
                 </div>
               </div>
