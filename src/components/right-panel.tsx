@@ -329,7 +329,7 @@ export default function RightPanel({
     projectId,
     endpointId:
       generateData.image && mediaType === "video"
-        ? endpoint?.imageForFrame 
+        ? endpoint?.imageForFrame
           ? endpointId // For models like LTX Video that handle images directly
           : `${endpointId}/image-to-video` // For other models that need the /image-to-video endpoint
         : endpointId,
