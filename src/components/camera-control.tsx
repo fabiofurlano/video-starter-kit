@@ -57,7 +57,7 @@ const CameraMovement = ({
   };
 
   return (
-    <div className="w-full mx-auto border-y border-neutral-800 py-3">
+    <div className="w-full mx-auto border-t border-neutral-800 py-3">
       {/* Header */}
       <div
         className="flex justify-between items-center select-none"
@@ -84,7 +84,7 @@ const CameraMovement = ({
               style={{
                 transform: getTransformStyle(),
               }}
-              className="w-2/3 border absolute rotate-0 border-green-400/20 rounded-xl aspect-video bg-green-400/30 flex items-center justify-center"
+              className="w-2/3 border absolute rotate-0 border-green-400/20 rounded-xl aspect-video bg-green-400/30 flex items-center justify-center transition-transform duration-300"
             >
               <FocusIcon size={24} />
             </div>

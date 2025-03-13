@@ -1,0 +1,59 @@
+
+# Camera Movement Component: User Guide
+
+The Camera Movement component allows you to add dynamic motion effects to your videos, creating more professional and engaging content. The recent improvements make it more intuitive and responsive.
+
+## How to Use the Camera Movement Component
+
+1. **Access the Component**: 
+   - The Camera Movement panel is located in the right sidebar of the video editor
+   - Click on the panel header to expand/collapse it
+
+2. **Preview Your Changes**:
+   - The green box in the preview area represents your video frame
+   - As you adjust settings, you'll see a real-time preview of how the camera movement will affect your video
+
+3. **Select a Movement Type**:
+   - Click the dropdown menu (currently showing "Default")
+   - Choose from movement options:
+     - **Horizontal**: Moves the camera side to side
+     - **Vertical**: Moves the camera up and down
+     - **Pan**: Rotates the camera horizontally
+     - **Tilt**: Rotates the camera vertically
+     - **Roll**: Rotates the camera around the center
+     - **Zoom**: Moves the camera closer or further
+
+4. **Adjust Movement Intensity**:
+   - Once you select a movement type, a slider will appear
+   - Move the slider left (negative values) or right (positive values) to control the direction and intensity
+   - The value box on the right shows the exact setting (-10 to +10 range)
+
+5. **Apply Your Changes**:
+   - Click the "Generate" button at the bottom to apply the camera movement to your video
+
+## Benefits of the Improved Camera Movement Component
+
+1. **More Intuitive Visual Feedback**:
+   - The new transition animations make it easier to understand how your adjustments affect the video
+   - The cleaner UI design makes the component more readable and less cluttered
+
+2. **Professional Video Effects**:
+   - Create cinematic pans, zooms, and camera movements without complex editing software
+   - Add visual interest to static footage with subtle movements
+
+3. **Creative Control**:
+   - Fine-tune movements with precise slider controls
+   - Combine different movement types for custom effects by adjusting the timeline
+
+4. **Real-time Preview**:
+   - See exactly how your video will look before generating the final result
+   - The visual preview helps you understand the effect of different settings
+
+## Tips for Effective Camera Movements
+
+- **Start Subtle**: Small camera movements often look more professional than dramatic ones
+- **Match the Content**: Choose movements that enhance your story (e.g., zoom for emphasis, pan to reveal)
+- **Combine with Timeline**: Add different camera movements to different segments of your video
+- **Use Reset**: If you don't like your changes, click "Reset" to return to default settings
+
+The improved Camera Movement component gives you more creative control while being easier to use, helping you create more engaging and professional-looking videos.
