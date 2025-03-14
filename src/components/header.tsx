@@ -10,6 +10,7 @@ import {
   Home,
   DownloadIcon,
   LayoutDashboard,
+  BookOpenIcon,
 } from "lucide-react";
 import { ThemeToggle } from "./theme-toggle";
 import config from "@/lib/config";
@@ -107,6 +108,13 @@ export default function Header({
           <Link href={config.urls.settings} target="_blank">
             <SettingsIcon className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Settings</span>
+          </Link>
+        </Button>
+
+        <Button variant="ghost" size="sm" asChild>
+          <Link href="/docs" passHref>
+            <BookOpenIcon className="w-4 h-4 mr-1" />
+            <span className="hidden sm:inline">Model Guide</span>
           </Link>
         </Button>
       </nav>
