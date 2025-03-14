@@ -1,33 +1,33 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import Header from '@/components/header';
-import Footer from '@/components/footer';
-import { 
-  FilmIcon, 
-  ImageIcon, 
-  MusicIcon, 
+import { useEffect, useState } from "react";
+import Header from "@/components/header";
+import Footer from "@/components/footer";
+import {
+  FilmIcon,
+  ImageIcon,
+  MusicIcon,
   MicIcon,
   LightbulbIcon,
   AlertTriangleIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   DollarSignIcon,
-  BookOpenIcon
+  BookOpenIcon,
 } from "lucide-react";
 
 // Model card component for better reusability
-function ModelCard({ 
-  type, 
-  color, 
-  name, 
+function ModelCard({
+  type,
+  color,
+  name,
   endpointId,
   description = "",
   cost = "Variable",
-  bestFor = [], 
+  bestFor = [],
   promptTips = [],
   features = [],
-  inputAsset = []
+  inputAsset = [],
 }: {
   type: string;
   color: string;
@@ -41,7 +41,7 @@ function ModelCard({
   inputAsset?: string[];
 }) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
-  
+
   const toggleSection = (section: string) => {
     if (expandedSection === section) {
       setExpandedSection(null);
@@ -51,16 +51,18 @@ function ModelCard({
   };
 
   // Convert bestFor to array if it's a string
-  const bestForArray = typeof bestFor === 'string' ? [bestFor] : bestFor;
+  const bestForArray = typeof bestFor === "string" ? [bestFor] : bestFor;
 
   return (
     <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-      <div className={`inline-block px-3 py-1 rounded-full bg-${color}-500/10 text-${color}-400 text-sm font-medium mb-4`}>
+      <div
+        className={`inline-block px-3 py-1 rounded-full bg-${color}-500/10 text-${color}-400 text-sm font-medium mb-4`}
+      >
         {type}
       </div>
       <h3 className="font-bold text-lg mb-2">{name}</h3>
       <div className="text-xs text-gray-400 mb-4">{endpointId}</div>
-      
+
       {/* Basic Info */}
       <div className="space-y-3 text-sm text-gray-300">
         <p className="text-gray-300">{description}</p>
@@ -71,33 +73,37 @@ function ModelCard({
         {inputAsset && inputAsset.length > 0 && (
           <div className="flex justify-between">
             <span className="text-gray-400">Accepts:</span>
-            <span>{inputAsset.join(', ')}</span>
+            <span>{inputAsset.join(", ")}</span>
           </div>
         )}
       </div>
-      
+
       {/* Best Use Cases Expandable Section */}
       {bestForArray && bestForArray.length > 0 && (
         <div className="mt-4 border-t border-gray-700 pt-4">
-          <button 
-            onClick={() => toggleSection('bestFor')}
+          <button
+            onClick={() => toggleSection("bestFor")}
             className="flex items-center justify-between w-full text-left"
           >
             <div className="flex items-center">
               <AlertTriangleIcon className="w-4 h-4 mr-2 text-green-400" />
               <span className="font-medium">Best Use Cases</span>
             </div>
-            {expandedSection === 'bestFor' ? 
-              <ChevronUpIcon className="w-4 h-4" /> : 
+            {expandedSection === "bestFor" ? (
+              <ChevronUpIcon className="w-4 h-4" />
+            ) : (
               <ChevronDownIcon className="w-4 h-4" />
-            }
+            )}
           </button>
-          
-          {expandedSection === 'bestFor' && (
+
+          {expandedSection === "bestFor" && (
             <div className="mt-3 pl-6">
               <ul className="space-y-2">
                 {bestForArray.map((use, index) => (
-                  <li key={index} className="flex items-start text-sm text-gray-300">
+                  <li
+                    key={index}
+                    className="flex items-start text-sm text-gray-300"
+                  >
                     <span className="text-green-400 mr-2">•</span>
                     <span>{use}</span>
                   </li>
@@ -107,29 +113,33 @@ function ModelCard({
           )}
         </div>
       )}
-      
+
       {/* Prompt Techniques Section */}
       {promptTips && promptTips.length > 0 && (
         <div className="mt-4 border-t border-gray-700 pt-4">
-          <button 
-            onClick={() => toggleSection('promptTips')}
+          <button
+            onClick={() => toggleSection("promptTips")}
             className="flex items-center justify-between w-full text-left"
           >
             <div className="flex items-center">
               <LightbulbIcon className="w-4 h-4 mr-2 text-yellow-400" />
               <span className="font-medium">Prompt Techniques</span>
             </div>
-            {expandedSection === 'promptTips' ? 
-              <ChevronUpIcon className="w-4 h-4" /> : 
+            {expandedSection === "promptTips" ? (
+              <ChevronUpIcon className="w-4 h-4" />
+            ) : (
               <ChevronDownIcon className="w-4 h-4" />
-            }
+            )}
           </button>
-          
-          {expandedSection === 'promptTips' && (
+
+          {expandedSection === "promptTips" && (
             <div className="mt-3 pl-6">
               <ul className="space-y-2">
                 {promptTips.map((tip, index) => (
-                  <li key={index} className="flex items-start text-sm text-gray-300">
+                  <li
+                    key={index}
+                    className="flex items-start text-sm text-gray-300"
+                  >
                     <span className="text-yellow-400 mr-2">•</span>
                     <span>{tip}</span>
                   </li>
@@ -139,29 +149,33 @@ function ModelCard({
           )}
         </div>
       )}
-      
+
       {/* Features Expandable Section */}
       {features && features.length > 0 && (
         <div className="mt-4 border-t border-gray-700 pt-4">
-          <button 
-            onClick={() => toggleSection('features')}
+          <button
+            onClick={() => toggleSection("features")}
             className="flex items-center justify-between w-full text-left"
           >
             <div className="flex items-center">
               <DollarSignIcon className="w-4 h-4 mr-2 text-purple-400" />
               <span className="font-medium">Features</span>
             </div>
-            {expandedSection === 'features' ? 
-              <ChevronUpIcon className="w-4 h-4" /> : 
+            {expandedSection === "features" ? (
+              <ChevronUpIcon className="w-4 h-4" />
+            ) : (
               <ChevronDownIcon className="w-4 h-4" />
-            }
+            )}
           </button>
-          
-          {expandedSection === 'features' && (
+
+          {expandedSection === "features" && (
             <div className="mt-3 pl-6">
               <ul className="space-y-2">
                 {features.map((feature, index) => (
-                  <li key={index} className="flex items-start text-sm text-gray-300">
+                  <li
+                    key={index}
+                    className="flex items-start text-sm text-gray-300"
+                  >
                     <span className="text-purple-400 mr-2">•</span>
                     <span>{feature}</span>
                   </li>
@@ -181,42 +195,70 @@ export default function DocsPage() {
       <Header />
       <main className="flex-grow p-6 text-white">
         <div className="container mx-auto max-w-6xl">
-          <h1 className="text-3xl font-bold mb-8 text-center">Video Starter Kit - Model Guide</h1>
-          
+          <h1 className="text-3xl font-bold mb-8 text-center">
+            Video Starter Kit - Model Guide
+          </h1>
+
           {/* Navigation Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
-            <a href="#video-section" className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all">
+            <a
+              href="#video-section"
+              className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-all"
+            >
               <FilmIcon className="w-8 h-8 mb-4 text-blue-400" />
-              <h3 className="font-bold text-xl mb-2 text-blue-400">Video Models</h3>
-              <p className="text-gray-300 text-sm">Professional video generation</p>
+              <h3 className="font-bold text-xl mb-2 text-blue-400">
+                Video Models
+              </h3>
+              <p className="text-gray-300 text-sm">
+                Professional video generation
+              </p>
             </a>
-            
-            <a href="#image-section" className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all">
+
+            <a
+              href="#image-section"
+              className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-purple-500 transition-all"
+            >
               <ImageIcon className="w-8 h-8 mb-4 text-purple-400" />
-              <h3 className="font-bold text-xl mb-2 text-purple-400">Image Models</h3>
-              <p className="text-gray-300 text-sm">High-quality image generation</p>
+              <h3 className="font-bold text-xl mb-2 text-purple-400">
+                Image Models
+              </h3>
+              <p className="text-gray-300 text-sm">
+                High-quality image generation
+              </p>
             </a>
-            
-            <a href="#audio-section" className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-green-500 transition-all">
+
+            <a
+              href="#audio-section"
+              className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-green-500 transition-all"
+            >
               <MusicIcon className="w-8 h-8 mb-4 text-green-400" />
-              <h3 className="font-bold text-xl mb-2 text-green-400">Audio Models</h3>
+              <h3 className="font-bold text-xl mb-2 text-green-400">
+                Audio Models
+              </h3>
               <p className="text-gray-300 text-sm">Music and sound effects</p>
             </a>
-            
-            <a href="#voice-section" className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-yellow-500 transition-all">
+
+            <a
+              href="#voice-section"
+              className="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-yellow-500 transition-all"
+            >
               <MicIcon className="w-8 h-8 mb-4 text-yellow-400" />
-              <h3 className="font-bold text-xl mb-2 text-yellow-400">Voice Models</h3>
-              <p className="text-gray-300 text-sm">Voiceover and dialogue generation</p>
+              <h3 className="font-bold text-xl mb-2 text-yellow-400">
+                Voice Models
+              </h3>
+              <p className="text-gray-300 text-sm">
+                Voiceover and dialogue generation
+              </p>
             </a>
           </div>
-          
+
           {/* Video Models Section */}
           <section id="video-section" className="mb-16">
             <div className="flex items-center mb-8">
               <FilmIcon className="w-8 h-8 mr-4 text-blue-400" />
               <h2 className="text-2xl font-bold">Video Models</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               <ModelCard
                 type="Professional"
@@ -229,19 +271,19 @@ export default function DocsPage() {
                   "High-quality cinematic videos",
                   "Up to 4K resolution outputs",
                   "Realistic motion generation",
-                  "Professional content creation"
+                  "Professional content creation",
                 ]}
                 promptTips={[
                   "Use cinematic language in prompts",
                   "Describe camera movements explicitly",
                   "Include lighting details for realism",
-                  "Keep prompts under 75 words for best results"
+                  "Keep prompts under 75 words for best results",
                 ]}
                 features={[
                   "Up to 4K resolution",
                   "Realistic motion physics",
                   "High-fidelity output",
-                  "Detailed textures"
+                  "Detailed textures",
                 ]}
               />
 
@@ -257,19 +299,19 @@ export default function DocsPage() {
                   "Rapid video prototyping",
                   "Image-to-video conversion",
                   "Budget-friendly video generation",
-                  "Testing concepts quickly"
+                  "Testing concepts quickly",
                 ]}
                 promptTips={[
                   "Keep prompts concise and direct",
                   "For image conditioning, use clear reference images",
                   "Specify motion direction clearly",
-                  "Use simple descriptions for best results"
+                  "Use simple descriptions for best results",
                 ]}
                 features={[
                   "Image conditioning capability",
                   "Fast generation times",
                   "Multi-conditioning options",
-                  "Good for rapid iterations"
+                  "Good for rapid iterations",
                 ]}
               />
 
@@ -285,23 +327,23 @@ export default function DocsPage() {
                   "Videos with realistic physics",
                   "Motion that follows physical laws",
                   "Natural movement sequences",
-                  "Image-guided video creation"
+                  "Image-guided video creation",
                 ]}
                 promptTips={[
                   "Describe physical interactions clearly",
                   "Specify object properties (weight, material)",
                   "Include environmental factors (wind, gravity)",
-                  "Reference natural physical phenomena"
+                  "Reference natural physical phenomena",
                 ]}
                 features={[
                   "Realistic physics simulation",
                   "Image input capability",
                   "Natural motion rendering",
-                  "High-quality output"
+                  "High-quality output",
                 ]}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
               <ModelCard
                 type="High Quality"
@@ -314,22 +356,22 @@ export default function DocsPage() {
                   "Visually stunning videos",
                   "Complex motion sequences",
                   "Text-aligned content creation",
-                  "Diverse visual styles"
+                  "Diverse visual styles",
                 ]}
                 promptTips={[
                   "Use detailed visual descriptions",
                   "Specify desired motion patterns",
                   "Include text elements if needed",
-                  "Reference visual styles clearly"
+                  "Reference visual styles clearly",
                 ]}
                 features={[
                   "Excellent text alignment",
                   "Diverse motion capabilities",
                   "High visual fidelity",
-                  "Strong prompt adherence"
+                  "Strong prompt adherence",
                 ]}
               />
-              
+
               <ModelCard
                 type="Professional"
                 color="purple"
@@ -342,22 +384,22 @@ export default function DocsPage() {
                   "Professional-grade videos",
                   "Image-guided generation",
                   "High-fidelity outputs",
-                  "Commercial applications"
+                  "Commercial applications",
                 ]}
                 promptTips={[
                   "Provide high-quality reference images",
                   "Describe desired motion clearly",
                   "Specify visual style details",
-                  "Include scene composition elements"
+                  "Include scene composition elements",
                 ]}
                 features={[
                   "Image input support",
                   "Professional quality output",
                   "Strong visual consistency",
-                  "High resolution capability"
+                  "High resolution capability",
                 ]}
               />
-              
+
               <ModelCard
                 type="Standard"
                 color="green"
@@ -369,23 +411,23 @@ export default function DocsPage() {
                   "Videos with specific camera movements",
                   "Controlled visual narratives",
                   "Dynamic scene exploration",
-                  "Directorial vision implementation"
+                  "Directorial vision implementation",
                 ]}
                 promptTips={[
                   "Include camera directions in prompts",
                   "Specify movement type (pan, zoom, etc.)",
                   "Note camera speed and timing",
-                  "Describe scene composition from camera perspective"
+                  "Describe scene composition from camera perspective",
                 ]}
                 features={[
                   "Camera control capabilities",
                   "Dynamic movement options",
                   "Cinematic possibilities",
-                  "Director-style control"
+                  "Director-style control",
                 ]}
               />
             </div>
-            
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <ModelCard
                 type="Dream Machine"
@@ -399,22 +441,22 @@ export default function DocsPage() {
                   "Dreamlike visual sequences",
                   "Artistic video creation",
                   "Image-based video generation",
-                  "Creative explorations"
+                  "Creative explorations",
                 ]}
                 promptTips={[
                   "Use evocative, imaginative language",
                   "Include mood and atmosphere descriptions",
                   "Reference artistic styles or visual aesthetics",
-                  "Describe transitions between visual elements"
+                  "Describe transitions between visual elements",
                 ]}
                 features={[
                   "Dreamlike visual effects",
                   "Image input capabilities",
                   "Artistic quality output",
-                  "Creative transformation options"
+                  "Creative transformation options",
                 ]}
               />
-              
+
               <ModelCard
                 type="Audio-Video"
                 color="purple"
@@ -427,22 +469,22 @@ export default function DocsPage() {
                   "Adding synchronized audio to videos",
                   "Sound design for silent videos",
                   "Audio-visual content creation",
-                  "Enhanced video experiences"
+                  "Enhanced video experiences",
                 ]}
                 promptTips={[
                   "Describe desired sound atmosphere",
                   "Specify audio style and mood",
                   "Note key moments for audio emphasis",
-                  "Include audio reference descriptions"
+                  "Include audio reference descriptions",
                 ]}
                 features={[
                   "Audio generation for videos",
                   "Synchronization capabilities",
                   "Text-guided audio creation",
-                  "Integrated audio-visual output"
+                  "Integrated audio-visual output",
                 ]}
               />
-              
+
               <ModelCard
                 type="Animation"
                 color="green"
@@ -455,31 +497,31 @@ export default function DocsPage() {
                   "Character lip synchronization",
                   "Dialogue animation",
                   "Virtual presenters",
-                  "Animated content creation"
+                  "Animated content creation",
                 ]}
                 promptTips={[
                   "Provide clear audio with distinct speech",
                   "Use video with visible mouth/face",
                   "Ensure good lighting in source video",
-                  "Keep audio properly normalized"
+                  "Keep audio properly normalized",
                 ]}
                 features={[
                   "Realistic lip movement synchronization",
                   "Works with multiple languages",
                   "High-quality animation results",
-                  "Support for various face angles"
+                  "Support for various face angles",
                 ]}
               />
             </div>
           </section>
-          
+
           {/* Image Models Section */}
           <section id="image-section" className="mb-16">
             <div className="flex items-center mb-8">
               <ImageIcon className="w-8 h-8 mr-4 text-purple-400" />
               <h2 className="text-2xl font-bold">Image Models</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <ModelCard
                 type="Professional"
@@ -492,19 +534,19 @@ export default function DocsPage() {
                   "High-end professional images",
                   "Detailed artistic creations",
                   "Commercial-quality outputs",
-                  "Complex scenes with fine details"
+                  "Complex scenes with fine details",
                 ]}
                 promptTips={[
                   "Provide detailed visual descriptions",
                   "Include artistic style references",
                   "Specify composition and lighting",
-                  "Add details about perspective and mood"
+                  "Add details about perspective and mood",
                 ]}
                 features={[
                   "Ultra-high quality output",
                   "Excellent detail rendering",
                   "Advanced style capabilities",
-                  "Professional-grade results"
+                  "Professional-grade results",
                 ]}
               />
 
@@ -519,22 +561,22 @@ export default function DocsPage() {
                   "Rapid prototyping",
                   "Quick concept exploration",
                   "Testing visual ideas",
-                  "Budget-friendly generation"
+                  "Budget-friendly generation",
                 ]}
                 promptTips={[
                   "Keep prompts concise",
                   "Focus on main elements",
                   "Use simple descriptors",
-                  "Iterate quickly between generations"
+                  "Iterate quickly between generations",
                 ]}
                 features={[
                   "Fast generation times",
                   "Good quality-to-speed ratio",
                   "Excellent for iterations",
-                  "Developer-friendly options"
+                  "Developer-friendly options",
                 ]}
               />
-              
+
               <ModelCard
                 type="Fast"
                 color="green"
@@ -546,22 +588,22 @@ export default function DocsPage() {
                   "Ultra-fast generation",
                   "Quick sketches and mockups",
                   "Mass image creation",
-                  "Speed-critical applications"
+                  "Speed-critical applications",
                 ]}
                 promptTips={[
                   "Use brief, clear descriptions",
                   "Focus on single main subjects",
                   "Limit style complexity",
-                  "Use short phrases instead of sentences"
+                  "Use short phrases instead of sentences",
                 ]}
                 features={[
                   "Fastest generation option",
                   "Suitable for batch processing",
                   "Good for initial concepts",
-                  "Economical resource usage"
+                  "Economical resource usage",
                 ]}
               />
-              
+
               <ModelCard
                 type="Typography"
                 color="purple"
@@ -573,31 +615,31 @@ export default function DocsPage() {
                   "Text and typography needs",
                   "Complex prompt handling",
                   "Detailed image generation",
-                  "Higher conceptual understanding"
+                  "Higher conceptual understanding",
                 ]}
                 promptTips={[
                   "Be explicit about text requirements",
                   "Use detailed descriptions for complex concepts",
                   "Include typography style references",
-                  "Specify text positioning and emphasis"
+                  "Specify text positioning and emphasis",
                 ]}
                 features={[
                   "Excellent text rendering",
                   "Advanced prompt understanding",
                   "High-quality output",
-                  "Large parameter model capabilities"
+                  "Large parameter model capabilities",
                 ]}
               />
             </div>
           </section>
-          
+
           {/* Audio Models Section */}
           <section id="audio-section" className="mb-16">
             <div className="flex items-center mb-8">
               <MusicIcon className="w-8 h-8 mr-4 text-green-400" />
               <h2 className="text-2xl font-bold">Audio Models</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <ModelCard
                 type="Music"
@@ -611,19 +653,19 @@ export default function DocsPage() {
                   "Original music composition",
                   "Reference-based music creation",
                   "Custom soundtracks",
-                  "Mood-specific music"
+                  "Mood-specific music",
                 ]}
                 promptTips={[
                   "Describe musical genre and mood",
                   "Specify tempo and intensity",
                   "Include instrument preferences",
-                  "Provide reference audio for style guidance"
+                  "Provide reference audio for style guidance",
                 ]}
                 features={[
                   "High-quality music generation",
                   "Support for reference audio",
                   "Diverse musical styles",
-                  "Advanced composition capabilities"
+                  "Advanced composition capabilities",
                 ]}
               />
 
@@ -638,31 +680,31 @@ export default function DocsPage() {
                   "Stable, consistent audio generation",
                   "High-quality music tracks",
                   "Noise-free audio content",
-                  "Clean music production"
+                  "Clean music production",
                 ]}
                 promptTips={[
                   "Specify audio duration needs",
                   "Describe desired audio characteristics",
                   "Include mood and energy level",
-                  "Note any specific audio elements"
+                  "Note any specific audio elements",
                 ]}
                 features={[
                   "Stable Diffusion technology for audio",
                   "Clean output quality",
                   "Consistent generation results",
-                  "High-fidelity audio production"
+                  "High-fidelity audio production",
                 ]}
               />
             </div>
           </section>
-          
+
           {/* Voice Models Section */}
           <section id="voice-section" className="mb-16">
             <div className="flex items-center mb-8">
               <MicIcon className="w-8 h-8 mr-4 text-yellow-400" />
               <h2 className="text-2xl font-bold">Voice Models</h2>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <ModelCard
                 type="Natural Speech"
@@ -675,19 +717,19 @@ export default function DocsPage() {
                   "Natural-sounding narration",
                   "Video voiceovers",
                   "Content narration",
-                  "Professional voice work"
+                  "Professional voice work",
                 ]}
                 promptTips={[
                   "Use proper punctuation for natural pauses",
                   "Mark emphasis with formatting when possible",
                   "Structure text in conversational patterns",
-                  "Include pronunciation guides for unusual terms"
+                  "Include pronunciation guides for unusual terms",
                 ]}
                 features={[
                   "Flow matching technology",
                   "Natural speech patterns",
                   "Multi-voice options",
-                  "High-quality output"
+                  "High-quality output",
                 ]}
               />
 
@@ -702,19 +744,19 @@ export default function DocsPage() {
                   "Multi-speaker conversations",
                   "Character dialogues",
                   "Interactive narratives",
-                  "Game and animation voicing"
+                  "Game and animation voicing",
                 ]}
                 promptTips={[
                   "Clearly mark different speakers",
                   "Include emotional cues in brackets",
                   "Structure conversation naturally",
-                  "Add pauses and timing notes"
+                  "Add pauses and timing notes",
                 ]}
                 features={[
                   "Multiple voice support",
                   "Natural conversation flow",
                   "Speaker distinction",
-                  "Emotional expression capabilities"
+                  "Emotional expression capabilities",
                 ]}
               />
 
@@ -729,29 +771,29 @@ export default function DocsPage() {
                   "Voice cloning applications",
                   "Custom voice creation",
                   "Personalized content",
-                  "Consistent voice identity"
+                  "Consistent voice identity",
                 ]}
                 promptTips={[
                   "Provide high-quality reference audio",
                   "Include reference text matching the audio",
                   "Keep reference audio clear and noise-free",
-                  "Use natural speech patterns in prompts"
+                  "Use natural speech patterns in prompts",
                 ]}
                 features={[
                   "Voice replication technology",
                   "Flow matching for natural speech",
                   "Reference audio capabilities",
-                  "Custom voice development"
+                  "Custom voice development",
                 ]}
               />
             </div>
           </section>
-          
+
           {/* Quick Reference */}
           <section className="mb-16">
             <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-8 border border-gray-700">
               <h2 className="text-2xl font-bold mb-6">Quick Reference</h2>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <h3 className="font-bold mb-3 text-blue-400">Video Costs</h3>
@@ -762,7 +804,9 @@ export default function DocsPage() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-bold mb-3 text-purple-400">Image Costs</h3>
+                  <h3 className="font-bold mb-3 text-purple-400">
+                    Image Costs
+                  </h3>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li>• Flux Pro Ultra: $0.10-0.30/image</li>
                     <li>• Flux Dev: $0.05-0.15/image</li>
@@ -777,7 +821,9 @@ export default function DocsPage() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-bold mb-3 text-yellow-400">Voice Costs</h3>
+                  <h3 className="font-bold mb-3 text-yellow-400">
+                    Voice Costs
+                  </h3>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li>• PlayHT TTS v3: $0.03/min</li>
                     <li>• PlayAI Dialog: $0.05/min</li>
@@ -794,7 +840,9 @@ export default function DocsPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm text-gray-300">
                   <div>
-                    <h4 className="font-medium mb-2 text-blue-400">Video Tips</h4>
+                    <h4 className="font-medium mb-2 text-blue-400">
+                      Video Tips
+                    </h4>
                     <ul className="space-y-1">
                       <li>• Start with short clips (5-10s)</li>
                       <li>• Be specific with camera movements</li>
@@ -803,7 +851,9 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-purple-400">Image Tips</h4>
+                    <h4 className="font-medium mb-2 text-purple-400">
+                      Image Tips
+                    </h4>
                     <ul className="space-y-1">
                       <li>• Use detailed visual descriptions</li>
                       <li>• Specify style and artistic references</li>
@@ -812,7 +862,9 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-green-400">Audio Tips</h4>
+                    <h4 className="font-medium mb-2 text-green-400">
+                      Audio Tips
+                    </h4>
                     <ul className="space-y-1">
                       <li>• Define genre and mood clearly</li>
                       <li>• Specify tempo and duration</li>
@@ -821,7 +873,9 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-yellow-400">Voice Tips</h4>
+                    <h4 className="font-medium mb-2 text-yellow-400">
+                      Voice Tips
+                    </h4>
                     <ul className="space-y-1">
                       <li>• Use proper punctuation for pacing</li>
                       <li>• Mark emphasis appropriately</li>
@@ -833,19 +887,27 @@ export default function DocsPage() {
               </div>
             </div>
           </section>
-          
+
           {/* Help Section */}
           <section>
             <div className="bg-gray-800 rounded-xl p-6 flex flex-col md:flex-row md:items-center md:justify-between">
               <div className="mb-4 md:mb-0">
                 <h2 className="text-xl font-bold mb-2">Need Help?</h2>
-                <p className="text-gray-400 text-sm">Contact support or check the documentation</p>
+                <p className="text-gray-400 text-sm">
+                  Contact support or check the documentation
+                </p>
               </div>
               <div className="flex space-x-4">
-                <a href="/docs" className="px-4 py-2 bg-blue-600 text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
+                <a
+                  href="/docs"
+                  className="px-4 py-2 bg-blue-600 text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors"
+                >
                   Documentation
                 </a>
-                <a href="/support" className="px-4 py-2 bg-gray-700 text-sm font-medium rounded-lg hover:bg-gray-600 transition-colors">
+                <a
+                  href="/support"
+                  className="px-4 py-2 bg-gray-700 text-sm font-medium rounded-lg hover:bg-gray-600 transition-colors"
+                >
                   Support
                 </a>
               </div>
