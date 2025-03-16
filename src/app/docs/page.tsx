@@ -16,30 +16,36 @@ import {
   BookOpenIcon,
 } from "lucide-react";
 
+interface ModelCardProps {
+  type: string;
+  color: string;
+  name: string;
+  endpointId: string;
+  description: string;
+  cost: string;
+  bestFor: string[];
+  promptTips: string[];
+  features: string[];
+  inputAsset?: (string | { type: string; key: string })[];
+  imageForFrame?: boolean;
+  cameraControl?: boolean;
+}
+
 // Model card component for better reusability
 function ModelCard({
   type,
   color,
   name,
   endpointId,
-  description = "",
-  cost = "Variable",
-  bestFor = [],
-  promptTips = [],
-  features = [],
-  inputAsset = [],
-}: {
-  type: string;
-  color: string;
-  name: string;
-  endpointId: string;
-  description?: string;
-  cost?: string;
-  bestFor?: string[] | string;
-  promptTips?: string[];
-  features?: string[];
-  inputAsset?: string[];
-}) {
+  description,
+  cost,
+  bestFor,
+  promptTips,
+  features,
+  inputAsset,
+  imageForFrame,
+  cameraControl
+}: ModelCardProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
   const toggleSection = (section: string) => {
@@ -265,25 +271,25 @@ export default function DocsPage() {
                 color="blue"
                 name="Veo 2"
                 endpointId="fal-ai/veo2"
-                description="Veo creates videos with realistic motion and high quality output, up to 4K."
+                description="Google's cutting-edge video generation model, offering unprecedented quality, physics understanding, and cinematic excellence."
                 cost="$1.25/5s ($0.25/additional second)"
                 bestFor={[
                   "High-quality cinematic videos",
-                  "Up to 4K resolution outputs",
-                  "Realistic motion generation",
-                  "Professional content creation",
+                  "Complex physical interactions",
+                  "Extended durations (minutes)",
+                  "High resolution (up to 4K)"
                 ]}
                 promptTips={[
-                  "Use cinematic language in prompts",
-                  "Describe camera movements explicitly",
-                  "Include lighting details for realism",
-                  "Keep prompts under 75 words for best results",
+                  "Write prompts like a movie script with detailed scene descriptions",
+                  "Include camera movements and lens choices",
+                  "Specify lighting details and atmosphere",
+                  "Structure narrative with clear beginning, middle, end"
                 ]}
                 features={[
-                  "Up to 4K resolution",
                   "Realistic motion physics",
-                  "High-fidelity output",
-                  "Detailed textures",
+                  "Professional cinematography",
+                  "Reduced artifacts and flickering",
+                  "Production-ready output quality"
                 ]}
               />
 
@@ -292,55 +298,55 @@ export default function DocsPage() {
                 color="green"
                 name="LTX Video v0.95"
                 endpointId="fal-ai/ltx-video-v095/multiconditioning"
-                description="Generate videos from prompts, images using LTX Video-0.9.5"
+                description="Generate videos from prompts or images using LTX Video-0.9.5 with multi-conditioning capabilities."
                 cost="~$0.04-0.08/second"
-                inputAsset={["image"]}
                 bestFor={[
                   "Rapid video prototyping",
                   "Image-to-video conversion",
-                  "Budget-friendly video generation",
-                  "Testing concepts quickly",
+                  "Quick concept testing",
+                  "Budget-friendly video generation"
                 ]}
                 promptTips={[
-                  "Keep prompts concise and direct",
-                  "For image conditioning, use clear reference images",
-                  "Specify motion direction clearly",
-                  "Use simple descriptions for best results",
+                  "Use clear, concise descriptions",
+                  "For image input, provide high-quality references",
+                  "Specify motion direction explicitly",
+                  "Describe simple, focused actions or scenes"
                 ]}
                 features={[
-                  "Image conditioning capability",
+                  "Multi-conditional inputs",
                   "Fast generation times",
-                  "Multi-conditioning options",
-                  "Good for rapid iterations",
+                  "Image guidance capability",
+                  "Efficient for rapid iterations"
                 ]}
+                inputAsset={["image"]}
               />
 
               <ModelCard
                 type="Physics Simulation"
                 color="purple"
-                name="Minimax Video"
+                name="Minimax Video-01-Live"
                 endpointId="fal-ai/minimax/video-01-live"
-                description="High quality video, realistic motion and physics"
-                cost="Variable (pay per compute)"
-                inputAsset={["image"]}
+                description="Specialized in turning static inputs into fluid animations with exceptional temporal consistency."
+                cost="~$0.40/video"
                 bestFor={[
-                  "Videos with realistic physics",
-                  "Motion that follows physical laws",
-                  "Natural movement sequences",
-                  "Image-guided video creation",
+                  "Bringing static images to life",
+                  "Dynamic portrait animations",
+                  "Face and character consistency",
+                  "Both stylized and realistic content"
                 ]}
                 promptTips={[
-                  "Describe physical interactions clearly",
-                  "Specify object properties (weight, material)",
-                  "Include environmental factors (wind, gravity)",
-                  "Reference natural physical phenomena",
+                  "Describe specific actions and movements",
+                  "Use image-to-video mode for best results",
+                  "Include camera directions (pan, zoom)",
+                  "Keep prompts in present tense like a film scene"
                 ]}
                 features={[
-                  "Realistic physics simulation",
-                  "Image input capability",
-                  "Natural motion rendering",
-                  "High-quality output",
+                  "Exceptional temporal consistency",
+                  "Strong face and character handling",
+                  "Smooth camera movements",
+                  "Live2D-style animation capability"
                 ]}
+                inputAsset={["image"]}
               />
             </div>
 
@@ -348,27 +354,27 @@ export default function DocsPage() {
               <ModelCard
                 type="High Quality"
                 color="blue"
-                name="Hunyuan"
+                name="Hunyuan Video"
                 endpointId="fal-ai/hunyuan-video"
-                description="High visual quality, motion diversity and text alignment"
-                cost="Variable (pay per compute)"
+                description="Large-scale (13B parameter) video foundation model by Tencent focusing on cinematic quality and physical realism."
+                cost="$0.40/video"
                 bestFor={[
-                  "Visually stunning videos",
-                  "Complex motion sequences",
-                  "Text-aligned content creation",
-                  "Diverse visual styles",
+                  "Cinematic video quality",
+                  "Realistic physical interactions",
+                  "Coherent scene transitions",
+                  "Movie-like footage generation"
                 ]}
                 promptTips={[
-                  "Use detailed visual descriptions",
-                  "Specify desired motion patterns",
-                  "Include text elements if needed",
-                  "Reference visual styles clearly",
+                  "Write detailed scene descriptions like movie snippets",
+                  "Keep prompts logically consistent",
+                  "Use temporal words (slowly, suddenly) to indicate timing",
+                  "Specify camera and lighting details for cinematic results"
                 ]}
                 features={[
-                  "Excellent text alignment",
-                  "Diverse motion capabilities",
-                  "High visual fidelity",
-                  "Strong prompt adherence",
+                  "Real-world physics simulation",
+                  "Highly optimized (generates in under a minute)",
+                  "High-fidelity HD output",
+                  "Continuous action sequences"
                 ]}
               />
 
@@ -377,27 +383,27 @@ export default function DocsPage() {
                 color="purple"
                 name="Kling 1.5 Pro"
                 endpointId="fal-ai/kling-video/v1.5/pro"
-                description="High quality video"
-                cost="Variable (pay per compute)"
-                inputAsset={["image"]}
+                description="Advanced video generator known for HD output (1080p) and enhanced physics simulation."
+                cost="$0.10/second (~$0.50/5s video)"
                 bestFor={[
-                  "Professional-grade videos",
-                  "Image-guided generation",
-                  "High-fidelity outputs",
-                  "Commercial applications",
+                  "Professional-quality video",
+                  "Complex physics interactions",
+                  "High-resolution (1080p) output",
+                  "Realistic physical simulations"
                 ]}
                 promptTips={[
-                  "Provide high-quality reference images",
-                  "Describe desired motion clearly",
-                  "Specify visual style details",
-                  "Include scene composition elements",
+                  "Start with an image when possible",
+                  "Describe both scene and movement clearly",
+                  "Emphasize physical interactions for best results",
+                  "Use present tense and descriptive language"
                 ]}
                 features={[
-                  "Image input support",
-                  "Professional quality output",
-                  "Strong visual consistency",
-                  "High resolution capability",
+                  "1080p HD output capability",
+                  "Realistic physics engine",
+                  "Support for image conditioning",
+                  "Extended duration capabilities"
                 ]}
+                inputAsset={["image"]}
               />
 
               <ModelCard
@@ -405,26 +411,27 @@ export default function DocsPage() {
                 color="green"
                 name="Kling 1.0 Standard"
                 endpointId="fal-ai/kling-video/v1/standard/text-to-video"
-                description="High quality video with camera control"
-                cost="Variable (pay per compute)"
+                description="Earlier Kling model offering more accessible, faster generation at lower resolution."
+                cost="~$0.05/second (Variable)"
                 bestFor={[
-                  "Videos with specific camera movements",
-                  "Controlled visual narratives",
-                  "Dynamic scene exploration",
-                  "Directorial vision implementation",
+                  "Quick video prototyping",
+                  "Simpler scenes and actions",
+                  "Faster turnaround times",
+                  "Budget-conscious projects"
                 ]}
                 promptTips={[
-                  "Include camera directions in prompts",
-                  "Specify movement type (pan, zoom, etc.)",
-                  "Note camera speed and timing",
-                  "Describe scene composition from camera perspective",
+                  "Use simpler, more concise prompts",
+                  "Focus on single, clear actions or scenes",
+                  "Specify style (cartoon, realistic) explicitly",
+                  "Keep chronology short (one main scene)"
                 ]}
                 features={[
-                  "Camera control capabilities",
-                  "Dynamic movement options",
-                  "Cinematic possibilities",
-                  "Director-style control",
+                  "Faster generation time",
+                  "Lower resource requirements",
+                  "Good for storyboarding",
+                  "Camera movement controls"
                 ]}
+                cameraControl={true}
               />
             </div>
 
@@ -432,29 +439,29 @@ export default function DocsPage() {
               <ModelCard
                 type="Dream Machine"
                 color="blue"
-                name="Luma Dream Machine 1.5"
+                name="Luma Dream Machine"
                 endpointId="fal-ai/luma-dream-machine"
-                description="High quality video"
-                cost="Variable (pay per compute)"
-                inputAsset={["image"]}
+                description="Video generation model known for immersive scene generation and consistent character interactions."
+                cost="$0.50/video"
                 bestFor={[
+                  "Creative storytelling scenes",
                   "Dreamlike visual sequences",
-                  "Artistic video creation",
-                  "Image-based video generation",
-                  "Creative explorations",
+                  "Multiple subjects interacting",
+                  "Cinematic camera movements"
                 ]}
                 promptTips={[
-                  "Use evocative, imaginative language",
-                  "Include mood and atmosphere descriptions",
-                  "Reference artistic styles or visual aesthetics",
-                  "Describe transitions between visual elements",
+                  "Include imaginative but visually concrete elements",
+                  "Always specify some form of motion or change",
+                  "Request specific camera movements for best results",
+                  "Structure prompts to indicate sequence of events"
                 ]}
                 features={[
-                  "Dreamlike visual effects",
-                  "Image input capabilities",
-                  "Artistic quality output",
-                  "Creative transformation options",
+                  "Handles both realistic and stylized content",
+                  "Relatively fast generation",
+                  "Maintains physical accuracy",
+                  "Supports both text and image inputs"
                 ]}
+                inputAsset={["image"]}
               />
 
               <ModelCard
@@ -462,55 +469,55 @@ export default function DocsPage() {
                 color="purple"
                 name="MMAudio V2"
                 endpointId="fal-ai/mmaudio-v2"
-                description="MMAudio generates synchronized audio given video and/or text inputs. It can be combined with video models to get videos with audio."
-                cost="Variable (pay per compute)"
-                inputAsset={["video"]}
+                description="Audio generation model that creates synchronized soundtracks for videos from visual content and text prompts."
+                cost="~$0.02-0.03/second of audio"
                 bestFor={[
-                  "Adding synchronized audio to videos",
-                  "Sound design for silent videos",
-                  "Audio-visual content creation",
-                  "Enhanced video experiences",
+                  "Adding audio to silent videos",
+                  "Synchronized sound effects",
+                  "Background music generation",
+                  "Complete audiovisual experiences"
                 ]}
                 promptTips={[
-                  "Describe desired sound atmosphere",
-                  "Specify audio style and mood",
-                  "Note key moments for audio emphasis",
-                  "Include audio reference descriptions",
+                  "Specify genre, mood, or sound types you want",
+                  "Match audio description to video content",
+                  "Be specific about musical style or ambient sounds",
+                  "Include timing cues if needed"
                 ]}
                 features={[
-                  "Audio generation for videos",
-                  "Synchronization capabilities",
-                  "Text-guided audio creation",
-                  "Integrated audio-visual output",
+                  "Multimodal inputs (video + text)",
+                  "Synchronized audio generation",
+                  "Capable of both music and sound effects",
+                  "Returns complete audio-augmented video"
                 ]}
+                inputAsset={["video"]}
               />
 
               <ModelCard
                 type="Animation"
                 color="green"
-                name="Sync.so LipSync 1.8.0"
+                name="Sync.so LipSync"
                 endpointId="fal-ai/sync-lipsync"
-                description="Generate realistic lipsync animations from audio using advanced algorithms for high-quality synchronization."
-                cost="Variable (pay per compute)"
-                inputAsset={["video", "audio"]}
+                description="Specialized model that animates a face video or image to lip-sync with speech audio."
+                cost="$0.05/minute"
                 bestFor={[
-                  "Character lip synchronization",
-                  "Dialogue animation",
+                  "Creating talking avatars",
+                  "Dubbing videos in new languages",
                   "Virtual presenters",
-                  "Animated content creation",
+                  "Giving voice to still images"
                 ]}
                 promptTips={[
-                  "Provide clear audio with distinct speech",
-                  "Use video with visible mouth/face",
-                  "Ensure good lighting in source video",
-                  "Keep audio properly normalized",
+                  "Provide clear face image/video with visible mouth",
+                  "Use high-quality clean audio",
+                  "Choose matching emotional expressions",
+                  "Trim silence from start of audio if needed"
                 ]}
                 features={[
-                  "Realistic lip movement synchronization",
-                  "Works with multiple languages",
-                  "High-quality animation results",
-                  "Support for various face angles",
+                  "High-quality synchronized lip movements",
+                  "Works with images or videos as input",
+                  "Fast processing",
+                  "Supports multiple languages"
                 ]}
+                inputAsset={["video", "audio"]}
               />
             </div>
           </section>
@@ -528,25 +535,25 @@ export default function DocsPage() {
                 color="purple"
                 name="Flux Pro 1.1 Ultra"
                 endpointId="fal-ai/flux-pro/v1.1-ultra"
-                description="FLUX.1 [pro] is a professional-grade model that generates premium quality images from text, optimized for commercial applications and professional creative workflows."
+                description="Latest professional-grade FLUX model with 2K output capability and improved photorealism."
                 cost="$0.10-0.30/image"
                 bestFor={[
-                  "High-end professional images",
-                  "Detailed artistic creations",
-                  "Commercial-quality outputs",
-                  "Complex scenes with fine details",
+                  "High-resolution realistic images",
+                  "Marketing and commercial work",
+                  "Highly detailed scenes",
+                  "Professional-grade visuals"
                 ]}
                 promptTips={[
-                  "Provide detailed visual descriptions",
-                  "Include artistic style references",
-                  "Specify composition and lighting",
-                  "Add details about perspective and mood",
+                  "Include photography terminology (camera, lens, lighting)",
+                  "Structure prompts clearly (subject, setting, style)",
+                  "Be specific and provide vivid details",
+                  "Consider reference images for style guidance"
                 ]}
                 features={[
-                  "Ultra-high quality output",
-                  "Excellent detail rendering",
-                  "Advanced style capabilities",
-                  "Professional-grade results",
+                  "Up to 2K resolution output",
+                  "Enhanced photorealism",
+                  "Better text handling",
+                  "High-fidelity detail rendering"
                 ]}
               />
 
@@ -555,25 +562,25 @@ export default function DocsPage() {
                 color="blue"
                 name="Flux Dev"
                 endpointId="fal-ai/flux/dev"
-                description="FLUX.1 [dev] is a 12 billion parameter flow transformer that generates high-quality images from text. It is suitable for personal and commercial use."
+                description="12 billion parameter flow transformer for high-quality image generation balancing quality and speed."
                 cost="$0.05-0.15/image"
                 bestFor={[
-                  "Rapid prototyping",
-                  "Quick concept exploration",
-                  "Testing visual ideas",
-                  "Budget-friendly generation",
+                  "Balanced quality and speed",
+                  "Detailed artistic creations",
+                  "Complex scene composition",
+                  "Long-form descriptive prompts"
                 ]}
                 promptTips={[
-                  "Keep prompts concise",
-                  "Focus on main elements",
-                  "Use simple descriptors",
-                  "Iterate quickly between generations",
+                  "Use long-form prompts with rich detail",
+                  "Employ weighted prompt segments with :: notation",
+                  "Structure prompts into subject, style, background",
+                  "20-40 inference steps for best quality"
                 ]}
                 features={[
-                  "Fast generation times",
-                  "Good quality-to-speed ratio",
-                  "Excellent for iterations",
-                  "Developer-friendly options",
+                  "High resolution capabilities",
+                  "Strong prompt understanding",
+                  "Supports personal and commercial use",
+                  "Handles complex, lengthy prompts"
                 ]}
               />
 
@@ -582,25 +589,25 @@ export default function DocsPage() {
                 color="green"
                 name="Flux Schnell"
                 endpointId="fal-ai/flux/schnell"
-                description="FLUX.1 [schnell] is a 12 billion parameter flow transformer that generates high-quality images from text in 1 to 4 steps, suitable for personal and commercial use."
+                description="Speed-optimized FLUX variant generating high-quality images in just 1-4 diffusion steps."
                 cost="$0.03-0.10/image"
                 bestFor={[
                   "Ultra-fast generation",
-                  "Quick sketches and mockups",
-                  "Mass image creation",
-                  "Speed-critical applications",
+                  "Rapid prototype iteration",
+                  "High-volume image needs",
+                  "Quick concept exploration"
                 ]}
                 promptTips={[
-                  "Use brief, clear descriptions",
-                  "Focus on single main subjects",
-                  "Limit style complexity",
-                  "Use short phrases instead of sentences",
+                  "Use same syntax as FLUX [dev]",
+                  "Keep prompts focused and concise",
+                  "Emphasize key elements with higher weights",
+                  "Structure into segments (subject | style | etc.)"
                 ]}
                 features={[
-                  "Fastest generation option",
-                  "Suitable for batch processing",
-                  "Good for initial concepts",
-                  "Economical resource usage",
+                  "1-4 diffusion steps (fastest FLUX)",
+                  "Output quality comparable to larger models",
+                  "Perfect for testing prompt ideas quickly",
+                  "Extremely cost-efficient"
                 ]}
               />
 
@@ -609,25 +616,25 @@ export default function DocsPage() {
                 color="purple"
                 name="SD 3.5 Large"
                 endpointId="fal-ai/stable-diffusion-v35-large"
-                description="Image quality, typography, complex prompt understanding"
-                cost="Variable (pay per compute)"
+                description="Stability AI's latest diffusion model with improved image quality, typography, and prompt understanding."
+                cost="$0.0006-0.0012/second of GPU time"
                 bestFor={[
-                  "Text and typography needs",
                   "Complex prompt handling",
-                  "Detailed image generation",
-                  "Higher conceptual understanding",
+                  "Text and typography needs",
+                  "Multimodal generation (text+image)",
+                  "High-quality detailed outputs"
                 ]}
                 promptTips={[
-                  "Be explicit about text requirements",
-                  "Use detailed descriptions for complex concepts",
-                  "Include typography style references",
-                  "Specify text positioning and emphasis",
+                  "Write rich, descriptive prompts",
+                  "Organize by subject, setting, style, technical details",
+                  "Use negative prompting to avoid issues",
+                  "Include artist/style references for specific looks"
                 ]}
                 features={[
-                  "Excellent text rendering",
-                  "Advanced prompt understanding",
-                  "High-quality output",
-                  "Large parameter model capabilities",
+                  "Multimodal Diffusion Transformer architecture",
+                  "Better text rendering in images",
+                  "ControlNet and LoRA support",
+                  "Resource efficiency improvements"
                 ]}
               />
             </div>
@@ -646,27 +653,30 @@ export default function DocsPage() {
                 color="green"
                 name="Minimax Music"
                 endpointId="fal-ai/minimax-music"
-                description="Advanced AI techniques to create high-quality, diverse musical compositions"
-                cost="Variable (pay per compute)"
-                inputAsset={["audio"]}
+                description="Generative music model creating high-quality, diverse musical compositions from text prompts."
+                cost="~$0.30-0.50/audio clip"
                 bestFor={[
                   "Original music composition",
-                  "Reference-based music creation",
                   "Custom soundtracks",
-                  "Mood-specific music",
+                  "Genre-specific music creation",
+                  "Mood-based audio generation"
                 ]}
                 promptTips={[
-                  "Describe musical genre and mood",
-                  "Specify tempo and intensity",
-                  "Include instrument preferences",
-                  "Provide reference audio for style guidance",
+                  "Specify genre, mood, tempo, and instruments",
+                  "Include BPM for rhythmic control",
+                  "Mention era or artist references for style",
+                  "Describe structure (intro, build, climax)"
                 ]}
                 features={[
-                  "High-quality music generation",
-                  "Support for reference audio",
-                  "Diverse musical styles",
-                  "Advanced composition capabilities",
+                  "Multi-genre support",
+                  "Coherent musical structure",
+                  "High-quality output",
+                  "Reference audio capability"
                 ]}
+                inputAsset={[{
+                  type: "audio",
+                  key: "reference_audio_url"
+                }]}
               />
 
               <ModelCard
@@ -674,25 +684,25 @@ export default function DocsPage() {
                 color="yellow"
                 name="Stable Audio"
                 endpointId="fal-ai/stable-audio"
-                description="Stable Diffusion music creation with high-quality tracks"
-                cost="Variable (pay per compute)"
+                description="Stability AI's open-source text-to-audio model for music, sound effects, or ambience."
+                cost="$0.0006-0.0012/second of GPU time"
                 bestFor={[
-                  "Stable, consistent audio generation",
-                  "High-quality music tracks",
-                  "Noise-free audio content",
-                  "Clean music production",
+                  "Music loops and samples",
+                  "Sound effects generation",
+                  "Ambient soundscapes",
+                  "Background music"
                 ]}
                 promptTips={[
-                  "Specify audio duration needs",
-                  "Describe desired audio characteristics",
-                  "Include mood and energy level",
-                  "Note any specific audio elements",
+                  "Be concise with sound-focused descriptions",
+                  "Specify tempo (BPM) for rhythmic content",
+                  "Include genre and instrument details",
+                  "Mention duration or 'loopable' if needed"
                 ]}
                 features={[
-                  "Stable Diffusion technology for audio",
-                  "Clean output quality",
-                  "Consistent generation results",
-                  "High-fidelity audio production",
+                  "Timing-conditioned latent diffusion",
+                  "Efficient resource usage",
+                  "Open for commercial use",
+                  "Good tempo/beat adherence"
                 ]}
               />
             </div>
@@ -711,52 +721,52 @@ export default function DocsPage() {
                 color="yellow"
                 name="PlayHT TTS v3"
                 endpointId="fal-ai/playht/tts/v3"
-                description="Fluent and faithful speech with flow matching"
-                cost="$0.03/minute (~33 minutes per $1)"
+                description="State-of-the-art TTS model with natural and expressive voices, multilingual support, and emotional rendering."
+                cost="$0.03/minute"
                 bestFor={[
-                  "Natural-sounding narration",
-                  "Video voiceovers",
-                  "Content narration",
-                  "Professional voice work",
+                  "High-quality voice narration",
+                  "Emotional and expressive speech",
+                  "Long-form content (audiobooks)",
+                  "Multilingual content"
                 ]}
                 promptTips={[
-                  "Use proper punctuation for natural pauses",
-                  "Mark emphasis with formatting when possible",
-                  "Structure text in conversational patterns",
-                  "Include pronunciation guides for unusual terms",
+                  "Use well-punctuated text for natural rhythm",
+                  "Add emotive cues and punctuation for tone",
+                  "Choose appropriate voice for content",
+                  "Split long content into manageable chunks"
                 ]}
                 features={[
-                  "Flow matching technology",
-                  "Natural speech patterns",
-                  "Multi-voice options",
-                  "High-quality output",
+                  "Blazing-fast generation",
+                  "Natural prosody and intonation",
+                  "Support for multiple languages",
+                  "Expressive emotional rendering"
                 ]}
               />
 
               <ModelCard
                 type="Dialogues"
                 color="purple"
-                name="PlayAI Text-to-Speech Dialog"
+                name="PlayAI Dialog"
                 endpointId="fal-ai/playai/tts/dialog"
-                description="Generate natural-sounding multi-speaker dialogues. Perfect for expressive outputs, storytelling, games, animations, and interactive media."
-                cost="$0.05/minute (~20 minutes per $1)"
+                description="Multi-speaker dialogue generator creating natural-sounding conversational audio from formatted scripts."
+                cost="$0.05/minute"
                 bestFor={[
-                  "Multi-speaker conversations",
                   "Character dialogues",
-                  "Interactive narratives",
-                  "Game and animation voicing",
+                  "Storytelling with multiple voices",
+                  "Games and interactive media",
+                  "Animation voice-overs"
                 ]}
                 promptTips={[
-                  "Clearly mark different speakers",
-                  "Include emotional cues in brackets",
-                  "Structure conversation naturally",
-                  "Add pauses and timing notes",
+                  "Format as 'Speaker name: dialogue' on each line",
+                  "Use punctuation to guide natural speech patterns",
+                  "Include emotive cues for better expression",
+                  "Use consistent speaker labels throughout"
                 ]}
                 features={[
-                  "Multiple voice support",
-                  "Natural conversation flow",
-                  "Speaker distinction",
-                  "Emotional expression capabilities",
+                  "Multiple distinct voice models",
+                  "Natural back-and-forth timing",
+                  "Expressive dialogue capability",
+                  "Simple formatting requirements"
                 ]}
               />
 
@@ -765,25 +775,25 @@ export default function DocsPage() {
                 color="blue"
                 name="F5 TTS"
                 endpointId="fal-ai/f5-tts"
-                description="Fluent and faithful speech with flow matching"
-                cost="Variable (pay per compute)"
+                description="Voice replication model that creates speech matching a reference voice sample."
+                cost="$0.0006-0.0012/second of GPU time"
                 bestFor={[
                   "Voice cloning applications",
                   "Custom voice creation",
-                  "Personalized content",
-                  "Consistent voice identity",
+                  "Matching specific voice characteristics",
+                  "Personalized voice content"
                 ]}
                 promptTips={[
                   "Provide high-quality reference audio",
-                  "Include reference text matching the audio",
-                  "Keep reference audio clear and noise-free",
-                  "Use natural speech patterns in prompts",
+                  "Include matching reference text",
+                  "Keep reference audio clean and noise-free",
+                  "Use natural speech patterns in input text"
                 ]}
                 features={[
                   "Voice replication technology",
+                  "Reference-based generation",
                   "Flow matching for natural speech",
-                  "Reference audio capabilities",
-                  "Custom voice development",
+                  "Seamless voice matching"
                 ]}
               />
             </div>
@@ -800,36 +810,43 @@ export default function DocsPage() {
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li>• Veo 2: $1.25/5s, +$0.25/s after</li>
                     <li>• LTX: ~$0.04-0.08/s</li>
-                    <li>• Others: Variable based on compute</li>
+                    <li>• Minimax: ~$0.40/video</li>
+                    <li>• Hunyuan: $0.40/video</li>
+                    <li>• Kling Pro: $0.10/s (~$0.50/5s)</li>
+                    <li>• Kling Standard: ~$0.05/s</li>
+                    <li>• Luma: $0.50/video</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-bold mb-3 text-purple-400">
-                    Image Costs
-                  </h3>
+                  <h3 className="font-bold mb-3 text-purple-400">Image Costs</h3>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li>• Flux Pro Ultra: $0.10-0.30/image</li>
                     <li>• Flux Dev: $0.05-0.15/image</li>
                     <li>• Flux Schnell: $0.03-0.10/image</li>
+                    <li>• SD 3.5: $0.0006-0.0012/s of GPU time</li>
                   </ul>
                 </div>
                 <div>
                   <h3 className="font-bold mb-3 text-green-400">Audio Costs</h3>
                   <ul className="space-y-2 text-sm text-gray-300">
-                    <li>• Minimax Music: Variable</li>
-                    <li>• Stable Audio: Variable</li>
+                    <li>• MMAudio V2: ~$0.02-0.03/s</li>
+                    <li>• Minimax Music: ~$0.30-0.50/clip</li>
+                    <li>• Stable Audio: $0.0006-0.0012/s of GPU time</li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-bold mb-3 text-yellow-400">
-                    Voice Costs
-                  </h3>
+                  <h3 className="font-bold mb-3 text-yellow-400">Voice Costs</h3>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li>• PlayHT TTS v3: $0.03/min</li>
                     <li>• PlayAI Dialog: $0.05/min</li>
-                    <li>• F5 TTS: Variable</li>
+                    <li>• F5 TTS: $0.0006-0.0012/s of GPU time</li>
+                    <li>• Sync.so LipSync: $0.05/min</li>
                   </ul>
                 </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-blue-900/20 border border-blue-800/30 rounded-lg text-sm text-gray-300">
+                <span className="font-medium text-blue-400">Cost-saving tip:</span> GPU time-based models (like SD 3.5, Stable Audio, F5 TTS) often cost less than fixed-price models for simple generations. For example, a basic SD 3.5 image might only cost $0.01-0.02 if generated in 10-20 seconds, compared to $0.10+ for Flux models.
               </div>
 
               {/* Best Practices Tips */}
@@ -840,9 +857,7 @@ export default function DocsPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm text-gray-300">
                   <div>
-                    <h4 className="font-medium mb-2 text-blue-400">
-                      Video Tips
-                    </h4>
+                    <h4 className="font-medium mb-2 text-blue-400">Video Tips</h4>
                     <ul className="space-y-1">
                       <li>• Start with short clips (5-10s)</li>
                       <li>• Be specific with camera movements</li>
@@ -851,9 +866,7 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-purple-400">
-                      Image Tips
-                    </h4>
+                    <h4 className="font-medium mb-2 text-purple-400">Image Tips</h4>
                     <ul className="space-y-1">
                       <li>• Use detailed visual descriptions</li>
                       <li>• Specify style and artistic references</li>
@@ -862,9 +875,7 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-green-400">
-                      Audio Tips
-                    </h4>
+                    <h4 className="font-medium mb-2 text-green-400">Audio Tips</h4>
                     <ul className="space-y-1">
                       <li>• Define genre and mood clearly</li>
                       <li>• Specify tempo and duration</li>
@@ -873,9 +884,7 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-yellow-400">
-                      Voice Tips
-                    </h4>
+                    <h4 className="font-medium mb-2 text-yellow-400">Voice Tips</h4>
                     <ul className="space-y-1">
                       <li>• Use proper punctuation for pacing</li>
                       <li>• Mark emphasis appropriately</li>
