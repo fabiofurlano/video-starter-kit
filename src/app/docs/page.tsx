@@ -44,7 +44,7 @@ function ModelCard({
   features,
   inputAsset,
   imageForFrame,
-  cameraControl
+  cameraControl,
 }: ModelCardProps) {
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
 
@@ -277,19 +277,19 @@ export default function DocsPage() {
                   "High-quality cinematic videos",
                   "Complex physical interactions",
                   "Extended durations (minutes)",
-                  "High resolution (up to 4K)"
+                  "High resolution (up to 4K)",
                 ]}
                 promptTips={[
                   "Write prompts like a movie script with detailed scene descriptions",
                   "Include camera movements and lens choices",
                   "Specify lighting details and atmosphere",
-                  "Structure narrative with clear beginning, middle, end"
+                  "Structure narrative with clear beginning, middle, end",
                 ]}
                 features={[
                   "Realistic motion physics",
                   "Professional cinematography",
                   "Reduced artifacts and flickering",
-                  "Production-ready output quality"
+                  "Production-ready output quality",
                 ]}
               />
 
@@ -304,19 +304,19 @@ export default function DocsPage() {
                   "Rapid video prototyping",
                   "Image-to-video conversion",
                   "Quick concept testing",
-                  "Budget-friendly video generation"
+                  "Budget-friendly video generation",
                 ]}
                 promptTips={[
                   "Use clear, concise descriptions",
                   "For image input, provide high-quality references",
                   "Specify motion direction explicitly",
-                  "Describe simple, focused actions or scenes"
+                  "Describe simple, focused actions or scenes",
                 ]}
                 features={[
                   "Multi-conditional inputs",
                   "Fast generation times",
                   "Image guidance capability",
-                  "Efficient for rapid iterations"
+                  "Efficient for rapid iterations",
                 ]}
                 inputAsset={["image"]}
               />
@@ -332,19 +332,19 @@ export default function DocsPage() {
                   "Bringing static images to life",
                   "Dynamic portrait animations",
                   "Face and character consistency",
-                  "Both stylized and realistic content"
+                  "Both stylized and realistic content",
                 ]}
                 promptTips={[
                   "Describe specific actions and movements",
                   "Use image-to-video mode for best results",
                   "Include camera directions (pan, zoom)",
-                  "Keep prompts in present tense like a film scene"
+                  "Keep prompts in present tense like a film scene",
                 ]}
                 features={[
                   "Exceptional temporal consistency",
                   "Strong face and character handling",
                   "Smooth camera movements",
-                  "Live2D-style animation capability"
+                  "Live2D-style animation capability",
                 ]}
                 inputAsset={["image"]}
               />
@@ -362,19 +362,19 @@ export default function DocsPage() {
                   "Cinematic video quality",
                   "Realistic physical interactions",
                   "Coherent scene transitions",
-                  "Movie-like footage generation"
+                  "Movie-like footage generation",
                 ]}
                 promptTips={[
                   "Write detailed scene descriptions like movie snippets",
                   "Keep prompts logically consistent",
                   "Use temporal words (slowly, suddenly) to indicate timing",
-                  "Specify camera and lighting details for cinematic results"
+                  "Specify camera and lighting details for cinematic results",
                 ]}
                 features={[
                   "Real-world physics simulation",
                   "Highly optimized (generates in under a minute)",
                   "High-fidelity HD output",
-                  "Continuous action sequences"
+                  "Continuous action sequences",
                 ]}
               />
 
@@ -389,19 +389,19 @@ export default function DocsPage() {
                   "Professional-quality video",
                   "Complex physics interactions",
                   "High-resolution (1080p) output",
-                  "Realistic physical simulations"
+                  "Realistic physical simulations",
                 ]}
                 promptTips={[
                   "Start with an image when possible",
                   "Describe both scene and movement clearly",
                   "Emphasize physical interactions for best results",
-                  "Use present tense and descriptive language"
+                  "Use present tense and descriptive language",
                 ]}
                 features={[
                   "1080p HD output capability",
                   "Realistic physics engine",
                   "Support for image conditioning",
-                  "Extended duration capabilities"
+                  "Extended duration capabilities",
                 ]}
                 inputAsset={["image"]}
               />
@@ -417,19 +417,19 @@ export default function DocsPage() {
                   "Quick video prototyping",
                   "Simpler scenes and actions",
                   "Faster turnaround times",
-                  "Budget-conscious projects"
+                  "Budget-conscious projects",
                 ]}
                 promptTips={[
                   "Use simpler, more concise prompts",
                   "Focus on single, clear actions or scenes",
                   "Specify style (cartoon, realistic) explicitly",
-                  "Keep chronology short (one main scene)"
+                  "Keep chronology short (one main scene)",
                 ]}
                 features={[
                   "Faster generation time",
                   "Lower resource requirements",
                   "Good for storyboarding",
-                  "Camera movement controls"
+                  "Camera movement controls",
                 ]}
                 cameraControl={true}
               />
@@ -447,19 +447,19 @@ export default function DocsPage() {
                   "Creative storytelling scenes",
                   "Dreamlike visual sequences",
                   "Multiple subjects interacting",
-                  "Cinematic camera movements"
+                  "Cinematic camera movements",
                 ]}
                 promptTips={[
                   "Include imaginative but visually concrete elements",
                   "Always specify some form of motion or change",
                   "Request specific camera movements for best results",
-                  "Structure prompts to indicate sequence of events"
+                  "Structure prompts to indicate sequence of events",
                 ]}
                 features={[
                   "Handles both realistic and stylized content",
                   "Relatively fast generation",
                   "Maintains physical accuracy",
-                  "Supports both text and image inputs"
+                  "Supports both text and image inputs",
                 ]}
                 inputAsset={["image"]}
               />
@@ -475,19 +475,19 @@ export default function DocsPage() {
                   "Adding audio to silent videos",
                   "Synchronized sound effects",
                   "Background music generation",
-                  "Complete audiovisual experiences"
+                  "Complete audiovisual experiences",
                 ]}
                 promptTips={[
                   "Specify genre, mood, or sound types you want",
                   "Match audio description to video content",
                   "Be specific about musical style or ambient sounds",
-                  "Include timing cues if needed"
+                  "Include timing cues if needed",
                 ]}
                 features={[
                   "Multimodal inputs (video + text)",
                   "Synchronized audio generation",
                   "Capable of both music and sound effects",
-                  "Returns complete audio-augmented video"
+                  "Returns complete audio-augmented video",
                 ]}
                 inputAsset={["video"]}
               />
@@ -503,19 +503,19 @@ export default function DocsPage() {
                   "Creating talking avatars",
                   "Dubbing videos in new languages",
                   "Virtual presenters",
-                  "Giving voice to still images"
+                  "Giving voice to still images",
                 ]}
                 promptTips={[
                   "Provide clear face image/video with visible mouth",
                   "Use high-quality clean audio",
                   "Choose matching emotional expressions",
-                  "Trim silence from start of audio if needed"
+                  "Trim silence from start of audio if needed",
                 ]}
                 features={[
                   "High-quality synchronized lip movements",
                   "Works with images or videos as input",
                   "Fast processing",
-                  "Supports multiple languages"
+                  "Supports multiple languages",
                 ]}
                 inputAsset={["video", "audio"]}
               />
@@ -541,19 +541,19 @@ export default function DocsPage() {
                   "High-resolution realistic images",
                   "Marketing and commercial work",
                   "Highly detailed scenes",
-                  "Professional-grade visuals"
+                  "Professional-grade visuals",
                 ]}
                 promptTips={[
                   "Include photography terminology (camera, lens, lighting)",
                   "Structure prompts clearly (subject, setting, style)",
                   "Be specific and provide vivid details",
-                  "Consider reference images for style guidance"
+                  "Consider reference images for style guidance",
                 ]}
                 features={[
                   "Up to 2K resolution output",
                   "Enhanced photorealism",
                   "Better text handling",
-                  "High-fidelity detail rendering"
+                  "High-fidelity detail rendering",
                 ]}
               />
 
@@ -568,19 +568,19 @@ export default function DocsPage() {
                   "Balanced quality and speed",
                   "Detailed artistic creations",
                   "Complex scene composition",
-                  "Long-form descriptive prompts"
+                  "Long-form descriptive prompts",
                 ]}
                 promptTips={[
                   "Use long-form prompts with rich detail",
                   "Employ weighted prompt segments with :: notation",
                   "Structure prompts into subject, style, background",
-                  "20-40 inference steps for best quality"
+                  "20-40 inference steps for best quality",
                 ]}
                 features={[
                   "High resolution capabilities",
                   "Strong prompt understanding",
                   "Supports personal and commercial use",
-                  "Handles complex, lengthy prompts"
+                  "Handles complex, lengthy prompts",
                 ]}
               />
 
@@ -595,19 +595,19 @@ export default function DocsPage() {
                   "Ultra-fast generation",
                   "Rapid prototype iteration",
                   "High-volume image needs",
-                  "Quick concept exploration"
+                  "Quick concept exploration",
                 ]}
                 promptTips={[
                   "Use same syntax as FLUX [dev]",
                   "Keep prompts focused and concise",
                   "Emphasize key elements with higher weights",
-                  "Structure into segments (subject | style | etc.)"
+                  "Structure into segments (subject | style | etc.)",
                 ]}
                 features={[
                   "1-4 diffusion steps (fastest FLUX)",
                   "Output quality comparable to larger models",
                   "Perfect for testing prompt ideas quickly",
-                  "Extremely cost-efficient"
+                  "Extremely cost-efficient",
                 ]}
               />
 
@@ -622,19 +622,19 @@ export default function DocsPage() {
                   "Complex prompt handling",
                   "Text and typography needs",
                   "Multimodal generation (text+image)",
-                  "High-quality detailed outputs"
+                  "High-quality detailed outputs",
                 ]}
                 promptTips={[
                   "Write rich, descriptive prompts",
                   "Organize by subject, setting, style, technical details",
                   "Use negative prompting to avoid issues",
-                  "Include artist/style references for specific looks"
+                  "Include artist/style references for specific looks",
                 ]}
                 features={[
                   "Multimodal Diffusion Transformer architecture",
                   "Better text rendering in images",
                   "ControlNet and LoRA support",
-                  "Resource efficiency improvements"
+                  "Resource efficiency improvements",
                 ]}
               />
             </div>
@@ -659,24 +659,26 @@ export default function DocsPage() {
                   "Original music composition",
                   "Custom soundtracks",
                   "Genre-specific music creation",
-                  "Mood-based audio generation"
+                  "Mood-based audio generation",
                 ]}
                 promptTips={[
                   "Specify genre, mood, tempo, and instruments",
                   "Include BPM for rhythmic control",
                   "Mention era or artist references for style",
-                  "Describe structure (intro, build, climax)"
+                  "Describe structure (intro, build, climax)",
                 ]}
                 features={[
                   "Multi-genre support",
                   "Coherent musical structure",
                   "High-quality output",
-                  "Reference audio capability"
+                  "Reference audio capability",
                 ]}
-                inputAsset={[{
-                  type: "audio",
-                  key: "reference_audio_url"
-                }]}
+                inputAsset={[
+                  {
+                    type: "audio",
+                    key: "reference_audio_url",
+                  },
+                ]}
               />
 
               <ModelCard
@@ -690,19 +692,19 @@ export default function DocsPage() {
                   "Music loops and samples",
                   "Sound effects generation",
                   "Ambient soundscapes",
-                  "Background music"
+                  "Background music",
                 ]}
                 promptTips={[
                   "Be concise with sound-focused descriptions",
                   "Specify tempo (BPM) for rhythmic content",
                   "Include genre and instrument details",
-                  "Mention duration or 'loopable' if needed"
+                  "Mention duration or 'loopable' if needed",
                 ]}
                 features={[
                   "Timing-conditioned latent diffusion",
                   "Efficient resource usage",
                   "Open for commercial use",
-                  "Good tempo/beat adherence"
+                  "Good tempo/beat adherence",
                 ]}
               />
             </div>
@@ -727,19 +729,19 @@ export default function DocsPage() {
                   "High-quality voice narration",
                   "Emotional and expressive speech",
                   "Long-form content (audiobooks)",
-                  "Multilingual content"
+                  "Multilingual content",
                 ]}
                 promptTips={[
                   "Use well-punctuated text for natural rhythm",
                   "Add emotive cues and punctuation for tone",
                   "Choose appropriate voice for content",
-                  "Split long content into manageable chunks"
+                  "Split long content into manageable chunks",
                 ]}
                 features={[
                   "Blazing-fast generation",
                   "Natural prosody and intonation",
                   "Support for multiple languages",
-                  "Expressive emotional rendering"
+                  "Expressive emotional rendering",
                 ]}
               />
 
@@ -754,19 +756,19 @@ export default function DocsPage() {
                   "Character dialogues",
                   "Storytelling with multiple voices",
                   "Games and interactive media",
-                  "Animation voice-overs"
+                  "Animation voice-overs",
                 ]}
                 promptTips={[
                   "Format as 'Speaker name: dialogue' on each line",
                   "Use punctuation to guide natural speech patterns",
                   "Include emotive cues for better expression",
-                  "Use consistent speaker labels throughout"
+                  "Use consistent speaker labels throughout",
                 ]}
                 features={[
                   "Multiple distinct voice models",
                   "Natural back-and-forth timing",
                   "Expressive dialogue capability",
-                  "Simple formatting requirements"
+                  "Simple formatting requirements",
                 ]}
               />
 
@@ -781,19 +783,19 @@ export default function DocsPage() {
                   "Voice cloning applications",
                   "Custom voice creation",
                   "Matching specific voice characteristics",
-                  "Personalized voice content"
+                  "Personalized voice content",
                 ]}
                 promptTips={[
                   "Provide high-quality reference audio",
                   "Include matching reference text",
                   "Keep reference audio clean and noise-free",
-                  "Use natural speech patterns in input text"
+                  "Use natural speech patterns in input text",
                 ]}
                 features={[
                   "Voice replication technology",
                   "Reference-based generation",
                   "Flow matching for natural speech",
-                  "Seamless voice matching"
+                  "Seamless voice matching",
                 ]}
               />
             </div>
@@ -818,7 +820,9 @@ export default function DocsPage() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-bold mb-3 text-purple-400">Image Costs</h3>
+                  <h3 className="font-bold mb-3 text-purple-400">
+                    Image Costs
+                  </h3>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li>• Flux Pro Ultra: $0.10-0.30/image</li>
                     <li>• Flux Dev: $0.05-0.15/image</li>
@@ -835,7 +839,9 @@ export default function DocsPage() {
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-bold mb-3 text-yellow-400">Voice Costs</h3>
+                  <h3 className="font-bold mb-3 text-yellow-400">
+                    Voice Costs
+                  </h3>
                   <ul className="space-y-2 text-sm text-gray-300">
                     <li>• PlayHT TTS v3: $0.03/min</li>
                     <li>• PlayAI Dialog: $0.05/min</li>
@@ -846,7 +852,13 @@ export default function DocsPage() {
               </div>
 
               <div className="mt-4 p-3 bg-blue-900/20 border border-blue-800/30 rounded-lg text-sm text-gray-300">
-                <span className="font-medium text-blue-400">Cost-saving tip:</span> GPU time-based models (like SD 3.5, Stable Audio, F5 TTS) often cost less than fixed-price models for simple generations. For example, a basic SD 3.5 image might only cost $0.01-0.02 if generated in 10-20 seconds, compared to $0.10+ for Flux models.
+                <span className="font-medium text-blue-400">
+                  Cost-saving tip:
+                </span>{" "}
+                GPU time-based models (like SD 3.5, Stable Audio, F5 TTS) often
+                cost less than fixed-price models for simple generations. For
+                example, a basic SD 3.5 image might only cost $0.01-0.02 if
+                generated in 10-20 seconds, compared to $0.10+ for Flux models.
               </div>
 
               {/* Best Practices Tips */}
@@ -857,7 +869,9 @@ export default function DocsPage() {
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-sm text-gray-300">
                   <div>
-                    <h4 className="font-medium mb-2 text-blue-400">Video Tips</h4>
+                    <h4 className="font-medium mb-2 text-blue-400">
+                      Video Tips
+                    </h4>
                     <ul className="space-y-1">
                       <li>• Start with short clips (5-10s)</li>
                       <li>• Be specific with camera movements</li>
@@ -866,7 +880,9 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-purple-400">Image Tips</h4>
+                    <h4 className="font-medium mb-2 text-purple-400">
+                      Image Tips
+                    </h4>
                     <ul className="space-y-1">
                       <li>• Use detailed visual descriptions</li>
                       <li>• Specify style and artistic references</li>
@@ -875,7 +891,9 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-green-400">Audio Tips</h4>
+                    <h4 className="font-medium mb-2 text-green-400">
+                      Audio Tips
+                    </h4>
                     <ul className="space-y-1">
                       <li>• Define genre and mood clearly</li>
                       <li>• Specify tempo and duration</li>
@@ -884,7 +902,9 @@ export default function DocsPage() {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="font-medium mb-2 text-yellow-400">Voice Tips</h4>
+                    <h4 className="font-medium mb-2 text-yellow-400">
+                      Voice Tips
+                    </h4>
                     <ul className="space-y-1">
                       <li>• Use proper punctuation for pacing</li>
                       <li>• Mark emphasis appropriately</li>
