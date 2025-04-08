@@ -29,13 +29,73 @@ This comprehensive guide provides detailed information about all AI models avail
 
 ---
 
-## Video Models
+## Video Models 🎬
 
 <div style="background-color: rgba(0, 123, 255, 0.1); border-left: 4px solid #007bff; padding: 1rem; margin-bottom: 1.5rem;">
 <strong>💡 Pro Tip:</strong> Video models transform text prompts or images into dynamic video content. They vary in style, quality, and motion capabilities.
 </div>
 
-### Veo 2
+### **Veo 2**
+
+<div style="display: flex; align-items: center; margin-bottom: 1rem;">
+<span style="background-color: #f2f7ff; color: #0057b8; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; margin-right: 0.5rem;">PROFESSIONAL</span>
+<span style="background-color: #fff8e6; color: #bb6a00; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold;">HIGH QUALITY</span>
+</div>
+
+![Veo 2 Example](/images/models/veo2-placeholder.jpg)
+
+**Cost:**
+- Base price: $1.25 for 5-second video
+- Additional seconds: $0.25 per second (limited time offer)
+- Regular pricing: $2.50 for 5-second video, $0.50 per additional second
+
+**Best Use Cases:**
+- Text-to-video generation
+- High-quality 4K resolution output
+- Realistic motion and physics
+- Detailed textures and lighting
+
+**Prompt Techniques:**
+- Include camera movement terms like "panning," "zooming," "dolly shot"
+- Specify film stock for consistent aesthetics (e.g., "Kodak Portra 400")
+- Mention specific lens types for different looks (e.g., "35mm lens," "85mm portrait lens")
+- Describe lighting conditions in detail
+
+---
+
+### **LTX Video v0.95**
+# Video Starter Kit Model Guide
+
+This comprehensive guide provides detailed information about all AI models available in the Video Starter Kit, including usage tips, pricing, and best practices for optimal results.
+
+## Table of Contents
+
+- [Video Models](#video-models) 🎬
+  - [Veo 2](#veo-2)
+  - [LTX Video v0.95](#ltx-video-v095)
+  - [Minimax Video 01 Live](#minimax-video-01-live)
+  - [Hunyuan](#hunyuan)
+  - [Kling 1.5 Pro](#kling-15-pro)
+  - [Kling 1.0 Standard](#kling-10-standard)
+  - [Luma Dream Machine 1.5](#luma-dream-machine-15)
+  - [MMAudio V2](#mmaudio-v2)
+  - [sync.so -- lipsync 1.8.0](#syncso----lipsync-180)
+- [Image Models](#image-models) 🖼️
+  - [Flux Dev](#flux-dev)
+  - [Flux Schnell](#flux-schnell)
+  - [Flux Pro 1.1 Ultra](#flux-pro-11-ultra)
+  - [Stable Diffusion 3.5 Large](#stable-diffusion-35-large)
+- [Music Models](#music-models) 🎵
+  - [Minimax Music](#minimax-music)
+  - [Stable Audio](#stable-audio)
+- [Voiceover Models](#voiceover-models) 🎙️
+  - [PlayHT TTS v3](#playht-tts-v3)
+  - [PlayAI Text-to-Speech Dialog](#playai-text-to-speech-dialog)
+  - [F5 TTS](#f5-tts)
+
+---
+
+### LTX Video v0.95
 
 <div style="display: flex; align-items: center; margin-bottom: 1rem;">
 <span style="background-color: #f2f7ff; color: #0057b8; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; margin-right: 0.5rem;">PROFESSIONAL</span>
@@ -78,7 +138,7 @@ Veo 2 creates videos with realistic motion and high-quality output, up to 4K res
 
 ---
 
-### LTX Video v0.95
+### **LTX Video v0.95**
 
 <div style="display: flex; align-items: center; margin-bottom: 1rem;">
 <span style="background-color: #f2f7ff; color: #0057b8; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; margin-right: 0.5rem;">NEW</span>
@@ -87,35 +147,23 @@ Veo 2 creates videos with realistic motion and high-quality output, up to 4K res
 
 ![LTX Video Example](/images/models/ltx-video-placeholder.jpg)
 
-LTX Video is a new multiconditioning model that can generate videos from both text prompts and reference images.
+**Cost:** Not specified
 
-**Endpoint ID:** `fal-ai/ltx-video-v095/multiconditioning`
-
-**✨ Capabilities:**
+**Best Use Cases:**
 - Generate videos from text prompts
 - Use reference images as visual guides
-- Direct image-to-video conversion without separate endpoint
+- Direct image-to-video conversion
 
-**🔧 Unique Features:**
-- **imageForFrame:** Can use input images directly as reference for video frames
-
-**⚙️ Best Practices:**
+**Prompt Techniques:**
 - For image-guided generation, use clear, high-quality reference images
 - Balance text prompt specificity with visual guidance from images
 - Use descriptive motion terms when you want specific movements
-
-<div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 1rem; margin: 1rem 0;">
-<strong>Example Prompt with Image:</strong>
-<pre style="background-color: #f1f3f5; padding: 0.5rem; border-radius: 4px; overflow-x: auto;">A tranquil forest scene with sunlight filtering through leaves, gentle wind creating subtle movement in the branches</pre>
-</div>
-
-**📝 Tips:**
 - Upload a reference image along with your prompt for better results
 - The model will use both your text and image to guide the video generation
 
 ---
 
-### Minimax Video 01 Live
+### **Minimax Video 01 Live**
 
 <div style="display: flex; align-items: center; margin-bottom: 1rem;">
 <span style="background-color: #fff8e6; color: #bb6a00; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; margin-right: 0.5rem;">VERSATILE</span>
@@ -196,66 +244,6 @@ Generates high-quality videos with an emphasis on visual quality and smooth moti
 
 **🖼️ Input Assets:** Supports image input for video generation
 
-<div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 1rem; margin: 1rem 0;">
-<strong>Example Prompt:</strong>
-<pre style="background-color: #f1f3f5; padding: 0.5rem; border-radius: 4px; overflow-x: auto;">A macro shot of a vivid blue morpho butterfly slowly opening and closing its wings while perched on a bright orange flower. Dew drops on the petals glisten in the soft morning light.</pre>
-</div>
-
-**📝 Tips:**
-- Specify camera perspectives (macro, wide-angle, etc.)
-- Include details about lighting and atmosphere
-- Describe motions clearly and specifically
-
----
-
-### Kling 1.0 Standard
-
-<div style="display: flex; align-items: center; margin-bottom: 1rem;">
-<span style="background-color: #fff8e6; color: #bb6a00; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; margin-right: 0.5rem;">CAMERA CONTROL</span>
-<span style="background-color: #f8e5ff; color: #6f42c1; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold;">STANDARD</span>
-</div>
-
-![Kling Standard Example](/images/models/kling-standard-placeholder.jpg)
-
-Standard video generation model with camera control capabilities.
-
-**Endpoint ID:** `fal-ai/kling-video/v1/standard/text-to-video`
-
-**✨ Capabilities:**
-- Text-to-video generation
-- Camera movement control
-
-**🎥 Features:**
-- **cameraControl:** Allows for specifying camera movements during generation
-
-<div style="background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; padding: 1rem; margin: 1rem 0;">
-<strong>Example Prompt with Camera Control:</strong>
-<pre style="background-color: #f1f3f5; padding: 0.5rem; border-radius: 4px; overflow-x: auto;">A drone shot of a Mediterranean coastal town, white buildings with blue roofs against the deep blue sea, boats in the harbor, people walking along narrow streets</pre>
-</div>
-
-**📝 Tips for Camera Control:**
-- Use the Camera Control panel to specify movement type
-- Options include pan, tilt, zoom, rotation, and dolly movements
-- Adjust the intensity of the movement using the slider
-
----
-
-### Luma Dream Machine 1.5
-
-<div style="display: flex; align-items: center; margin-bottom: 1rem;">
-<span style="background-color: #f2f7ff; color: #0057b8; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold; margin-right: 0.5rem;">HIGH QUALITY</span>
-<span style="background-color: #e6f7ee; color: #00843d; padding: 0.25rem 0.5rem; border-radius: 4px; font-weight: bold;">IMAGE-GUIDED</span>
-</div>
-
-![Luma Dream Machine Example](/images/models/luma-placeholder.jpg)
-
-High-quality video generation with support for image-guided generation.
-
-**Endpoint ID:** `fal-ai/luma-dream-machine`
-
-**✨ Capabilities:**
-- High-quality video generation
-- Image-to-video transformation
 
 **🖼️ Input Assets:** Supports image input for video generation
 
@@ -542,6 +530,18 @@ For Sound Effects:
 
 ![PlayHT Example](/images/models/playht-placeholder.jpg)
 
+Generates fluent and natural speech with improved emotional tones.
+
+**Endpoint ID:** `fal-ai/playht/tts/v3`
+
+**✨ Capabilities:**
+- High-quality text-to-speech
+- Natural-sounding voice synthesis
+- Fast processing for efficient workflows
+
+**🗣️ Default Voice:** Dexter (English (US)/American)
+
+**💰 Pricing:** $0.03 per minute per audio minute generated
 Generates fluent and natural speech with improved emotional tones.
 
 **Endpoint ID:** `fal-ai/playht/tts/v3`
