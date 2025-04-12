@@ -9,8 +9,9 @@ const nextConfig = {
           {
             key: "Content-Security-Policy",
             // Allow embedding from self, localhost, staging (mecai.app), and production (novelvisionai.art)
-            value: "frame-ancestors 'self' http://localhost:8000 https://mecai.app https://novelvisionai.art;",
-          }
+            value:
+              "frame-ancestors 'self' http://localhost:8000 https://mecai.app https://novelvisionai.art;",
+          },
         ],
       },
     ];
