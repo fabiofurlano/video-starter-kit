@@ -259,7 +259,9 @@ export default function IndexPage() {
           sessionManager.initializeSession(parsedData);
           // setUserData(sessionManager.getUserData()); // Data is set later after auth check
           // setIsLoading(false); // Removed
-          console.log("Session data loaded from localStorage cache (pre-auth check)");
+          console.log(
+            "Session data loaded from localStorage cache (pre-auth check)",
+          );
           // setDebugInfo("Session data loaded from localStorage"); // Removed
         }
       } catch (error) {
@@ -269,7 +271,9 @@ export default function IndexPage() {
       // We already have data in the session from a previous load or message
       // Set the SDK user data state here as well, but wait for auth check effect
       setSdkUserData(currentData); // Restore setting the state
-      console.log("Session data already available in sessionManager (pre-auth check), set in state.");
+      console.log(
+        "Session data already available in sessionManager (pre-auth check), set in state.",
+      );
     }
 
     function handleMessage(event: MessageEvent) {
@@ -389,7 +393,9 @@ export default function IndexPage() {
               setIsAuthenticated(null); // Indicate error state
             }
           } else {
-            console.log("Message received but no valid user data structure found");
+            console.log(
+              "Message received but no valid user data structure found",
+            );
             // Potentially handle this case - maybe mark session ready but unauthenticated?
             setIsAuthenticated(false);
             setIsSessionReady(true);
@@ -408,26 +414,30 @@ export default function IndexPage() {
   // Effect to check authentication status once session is ready
   useEffect(() => {
     if (isSessionReady) {
-      console.log('SDK: Session is ready. Checking authentication status.');
+      console.log("SDK: Session is ready. Checking authentication status.");
       // Use the locally tracked isAuthenticated state which was set by the message listener
       if (isAuthenticated === false) {
-        console.log('SDK: User is not authenticated. Sending REDIRECT_AUTH to parent.');
-        if (parentOrigin) { // Ensure we know where to send the message
-           window.parent.postMessage({ type: 'REDIRECT_AUTH' }, parentOrigin);
-           console.log('SDK: REDIRECT_AUTH sent to:', parentOrigin);
+        console.log(
+          "SDK: User is not authenticated. Sending REDIRECT_AUTH to parent.",
+        );
+        if (parentOrigin) {
+          // Ensure we know where to send the message
+          window.parent.postMessage({ type: "REDIRECT_AUTH" }, parentOrigin);
+          console.log("SDK: REDIRECT_AUTH sent to:", parentOrigin);
         } else {
-           console.error("SDK: Cannot send REDIRECT_AUTH, parent origin not known.");
-           // Fallback for safety, though parentOrigin should be set
-           window.parent.postMessage({ type: 'REDIRECT_AUTH' }, '*');
+          console.error(
+            "SDK: Cannot send REDIRECT_AUTH, parent origin not known.",
+          );
+          // Fallback for safety, though parentOrigin should be set
+          window.parent.postMessage({ type: "REDIRECT_AUTH" }, "*");
         }
       } else if (isAuthenticated === true) {
-        console.log('SDK: User is authenticated. Proceeding with rendering.');
+        console.log("SDK: User is authenticated. Proceeding with rendering.");
         // Load data from session manager into local state now that auth is confirmed
         setSdkUserData(sessionManager.getUserData());
       }
     }
   }, [isSessionReady, isAuthenticated, parentOrigin]); // Re-run if session readiness or auth status changes
-
 
   // --- Conditional Rendering Logic ---
   if (!isSessionReady) {
@@ -454,65 +464,65 @@ export default function IndexPage() {
       <div className="min-h-screen bg-gradient-to-br from-black to-[#0A0F23] text-white relative">
         <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism mb-8">
           <div className="flex items-center">
-          <Logo />
-          <span className="mx-2 text-gray-400">|</span>
-          <h2 className="text-lg font-medium">AI Visual Studio</h2>
-        </div>
+            <Logo />
+            <span className="mx-2 text-gray-400">|</span>
+            <h2 className="text-lg font-medium">AI Visual Studio</h2>
+          </div>
 
-        <nav className="flex flex-row items-center justify-end gap-2">
-          <ThemeToggle />
+          <nav className="flex flex-row items-center justify-end gap-2">
+            <ThemeToggle />
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => (window.location.href = "/app")}
-          >
-            <LayoutDashboard className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">Video Studio</span>
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => (window.location.href = "/app")}
+            >
+              <LayoutDashboard className="w-4 h-4 mr-1" />
+              <span className="hidden sm:inline">Video Studio</span>
+            </Button>
 
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={config.urls.main} target="_blank">
-              <Home className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">Home</span>
-            </Link>
-          </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={config.urls.main} target="_blank">
+                <Home className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">Home</span>
+              </Link>
+            </Button>
 
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={config.urls.writingWorkspace} target="_blank">
-              <Edit3Icon className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">Writing Space</span>
-            </Link>
-          </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={config.urls.writingWorkspace} target="_blank">
+                <Edit3Icon className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">Writing Space</span>
+              </Link>
+            </Button>
 
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={config.urls.characterSetup} target="_blank">
-              <Users className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">Characters</span>
-            </Link>
-          </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={config.urls.characterSetup} target="_blank">
+                <Users className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">Characters</span>
+              </Link>
+            </Button>
 
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={config.urls.storyOutline} target="_blank">
-              <FileTextIcon className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">Outline</span>
-            </Link>
-          </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={config.urls.storyOutline} target="_blank">
+                <FileTextIcon className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">Outline</span>
+              </Link>
+            </Button>
 
-          <Button variant="ghost" size="sm" asChild>
-            <Link href={config.urls.settings} target="_blank">
-              <SettingsIcon className="w-4 h-4 mr-1" />
-              <span className="hidden sm:inline">Settings</span>
+            <Button variant="ghost" size="sm" asChild>
+              <Link href={config.urls.settings} target="_blank">
+                <SettingsIcon className="w-4 h-4 mr-1" />
+                <span className="hidden sm:inline">Settings</span>
               </Link>
             </Button>
           </nav>
         </header>
 
         <main className="max-w-7xl mx-auto p-6">
-           {/* Main content is now rendered directly if authenticated */}
-           <div className="space-y-8">
-             {/* Tabs Only Section at Top */}
-             <div className="glassmorphism p-6 border-gray-800">
+          {/* Main content is now rendered directly if authenticated */}
+          <div className="space-y-8">
+            {/* Tabs Only Section at Top */}
+            <div className="glassmorphism p-6 border-gray-800">
               <h2 className="text-2xl font-bold mb-6 text-white">
                 Create Storyboard
               </h2>
@@ -668,35 +678,37 @@ export default function IndexPage() {
               </Tabs>
             </div>
 
-             {/* Story Info Panel */}
-             <div className="glassmorphism p-6 border-gray-800">
-               <h2 className="text-2xl font-bold mb-4 text-white">
-                 Story Information
-               </h2>
-               {sdkUserData.title || sdkUserData.genre || sdkUserData.language ? (
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                   <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
-                     <h3 className="text-gray-400 text-sm mb-1">Title</h3>
-                     <p className="text-lg font-medium">
-                       {sdkUserData.title || "Untitled Story"}
-                     </p>
-                   </div>
-                   <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
-                     <h3 className="text-gray-400 text-sm mb-1">Genre</h3>
-                     <p className="text-lg font-medium">
-                       {sdkUserData.genre || "Not specified"}
-                     </p>
-                   </div>
-                   <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
-                     <h3 className="text-gray-400 text-sm mb-1">Language</h3>
-                     <p className="text-lg font-medium">
-                       {sdkUserData.language || "Not specified"}
-                     </p>
-                   </div>
-                   <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
-                     <h3 className="text-gray-400 text-sm mb-1">Location</h3>
-                     <p className="text-lg font-medium">
-                       {sdkUserData.location || "Not specified"}
+            {/* Story Info Panel */}
+            <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-4 text-white">
+                Story Information
+              </h2>
+              {sdkUserData.title ||
+              sdkUserData.genre ||
+              sdkUserData.language ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
+                    <h3 className="text-gray-400 text-sm mb-1">Title</h3>
+                    <p className="text-lg font-medium">
+                      {sdkUserData.title || "Untitled Story"}
+                    </p>
+                  </div>
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
+                    <h3 className="text-gray-400 text-sm mb-1">Genre</h3>
+                    <p className="text-lg font-medium">
+                      {sdkUserData.genre || "Not specified"}
+                    </p>
+                  </div>
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
+                    <h3 className="text-gray-400 text-sm mb-1">Language</h3>
+                    <p className="text-lg font-medium">
+                      {sdkUserData.language || "Not specified"}
+                    </p>
+                  </div>
+                  <div className="bg-gray-900/40 p-4 rounded-lg border border-gray-800 hover:border-gray-700 transition-colors duration-200">
+                    <h3 className="text-gray-400 text-sm mb-1">Location</h3>
+                    <p className="text-lg font-medium">
+                      {sdkUserData.location || "Not specified"}
                     </p>
                   </div>
                 </div>
@@ -710,14 +722,14 @@ export default function IndexPage() {
               )}
             </div>
 
-             {/* Characters Panel */}
-             <div className="glassmorphism p-6 border-gray-800">
-               <h2 className="text-2xl font-bold mb-6 text-white">Characters</h2>
-               {sdkUserData.characters && sdkUserData.characters.length > 0 ? (
-                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
-                   {sdkUserData.characters.map((character, index) => (
-                     <div
-                       key={index}
+            {/* Characters Panel */}
+            <div className="glassmorphism p-6 border-gray-800">
+              <h2 className="text-2xl font-bold mb-6 text-white">Characters</h2>
+              {sdkUserData.characters && sdkUserData.characters.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                  {sdkUserData.characters.map((character, index) => (
+                    <div
+                      key={index}
                       className="bg-gray-900/50 p-5 rounded-lg border border-gray-800 hover:border-blue-500/50 transition-all duration-300"
                     >
                       <h3 className="font-bold text-white">{character.name}</h3>
@@ -739,15 +751,15 @@ export default function IndexPage() {
             </div>
 
             {/* Full Storyboard Creation Section with Chapters */}
-             <div className="glassmorphism p-6 border-gray-800">
-               <Tabs defaultValue="chapters" className="w-full">
-                 <TabsContent value="chapters">
-                   {/* Existing Chapters Panel */}
-                   {sdkUserData.chapters && sdkUserData.chapters.length > 0 ? (
-                     <div className="grid grid-cols-1 gap-6">
-                       {sdkUserData.chapters.map((chapter, index) => (
-                         <div
-                           key={index}
+            <div className="glassmorphism p-6 border-gray-800">
+              <Tabs defaultValue="chapters" className="w-full">
+                <TabsContent value="chapters">
+                  {/* Existing Chapters Panel */}
+                  {sdkUserData.chapters && sdkUserData.chapters.length > 0 ? (
+                    <div className="grid grid-cols-1 gap-6">
+                      {sdkUserData.chapters.map((chapter, index) => (
+                        <div
+                          key={index}
                           className="bg-gray-900/50 p-5 rounded-lg shadow-lg border border-gray-800 hover:border-blue-500/50 transition-all duration-300"
                         >
                           <h1 className="text-xl font-bold mb-3 text-white border-b border-gray-700/50 pb-2">
@@ -790,10 +802,10 @@ export default function IndexPage() {
                                 className="bg-gray-800/70 border border-gray-700 text-gray-200 text-xs py-1.5 px-3 rounded-lg focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 hover:border-blue-400"
                                 value={slideSelections[index] || ""}
                                 onChange={(e) =>
-                                   handleSlideCountChange(index, e.target.value)
-                                 }
-                               >
-                                 <option value="">Slides</option>
+                                  handleSlideCountChange(index, e.target.value)
+                                }
+                              >
+                                <option value="">Slides</option>
                                 <option value="1">1 Slide</option>
                                 <option value="2">2 Slides</option>
                                 <option value="3">3 Slides</option>
@@ -819,38 +831,38 @@ export default function IndexPage() {
                                   />
                                   <path d="M6 7a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" />
                                 </svg>
-                                 Generate Storyboard
-                               </button>
-                             </div>
-                           </div>
-                         </div>
-                       ))}
-                     </div>
-                   ) : (
-                     <p className="text-gray-400 text-center py-6">
-                       No chapters found. Try creating a storyboard from scratch
-                       instead.
-                     </p>
-                   )}
-                 </TabsContent>
-               </Tabs>
-             </div>
-           </div>
-         </main>
-       </div>
-     );
-   }
+                                Generate Storyboard
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-gray-400 text-center py-6">
+                      No chapters found. Try creating a storyboard from scratch
+                      instead.
+                    </p>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
-   // Fallback loading state if authenticated but data not yet loaded into state
-   // This might occur briefly between isSessionReady=true and sdkUserData being set.
-   return (
-       <div className="flex items-center justify-center min-h-screen bg-black text-white">
-           Loading authenticated session data...
-       </div>
-   );
+  // Fallback loading state if authenticated but data not yet loaded into state
+  // This might occur briefly between isSessionReady=true and sdkUserData being set.
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      Loading authenticated session data...
+    </div>
+  );
 
-   // --- Original Missing API Key Fallback (Removed as auth check handles this now) ---
-   /* REMOVED THIS ENTIRE BLOCK
+  // --- Original Missing API Key Fallback (Removed as auth check handles this now) ---
+  /* REMOVED THIS ENTIRE BLOCK
    else {
      // This case should ideally not be reached if the redirect logic works
      return (

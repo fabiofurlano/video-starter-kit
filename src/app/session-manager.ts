@@ -7,7 +7,7 @@
 export interface UserData {
   // Auth Status
   isAuthenticated: boolean; // ADDED
-  userId: string | null;    // ADDED
+  userId: string | null; // ADDED
 
   // API keys
   openaiApiKey?: string;
@@ -53,7 +53,7 @@ class SessionManager {
   private userData: UserData | null = null;
   private initialized: boolean = false;
   private isAuthenticated: boolean = false; // ADDED
-  private userId: string | null = null;    // ADDED
+  private userId: string | null = null; // ADDED
 
   /**
    * Initialize the SDK session with user data
@@ -64,8 +64,10 @@ class SessionManager {
 
     // Store auth status
     this.isAuthenticated = userData.isAuthenticated ?? false; // ADDED
-    this.userId = userData.userId ?? null;                // ADDED
-    console.log(`SDK Auth Status Received: isAuthenticated=${this.isAuthenticated}, userId=${this.userId}`);
+    this.userId = userData.userId ?? null; // ADDED
+    console.log(
+      `SDK Auth Status Received: isAuthenticated=${this.isAuthenticated}, userId=${this.userId}`,
+    );
 
     // Process API keys from different message formats
     let apiKeys: Record<string, string> = {};
@@ -78,7 +80,7 @@ class SessionManager {
     // Set user data with properly formatted chapters
     this.userData = {
       isAuthenticated: this.isAuthenticated, // Store in userData object as well
-      userId: this.userId,                 // Store in userData object as well
+      userId: this.userId, // Store in userData object as well
       openaiApiKey: apiKeys.openai || userData.openai_key || "",
       openrouterApiKey: apiKeys.openrouter || userData.openrouter_key || "",
       falaiApiKey: apiKeys.falai || userData.falai_key || "",
