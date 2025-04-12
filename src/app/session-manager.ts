@@ -5,6 +5,10 @@
 
 // Define the type for user data
 export interface UserData {
+  // Auth Status
+  isAuthenticated: boolean; // ADDED
+  userId: string | null;    // ADDED
+
   // API keys
   openaiApiKey?: string;
   openrouterApiKey?: string;
@@ -48,6 +52,8 @@ export interface ParentPostMessageData {
 class SessionManager {
   private userData: UserData | null = null;
   private initialized: boolean = false;
+  private isAuthenticated: boolean = false; // ADDED
+  private userId: string | null = null;    // ADDED
 
   /**
    * Initialize the SDK session with user data
@@ -55,6 +61,11 @@ class SessionManager {
    */
   initializeSession(userData: Record<string, any>): void {
     console.log("SDK receiving session data:", userData);
+
+    // Store auth status
+    this.isAuthenticated = userData.isAuthenticated ?? false; // ADDED
+    this.userId = userData.userId ?? null;                // ADDED
+    console.log(`SDK Auth Status Received: isAuthenticated=${this.isAuthenticated}, userId=${this.userId}`);
 
     // Process API keys from different message formats
     let apiKeys: Record<string, string> = {};
@@ -66,6 +77,8 @@ class SessionManager {
 
     // Set user data with properly formatted chapters
     this.userData = {
+      isAuthenticated: this.isAuthenticated, // Store in userData object as well
+      userId: this.userId,                 // Store in userData object as well
       openaiApiKey: apiKeys.openai || userData.openai_key || "",
       openrouterApiKey: apiKeys.openrouter || userData.openrouter_key || "",
       falaiApiKey: apiKeys.falai || userData.falai_key || "",
@@ -115,6 +128,23 @@ class SessionManager {
   isInitialized(): boolean {
     return this.initialized;
   }
+
+  /** // ADDED Getters for Auth Status
+   * Get the authentication status received from the parent.
+   * @returns True if the parent indicated the user is authenticated.
+   */
+  getIsAuthenticated(): boolean {
+    return this.isAuthenticated;
+  }
+
+  /**
+   * Get the user ID received from the parent.
+   * @returns The Firebase User ID string or null.
+   */
+  getUserId(): string | null {
+    return this.userId;
+  }
+  // END ADDED Getters
 
   /**
    * Get a specific API key
