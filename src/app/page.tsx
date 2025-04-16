@@ -324,6 +324,20 @@ export default function IndexPage() {
           return; // Important: Stop processing after handling ping
         }
 
+        // Handle FALAI_KEY_RESPONSE message
+        if (event.data && event.data.type === "FALAI_KEY_RESPONSE") {
+          console.log("FALAI_KEY_RESPONSE received");
+          const falaiKey = event.data.falai_key;
+
+          if (falaiKey) {
+            console.log("SDK: Received falai_key from parent, saving to localStorage");
+            sessionManager.saveFalApiKey(falaiKey);
+          } else {
+            console.warn("SDK: Received FALAI_KEY_RESPONSE but no key was provided");
+          }
+          return; // Stop processing after handling key response
+        }
+
         // Handle any message with user data - be more tolerant of message format
         // Accept USER_DATA or AI_VISUAL_STUDIO_DATA or any message with the right fields
         if (event.data) {
@@ -435,6 +449,23 @@ export default function IndexPage() {
         console.log("SDK: User is authenticated. Proceeding with rendering.");
         // Load data from session manager into local state now that auth is confirmed
         setSdkUserData(sessionManager.getUserData());
+
+        // DIRECT KEY INJECTION: Try to get the falai_key from the userData and save it to localStorage
+        const userData = sessionManager.getUserData();
+        if (userData && userData.falaiApiKey) {
+          console.log("SDK: Direct key injection - Found falai_key in userData, saving to localStorage");
+          sessionManager.saveFalApiKey(userData.falaiApiKey);
+        } else {
+          console.warn("SDK: Direct key injection - No falai_key found in userData");
+
+          // Try to get the key from the parent's localStorage via postMessage
+          console.log("SDK: Requesting falai_key from parent via postMessage");
+          if (parentOrigin) {
+            window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, parentOrigin);
+          } else {
+            window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, "*");
+          }
+        }
       }
     }
   }, [isSessionReady, isAuthenticated, parentOrigin]); // Re-run if session readiness or auth status changes

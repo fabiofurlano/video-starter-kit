@@ -77,13 +77,22 @@ class SessionManager {
       apiKeys = userData.apiKeys;
     }
 
+    // Extract the falai_key and save it to localStorage immediately
+    const falaiKey = apiKeys.falai || userData.falai_key || "";
+    if (falaiKey) {
+      console.log("SDK: Found falai_key in session data, saving to localStorage");
+      this.saveFalApiKey(falaiKey);
+    } else {
+      console.warn("SDK: No falai_key found in session data");
+    }
+
     // Set user data with properly formatted chapters
     this.userData = {
       isAuthenticated: this.isAuthenticated, // Store in userData object as well
       userId: this.userId, // Store in userData object as well
       openaiApiKey: apiKeys.openai || userData.openai_key || "",
       openrouterApiKey: apiKeys.openrouter || userData.openrouter_key || "",
-      falaiApiKey: apiKeys.falai || userData.falai_key || "",
+      falaiApiKey: falaiKey,
 
       language: userData.language || "",
       genre: userData.genre || "",
@@ -172,15 +181,27 @@ class SessionManager {
    * Save the fal.ai API key to the SDK's storage
    * @param apiKey The API key to save
    */
-  private saveFalApiKey(apiKey: string): void {
+  saveFalApiKey(apiKey: string): void {
     try {
+      console.log("SDK: Attempting to save falai_key to localStorage:", apiKey.substring(0, 5) + "...");
+
       // Save to window.localStorage using the same key name as settings.js
       if (typeof window !== "undefined" && window.localStorage) {
         window.localStorage.setItem("falai_key", apiKey);
-        console.log("Fal.ai API key stored as 'falai_key'");
+        console.log("SDK: Fal.ai API key stored as 'falai_key'");
+
+        // Verify the key was saved correctly
+        const savedKey = window.localStorage.getItem("falai_key");
+        if (savedKey) {
+          console.log("SDK: Verified falai_key was saved correctly:", savedKey.substring(0, 5) + "...");
+        } else {
+          console.error("SDK: Failed to verify falai_key in localStorage");
+        }
+      } else {
+        console.error("SDK: window.localStorage is not available");
       }
     } catch (error) {
-      console.error("Failed to save Fal.ai API key:", error);
+      console.error("SDK: Failed to save Fal.ai API key:", error);
     }
   }
 
