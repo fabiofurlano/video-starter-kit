@@ -330,10 +330,14 @@ export default function IndexPage() {
           const falaiKey = event.data.falai_key;
 
           if (falaiKey) {
-            console.log("SDK: Received falai_key from parent, saving to localStorage");
+            console.log(
+              "SDK: Received falai_key from parent, saving to localStorage",
+            );
             sessionManager.saveFalApiKey(falaiKey);
           } else {
-            console.warn("SDK: Received FALAI_KEY_RESPONSE but no key was provided");
+            console.warn(
+              "SDK: Received FALAI_KEY_RESPONSE but no key was provided",
+            );
           }
           return; // Stop processing after handling key response
         }
@@ -453,15 +457,22 @@ export default function IndexPage() {
         // DIRECT KEY INJECTION: Try to get the falai_key from the userData and save it to localStorage
         const userData = sessionManager.getUserData();
         if (userData && userData.falaiApiKey) {
-          console.log("SDK: Direct key injection - Found falai_key in userData, saving to localStorage");
+          console.log(
+            "SDK: Direct key injection - Found falai_key in userData, saving to localStorage",
+          );
           sessionManager.saveFalApiKey(userData.falaiApiKey);
         } else {
-          console.warn("SDK: Direct key injection - No falai_key found in userData");
+          console.warn(
+            "SDK: Direct key injection - No falai_key found in userData",
+          );
 
           // Try to get the key from the parent's localStorage via postMessage
           console.log("SDK: Requesting falai_key from parent via postMessage");
           if (parentOrigin) {
-            window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, parentOrigin);
+            window.parent.postMessage(
+              { type: "REQUEST_FALAI_KEY" },
+              parentOrigin,
+            );
           } else {
             window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, "*");
           }

@@ -80,7 +80,9 @@ class SessionManager {
     // Extract the falai_key and save it to localStorage immediately
     const falaiKey = apiKeys.falai || userData.falai_key || "";
     if (falaiKey) {
-      console.log("SDK: Found falai_key in session data, saving to localStorage");
+      console.log(
+        "SDK: Found falai_key in session data, saving to localStorage",
+      );
       this.saveFalApiKey(falaiKey);
     } else {
       console.warn("SDK: No falai_key found in session data");
@@ -183,7 +185,10 @@ class SessionManager {
    */
   saveFalApiKey(apiKey: string): void {
     try {
-      console.log("SDK: Attempting to save falai_key to localStorage:", apiKey.substring(0, 5) + "...");
+      console.log(
+        "SDK: Attempting to save falai_key to localStorage:",
+        apiKey.substring(0, 5) + "...",
+      );
 
       // Save to window.localStorage using the same key name as settings.js
       if (typeof window !== "undefined" && window.localStorage) {
@@ -193,7 +198,10 @@ class SessionManager {
         // Verify the key was saved correctly
         const savedKey = window.localStorage.getItem("falai_key");
         if (savedKey) {
-          console.log("SDK: Verified falai_key was saved correctly:", savedKey.substring(0, 5) + "...");
+          console.log(
+            "SDK: Verified falai_key was saved correctly:",
+            savedKey.substring(0, 5) + "...",
+          );
         } else {
           console.error("SDK: Failed to verify falai_key in localStorage");
         }
