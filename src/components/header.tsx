@@ -71,38 +71,25 @@ export default function Header({
           <span className="hidden sm:inline">Export</span>
         </Button>
 
+        {/* Storyboard button commented out for future implementation
         <Button variant="ghost" size="sm" onClick={navigateToStoryboard}>
           <LayoutDashboard className="w-4 h-4 mr-1" />
           <span className="hidden sm:inline">Storyboard</span>
         </Button>
+        */}
+
+        {/* Home button removed as per requirements */}
 
         <Button variant="ghost" size="sm" asChild>
-          <Link href={config.urls.main} target="_blank">
-            <Home className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">Home</span>
-          </Link>
-        </Button>
-
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={config.urls.writingWorkspace} target="_blank">
+          <Link href={config.urls.writingWorkspace}>
             <Edit3Icon className="w-4 h-4 mr-1" />
             <span className="hidden sm:inline">Writing Space</span>
           </Link>
         </Button>
 
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={config.urls.characterSetup} target="_blank">
-            <Users className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">Characters</span>
-          </Link>
-        </Button>
+        {/* Characters button removed as per requirements */}
 
-        <Button variant="ghost" size="sm" asChild>
-          <Link href={config.urls.storyOutline} target="_blank">
-            <FileTextIcon className="w-4 h-4 mr-1" />
-            <span className="hidden sm:inline">Outline</span>
-          </Link>
-        </Button>
+        {/* Outline button removed as per requirements */}
 
         <Button variant="ghost" size="sm" asChild>
           <Link href={config.urls.settings} target="_blank">
