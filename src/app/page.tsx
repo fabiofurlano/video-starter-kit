@@ -44,6 +44,8 @@ export default function IndexPage() {
   const [slideSelections, setSlideSelections] = useState<
     Record<number, string>
   >({});
+  // Iframe detection state
+  const [isInIframe, setIsInIframe] = useState<boolean>(false);
 
   // New state for storyboard from scratch feature
   const [storyInput, setStoryInput] = useState("");
@@ -225,6 +227,26 @@ export default function IndexPage() {
       setInputError("Error preparing storyboard data. Please try again.");
     }
   };
+
+  // Detect if running in iframe
+  useEffect(() => {
+    try {
+      // Check if window.self is different from window.top
+      const inIframe = window.self !== window.top;
+      console.log(`SDK: Running in iframe: ${inIframe}`);
+      setIsInIframe(inIframe);
+
+      // If in iframe, send a message to parent to notify we're ready for fullscreen
+      if (inIframe) {
+        console.log('SDK: Running in iframe - will auto-expand to fullscreen');
+        // The actual fullscreen trigger will happen after authentication
+      }
+    } catch (e) {
+      // If accessing window.top throws an error, we're definitely in an iframe with different origin
+      console.log('SDK: Error checking iframe status - assuming iframe with restrictions');
+      setIsInIframe(true);
+    }
+  }, []);
 
   // Listen for messages from the parent page
   useEffect(() => {
@@ -477,9 +499,21 @@ export default function IndexPage() {
             window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, "*");
           }
         }
+
+        // If we're in an iframe, notify the parent to trigger fullscreen mode
+        if (isInIframe && parentOrigin) {
+          console.log("SDK: Authenticated and in iframe - requesting fullscreen mode");
+          window.parent.postMessage(
+            { type: "TRIGGER_FULLSCREEN" },
+            parentOrigin
+          );
+        } else if (isInIframe) {
+          // Fallback if we don't have the parent origin
+          window.parent.postMessage({ type: "TRIGGER_FULLSCREEN" }, "*");
+        }
       }
     }
-  }, [isSessionReady, isAuthenticated, parentOrigin]); // Re-run if session readiness or auth status changes
+  }, [isSessionReady, isAuthenticated, parentOrigin, isInIframe]); // Re-run if session readiness or auth status changes
 
   // --- Conditional Rendering Logic ---
   if (!isSessionReady) {
@@ -531,7 +565,7 @@ export default function IndexPage() {
             </Button>
 
             <Button variant="ghost" size="sm" asChild>
-              <Link href={config.urls.writingWorkspace} target="_blank">
+              <Link href={config.urls.writingWorkspace}>
                 <Edit3Icon className="w-4 h-4 mr-1" />
                 <span className="hidden sm:inline">Writing Space</span>
               </Link>
