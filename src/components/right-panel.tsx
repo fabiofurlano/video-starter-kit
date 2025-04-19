@@ -58,6 +58,7 @@ import { LoadingIcon } from "./ui/icons";
 import { getMediaMetadata } from "@/lib/ffmpeg";
 import CameraMovement from "./camera-control";
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "./ui/sheet";
+import { ModelHelper } from "./model-helper";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -514,7 +515,7 @@ export default function RightPanel({
             </Button>
           </div>
           <div className="flex flex-col gap-2 mt-2 justify-start font-medium text-base">
-            <div className="text-muted-foreground">Using</div>
+            <div className="text-muted-foreground font-medium">Using</div>
             <ModelEndpointPicker
               mediaType={mediaType}
               value={endpointId}
@@ -530,6 +531,11 @@ export default function RightPanel({
                 setGenerateData({ ...initialInput });
               }}
             />
+
+            {/* Model Helper Panel */}
+            <div className="w-full px-0.5">
+              <ModelHelper modelId={endpointId} />
+            </div>
 
             <div className="mt-2">
               <div className="text-muted-foreground">
@@ -674,7 +680,7 @@ export default function RightPanel({
                 <Button
                   variant="secondary"
                   disabled={enhancePromptMutation.isPending}
-                  className="bg-purple-400/10 text-purple-400 text-xs rounded-full h-6 px-3"
+                  className="bg-white/10 text-white text-xs rounded-full h-6 px-3 hover:bg-white/20 transition-colors"
                   onClick={() => enhancePromptMutation.mutate()}
                 >
                   {enhancePromptMutation.isPending ? (
