@@ -3,7 +3,12 @@
 import { useEffect, useState } from "react";
 import { ChevronDown, ChevronUp, Copy, Check, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface ModelHint {
   label: string;
@@ -51,7 +56,6 @@ export function ModelHelper({ modelId }: { modelId: string }) {
 
         // Cache the data in localStorage
         localStorage.setItem("modelHintsData", JSON.stringify(data));
-
       } catch (err) {
         console.error("Error loading model hints:", err);
         setError("Failed to load model information");
@@ -102,7 +106,7 @@ export function ModelHelper({ modelId }: { modelId: string }) {
       },
       (err) => {
         console.error("Could not copy text: ", err);
-      }
+      },
     );
   };
 
@@ -164,7 +168,9 @@ export function ModelHelper({ modelId }: { modelId: string }) {
           <div className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-500/20 text-blue-300 border border-blue-500/30 backdrop-blur-sm">
             {modelHint.category}
           </div>
-          <h3 className="font-medium text-sm text-gray-100">{modelHint.label}</h3>
+          <h3 className="font-medium text-sm text-gray-100">
+            {modelHint.label}
+          </h3>
         </div>
         <Button
           variant="ghost"
@@ -185,14 +191,18 @@ export function ModelHelper({ modelId }: { modelId: string }) {
 
       {/* Collapsible content */}
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'}`}
+        className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}
       >
         <div className="px-4 pb-4 pt-1 text-sm">
-          <p className="text-gray-200 mb-3 leading-relaxed">{modelHint.headline}</p>
+          <p className="text-gray-200 mb-3 leading-relaxed">
+            {modelHint.headline}
+          </p>
 
           {/* Best For Section */}
           <div className="mb-4">
-            <h4 className="text-xs uppercase tracking-wider text-blue-300/80 mb-2 font-medium">Best For</h4>
+            <h4 className="text-xs uppercase tracking-wider text-blue-300/80 mb-2 font-medium">
+              Best For
+            </h4>
             <div className="flex flex-wrap gap-2">
               {modelHint.bestFor.map((use, index) => (
                 <span
@@ -207,7 +217,9 @@ export function ModelHelper({ modelId }: { modelId: string }) {
 
           {/* Tips Section */}
           <div className="mb-4">
-            <h4 className="text-xs uppercase tracking-wider text-blue-300/80 mb-2 font-medium">Prompt Tips</h4>
+            <h4 className="text-xs uppercase tracking-wider text-blue-300/80 mb-2 font-medium">
+              Prompt Tips
+            </h4>
             <ul className="space-y-1.5 text-gray-200 text-xs pl-1">
               {modelHint.tips.map((tip, index) => (
                 <li key={index} className="flex items-start">
@@ -220,23 +232,35 @@ export function ModelHelper({ modelId }: { modelId: string }) {
 
           {/* Pricing Section */}
           <div className="mb-4 bg-blue-900/10 p-3 rounded-lg border border-blue-500/20 backdrop-blur-sm">
-            <h4 className="text-xs uppercase tracking-wider text-blue-300/80 mb-2 font-medium">Pricing</h4>
+            <h4 className="text-xs uppercase tracking-wider text-blue-300/80 mb-2 font-medium">
+              Pricing
+            </h4>
             <div className="flex justify-between items-center">
               <div className="text-gray-200 text-sm">
-                <span className="font-semibold">${modelHint.pricePerCreditUSD.toFixed(2)}</span> / 5s
+                <span className="font-semibold">
+                  ${modelHint.pricePerCreditUSD.toFixed(2)}
+                </span>{" "}
+                / 5s
               </div>
               <div className="text-gray-300 text-sm">
-                ≈ <span className="text-green-300 font-semibold">{modelHint.secondsPerDollar}</span> seconds per $1
+                ≈{" "}
+                <span className="text-green-300 font-semibold">
+                  {modelHint.secondsPerDollar}
+                </span>{" "}
+                seconds per $1
               </div>
             </div>
             <div className="mt-2 text-xs text-gray-400 italic">
-              Based on fal.ai official API pricing. We use your API keys (BYOK) and don't charge additional fees.
+              Based on fal.ai official API pricing. We use your API keys (BYOK)
+              and don't charge additional fees.
             </div>
           </div>
 
           {/* Example Prompt */}
           <div>
-            <h4 className="text-xs uppercase tracking-wider text-blue-300/80 mb-2 font-medium">Example Prompt</h4>
+            <h4 className="text-xs uppercase tracking-wider text-blue-300/80 mb-2 font-medium">
+              Example Prompt
+            </h4>
             <div className="relative group">
               <div className="bg-gray-900/40 p-3 rounded-lg border border-gray-700/50 text-gray-200 text-xs pr-9 max-h-24 overflow-y-auto leading-relaxed backdrop-blur-sm">
                 {modelHint.examplePrompt}
