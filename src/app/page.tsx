@@ -238,12 +238,14 @@ export default function IndexPage() {
 
       // If in iframe, send a message to parent to notify we're ready for fullscreen
       if (inIframe) {
-        console.log('SDK: Running in iframe - will auto-expand to fullscreen');
+        console.log("SDK: Running in iframe - will auto-expand to fullscreen");
         // The actual fullscreen trigger will happen after authentication
       }
     } catch (e) {
       // If accessing window.top throws an error, we're definitely in an iframe with different origin
-      console.log('SDK: Error checking iframe status - assuming iframe with restrictions');
+      console.log(
+        "SDK: Error checking iframe status - assuming iframe with restrictions",
+      );
       setIsInIframe(true);
     }
   }, []);
@@ -502,10 +504,12 @@ export default function IndexPage() {
 
         // If we're in an iframe, notify the parent to trigger fullscreen mode
         if (isInIframe && parentOrigin) {
-          console.log("SDK: Authenticated and in iframe - requesting fullscreen mode");
+          console.log(
+            "SDK: Authenticated and in iframe - requesting fullscreen mode",
+          );
           window.parent.postMessage(
             { type: "TRIGGER_FULLSCREEN" },
-            parentOrigin
+            parentOrigin,
           );
         } else if (isInIframe) {
           // Fallback if we don't have the parent origin
