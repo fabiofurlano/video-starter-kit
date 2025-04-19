@@ -1,0 +1,41 @@
+/* Right Panel Layout Styles */
+
+/* Increase width on desktop only */
+@media (min-width: 1280px) {
+  .right-panel-container {
+    width: 560px !important;
+    min-width: 560px !important;
+  }
+}
+
+/* Apply main app theme to right panel */
+.right-panel-container {
+  background: var(--glass-bg-light) !important;
+  border-color: var(--glass-border-light) !important;
+}
+
+.dark .right-panel-container {
+  background: var(--glass-bg-dark) !important;
+  border-color: var(--glass-border-dark) !important;
+}
+
+/* Two-column layout container */
+.two-column-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  min-height: 300px;
+}
+
+/* Left column for model selectors */
+.model-selectors-column {
+  flex: 0 0 50%;
+}
+
+/* Right column for helper */
+.helper-column {
+  flex: 0 0 50%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

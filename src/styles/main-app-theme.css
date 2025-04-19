@@ -1,0 +1,160 @@
+/* Main App Theme Integration */
+
+:root {
+  /* Import main app variables */
+  --bg-light: #f8f9fa;
+  --text-light: #2d3748;
+  --glass-bg-light: rgba(255, 255, 255, 0.7);
+  --glass-border-light: rgba(255, 255, 255, 0.2);
+  
+  /* Dark Mode Colors */
+  --bg-dark: #1a1a2e;
+  --text-dark: #e0e0e0;
+  --glass-bg-dark: rgba(26, 26, 26, 0.7);
+  --glass-border-dark: rgba(255, 255, 255, 0.1);
+  
+  /* Common Variables */
+  --font-family: 'Poppins', sans-serif;
+  --transition-speed: 0.3s;
+  --radius-sm: 5px;
+  --radius-md: 10px;
+  --radius-lg: 15px;
+}
+
+/* Override Tailwind variables in light mode */
+:root {
+  --background: 220 20% 97%;
+  --foreground: 220 20% 10%;
+  --card: 0 0% 98%;
+  --card-foreground: 220 20% 10%;
+  --popover: 0 0% 98%;
+  --popover-foreground: 220 20% 10%;
+  --primary: 220 85% 57%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 220 20% 96.1%;
+  --secondary-foreground: 220 20% 9%;
+  --muted: 220 20% 96.1%;
+  --muted-foreground: 220 20% 45%;
+  --accent: 220 20% 96.1%;
+  --accent-foreground: 220 20% 9%;
+  --border: 220 20% 89.8%;
+  
+  /* Background gradient */
+  --tw-gradient-from: hsl(214, 30%, 95%);
+  --tw-gradient-to: hsl(226, 30%, 95%);
+}
+
+/* Override Tailwind variables in dark mode */
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 0 0% 88%;
+  --card: 222 47% 11%;
+  --card-foreground: 0 0% 88%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 0 0% 88%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  
+  /* Background gradient for dark mode - matches main app */
+  --tw-gradient-from: hsl(220, 30%, 13%);
+  --tw-gradient-to: hsl(240, 30%, 16%);
+}
+
+/* Body styles */
+body {
+  font-family: var(--font-family);
+  background: linear-gradient(
+    to bottom right,
+    var(--tw-gradient-from),
+    var(--tw-gradient-to)
+  );
+  min-height: 100vh;
+  transition: background-color var(--transition-speed),
+              color var(--transition-speed);
+}
+
+/* Glassmorphism effects - match main app */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.dark .glassmorphism {
+  background: rgba(26, 26, 26, 0.75);
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+/* Button hover states */
+button:hover,
+.btn:hover {
+  background: linear-gradient(145deg, #2563eb, #1d4ed8);
+  color: white;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  height: 0.25rem;
+  width: 0.25rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(38, 38, 38, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(64, 64, 64, 0.5);
+  border-radius: 0.25rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(82, 82, 82, 0.8);
+}
+
+/* Input fields */
+input, textarea, select {
+  background-color: var(--glass-bg-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-light);
+  transition: all var(--transition-speed) ease;
+}
+
+.dark input, 
+.dark textarea, 
+.dark select {
+  background-color: var(--glass-bg-dark);
+  border-color: var(--glass-border-dark);
+  color: var(--text-dark);
+}
+
+input:focus, 
+textarea:focus, 
+select:focus {
+  border-color: hsl(var(--primary));
+  outline: none;
+}
+
+/* Card styles */
+.card {
+  background: var(--glass-bg-light);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border-light);
+  transition: all var(--transition-speed) ease;
+}
+
+.dark .card {
+  background: var(--glass-bg-dark);
+  border-color: var(--glass-border-dark);
+}

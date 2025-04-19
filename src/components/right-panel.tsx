@@ -449,7 +449,7 @@ export default function RightPanel({
   return (
     <div
       className={cn(
-        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto glassmorphism",
+        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto glassmorphism right-panel-container",
         generateDialogOpen ? "right-0" : "-right-[400px]",
       )}
     >
@@ -473,7 +473,7 @@ export default function RightPanel({
               variant="ghost"
               onClick={() => handleMediaTypeChange("image")}
               className={cn(
-                mediaType === "image" && "bg-white/10",
+                mediaType === "image" && "bg-primary/20",
                 "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
               )}
             >
@@ -484,7 +484,7 @@ export default function RightPanel({
               variant="ghost"
               onClick={() => handleMediaTypeChange("video")}
               className={cn(
-                mediaType === "video" && "bg-white/10",
+                mediaType === "video" && "bg-primary/20",
                 "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
               )}
             >
@@ -495,7 +495,7 @@ export default function RightPanel({
               variant="ghost"
               onClick={() => handleMediaTypeChange("voiceover")}
               className={cn(
-                mediaType === "voiceover" && "bg-white/10",
+                mediaType === "voiceover" && "bg-primary/20",
                 "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
               )}
             >
@@ -506,7 +506,7 @@ export default function RightPanel({
               variant="ghost"
               onClick={() => handleMediaTypeChange("music")}
               className={cn(
-                mediaType === "music" && "bg-white/10",
+                mediaType === "music" && "bg-primary/20",
                 "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
               )}
             >
@@ -514,41 +514,47 @@ export default function RightPanel({
               <span className="text-[10px]">Music</span>
             </Button>
           </div>
-          <div className="flex flex-col gap-2 mt-2 justify-start font-medium text-base">
-            <div className="text-muted-foreground font-medium">Using</div>
-            <ModelEndpointPicker
-              mediaType={mediaType}
-              value={endpointId}
-              onValueChange={(endpointId) => {
-                resetGenerateData();
-                setEndpointId(endpointId);
+          <div className="two-column-container">
+            <div className="model-selectors-column">
+              <div className="flex flex-col gap-2 justify-start font-medium text-base">
+                <div className="text-muted-foreground font-medium">Using</div>
+                <ModelEndpointPicker
+                  mediaType={mediaType}
+                  value={endpointId}
+                  onValueChange={(endpointId) => {
+                    resetGenerateData();
+                    setEndpointId(endpointId);
 
-                const endpoint = AVAILABLE_ENDPOINTS.find(
-                  (endpoint) => endpoint.endpointId === endpointId,
-                );
+                    const endpoint = AVAILABLE_ENDPOINTS.find(
+                      (endpoint) => endpoint.endpointId === endpointId,
+                    );
 
-                const initialInput = endpoint?.initialInput || {};
-                setGenerateData({ ...initialInput });
-              }}
-            />
+                    const initialInput = endpoint?.initialInput || {};
+                    setGenerateData({ ...initialInput });
+                  }}
+                />
 
-            {/* Model Helper Panel */}
-            <div className="w-full px-0.5">
-              <ModelHelper modelId={endpointId} />
+                <div className="mt-2">
+                  <div className="text-muted-foreground">
+                    LLM Model for Prompt Enhancement
+                  </div>
+                  <LlmModelPicker
+                    selectedModel={llmModel}
+                    onValueChange={handleLlmModelChange}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Select the LLM model to use for enhancing prompts. More powerful
+                    models may produce better results but may cost more credits.
+                  </p>
+                </div>
+              </div>
             </div>
 
-            <div className="mt-2">
-              <div className="text-muted-foreground">
-                LLM Model for Prompt Enhancement
+            <div className="helper-column">
+              {/* Model Helper Panel */}
+              <div className="h-full flex flex-col">
+                <ModelHelper modelId={endpointId} />
               </div>
-              <LlmModelPicker
-                selectedModel={llmModel}
-                onValueChange={handleLlmModelChange}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Select the LLM model to use for enhancing prompts. More powerful
-                models may produce better results but may cost more credits.
-              </p>
             </div>
           </div>
         </div>
@@ -680,7 +686,7 @@ export default function RightPanel({
                 <Button
                   variant="secondary"
                   disabled={enhancePromptMutation.isPending}
-                  className="bg-white/10 text-white text-xs rounded-full h-6 px-3 hover:bg-white/20 transition-colors"
+                  className="bg-primary/20 text-white text-xs rounded-full h-6 px-3 hover:bg-primary/40 transition-colors"
                   onClick={() => enhancePromptMutation.mutate()}
                 >
                   {enhancePromptMutation.isPending ? (
@@ -745,7 +751,7 @@ export default function RightPanel({
             )}
             <div className="flex flex-row gap-2">
               <Button
-                className="w-full"
+                className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
                 disabled={
                   enhancePromptMutation.isPending || createJob.isPending
                 }

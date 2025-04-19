@@ -158,10 +158,10 @@ export function ModelHelper({ modelId }: { modelId: string }) {
   }
 
   return (
-    <div className="w-full mt-3 mb-1 bg-gray-800/40 rounded-lg border border-gray-700/50 overflow-hidden transition-all duration-300 shadow-lg backdrop-blur-sm">
+    <div className="w-full h-full flex flex-col glassmorphism overflow-hidden transition-all duration-300 shadow-lg">
       {/* Header - always visible */}
       <div
-        className="p-3 flex items-center justify-between cursor-pointer hover:bg-gray-700/30 transition-colors group"
+        className="p-3 flex items-center justify-between cursor-pointer hover:bg-primary/20 transition-colors group"
         onClick={toggleExpanded}
       >
         <div className="flex items-center space-x-2">
@@ -191,7 +191,7 @@ export function ModelHelper({ modelId }: { modelId: string }) {
 
       {/* Collapsible content */}
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}
+        className={`overflow-y-auto flex-grow transition-all duration-300 ease-in-out ${isExpanded ? "opacity-100" : "max-h-0 opacity-0"}`}
       >
         <div className="px-4 pb-4 pt-1 text-sm">
           <p className="text-gray-200 mb-3 leading-relaxed">
