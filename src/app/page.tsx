@@ -523,7 +523,7 @@ export default function IndexPage() {
   if (!isSessionReady) {
     // Still waiting for the initial message from the parent
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E] text-white">
         Initializing Session... Waiting for Parent Application...
       </div>
     );
@@ -532,7 +532,7 @@ export default function IndexPage() {
   if (isAuthenticated === false) {
     // User is not authenticated, waiting for parent to redirect
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E] text-white">
         Authentication required. Redirecting to login...
       </div>
     );
@@ -541,8 +541,8 @@ export default function IndexPage() {
   if (isAuthenticated === true && sdkUserData) {
     // --- Render the main UI using sdkUserData ---
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black to-[#0A0F23] text-white relative">
-        <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism mb-8">
+      <div className="min-h-screen bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E] text-white relative">
+        <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism mb-8 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
           <div className="flex items-center">
             <Logo />
             <span className="mx-2 text-gray-400">|</span>
@@ -602,7 +602,7 @@ export default function IndexPage() {
           {/* Main content is now rendered directly if authenticated */}
           <div className="space-y-8">
             {/* Tabs Only Section at Top */}
-            <div className="glassmorphism p-6 border-gray-800">
+            <div className="glassmorphism p-6 border-gray-800 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
               <h2 className="text-2xl font-bold mb-6 text-white">
                 Create Storyboard
               </h2>
@@ -759,7 +759,7 @@ export default function IndexPage() {
             </div>
 
             {/* Story Info Panel */}
-            <div className="glassmorphism p-6 border-gray-800">
+            <div className="glassmorphism p-6 border-gray-800 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
               <h2 className="text-2xl font-bold mb-4 text-white">
                 Story Information
               </h2>
@@ -803,7 +803,7 @@ export default function IndexPage() {
             </div>
 
             {/* Characters Panel */}
-            <div className="glassmorphism p-6 border-gray-800">
+            <div className="glassmorphism p-6 border-gray-800 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
               <h2 className="text-2xl font-bold mb-6 text-white">Characters</h2>
               {sdkUserData.characters && sdkUserData.characters.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
@@ -831,7 +831,7 @@ export default function IndexPage() {
             </div>
 
             {/* Full Storyboard Creation Section with Chapters */}
-            <div className="glassmorphism p-6 border-gray-800">
+            <div className="glassmorphism p-6 border-gray-800 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
               <Tabs defaultValue="chapters" className="w-full">
                 <TabsContent value="chapters">
                   {/* Existing Chapters Panel */}
@@ -936,7 +936,7 @@ export default function IndexPage() {
   // Fallback loading state if authenticated but data not yet loaded into state
   // This might occur briefly between isSessionReady=true and sdkUserData being set.
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E] text-white">
       Loading authenticated session data...
     </div>
   );

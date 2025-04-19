@@ -119,7 +119,7 @@ export default function LeftPanel() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col border-r border-border glassmorphism">
+    <div className="h-full w-full flex flex-col border-r border-border glassmorphism bg-transparent">
       <div className="p-4 flex items-center gap-4 border-b border-border">
         <div className="flex w-full">
           <Accordion type="single" collapsible className="w-full">

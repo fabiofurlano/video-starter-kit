@@ -10,12 +10,12 @@
 
 /* Apply main app theme to right panel */
 .right-panel-container {
-  background: var(--glass-bg-light) !important;
+  background: #f4f4f6 !important; /* Opaque light background */
   border-color: var(--glass-border-light) !important;
 }
 
 .dark .right-panel-container {
-  background: var(--glass-bg-dark) !important;
+  background: #0A1128 !important; /* Opaque dark background matching homepage */
   border-color: var(--glass-border-dark) !important;
 }
 

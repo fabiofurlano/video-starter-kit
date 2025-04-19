@@ -1,16 +1,16 @@
 /* Main App Theme Integration */
 
 :root {
-  /* Import main app variables */
-  --bg-light: #f8f9fa;
+  /* Import main app variables - softer light tone matching homepage */
+  --bg-light: #f4f4f6;
   --text-light: #2d3748;
   --glass-bg-light: rgba(255, 255, 255, 0.7);
   --glass-border-light: rgba(255, 255, 255, 0.2);
 
-  /* Dark Mode Colors */
-  --bg-dark: #1a1a2e;
+  /* Dark Mode Colors - matches homepage */
+  --bg-dark: #0A1128;
   --text-dark: #e0e0e0;
-  --glass-bg-dark: rgba(26, 26, 26, 0.7);
+  --glass-bg-dark: rgba(26, 26, 26, 0.5); /* Slightly more transparent for better readability */
   --glass-border-dark: rgba(255, 255, 255, 0.1);
 
   /* Common Variables */
@@ -39,9 +39,9 @@
   --accent-foreground: 220 20% 9%;
   --border: 220 20% 89.8%;
 
-  /* Background gradient */
-  --tw-gradient-from: hsl(214, 30%, 95%);
-  --tw-gradient-to: hsl(226, 30%, 95%);
+  /* Background gradient - softer light tone matching homepage */
+  --tw-gradient-from: #f4f4f6;
+  --tw-gradient-to: #e8e8ec;
 }
 
 /* Override Tailwind variables in dark mode */
@@ -62,9 +62,10 @@
   --accent-foreground: 210 40% 98%;
   --border: 217.2 32.6% 17.5%;
 
-  /* Background gradient for dark mode - matches main app */
-  --tw-gradient-from: hsl(220, 30%, 13%);
-  --tw-gradient-to: hsl(240, 30%, 16%);
+  /* Background gradient for dark mode - matches homepage */
+  --tw-gradient-from: #0A1128;
+  --tw-gradient-via: #1B3A6B;
+  --tw-gradient-to: #16213E;
 }
 
 /* Body styles */
@@ -73,6 +74,7 @@ body {
   background: linear-gradient(
     to bottom right,
     var(--tw-gradient-from),
+    var(--tw-gradient-via),
     var(--tw-gradient-to)
   );
   min-height: 100vh;
@@ -80,7 +82,7 @@ body {
     var(--transition-speed);
 }
 
-/* Glassmorphism effects - match main app */
+/* Glassmorphism effects - match main app - ONLY for left panel */
 .glassmorphism {
   background: rgba(255, 255, 255, 0.15);
   backdrop-filter: blur(12px);
@@ -91,9 +93,10 @@ body {
 }
 
 .dark .glassmorphism {
-  background: rgba(26, 26, 26, 0.75);
+  background: linear-gradient(to bottom right, rgba(10, 17, 40, 0.7), rgba(27, 58, 107, 0.7), rgba(22, 33, 62, 0.7));
   border-color: rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 /* Button hover states */
@@ -157,6 +160,6 @@ select:focus {
 }
 
 .dark .card {
-  background: var(--glass-bg-dark);
+  background: linear-gradient(to bottom right, rgba(10, 17, 40, 0.7), rgba(27, 58, 107, 0.7), rgba(22, 33, 62, 0.7));
   border-color: var(--glass-border-dark);
 }

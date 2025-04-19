@@ -54,9 +54,9 @@ body {
     --chart-5: 340 75% 55%;
     --radius: 0.5rem;
 
-    /* Background gradient */
-    --tw-gradient-from: hsl(214, 100%, 97%);
-    --tw-gradient-to: hsl(226, 100%, 97%);
+    /* Background gradient - softer light tone matching homepage */
+    --tw-gradient-from: #f4f4f6;
+    --tw-gradient-to: #e8e8ec;
   }
   .dark {
     /* Dark mode variables */
@@ -87,9 +87,10 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    /* Background gradient for dark mode */
-    --tw-gradient-from: hsl(220, 24%, 7%);
-    --tw-gradient-to: hsl(246, 24%, 9%);
+    /* Background gradient for dark mode - matches homepage */
+    --tw-gradient-from: #0A1128;
+    --tw-gradient-via: #1B3A6B;
+    --tw-gradient-to: #16213E;
   }
 }
 
@@ -116,6 +117,7 @@ body {
   background: rgba(26, 26, 26, 0.75);
   border-color: rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 /* Enhanced UI Elements */
@@ -169,7 +171,7 @@ button:hover,
 
 /* Left panel glassmorphism effects */
 .dark [class*="left-panel"] {
-  background: rgba(26, 26, 26, 0.75);
+  background: linear-gradient(to bottom right, rgba(10, 17, 40, 0.75), rgba(27, 58, 107, 0.75), rgba(22, 33, 62, 0.75));
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
