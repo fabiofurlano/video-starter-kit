@@ -98,9 +98,6 @@ async function forwardToFal(req: NextRequest) {
     headers.set("Content-Type", contentType);
     headers.set("Authorization", authHeader);
 
-    // Remove the x-fal-target-url header as it's not needed for the actual request
-    headers.delete("x-fal-target-url");
-
     console.log(`🔍 Forwarding to: ${targetUrl}`);
 
     // Forward the request
