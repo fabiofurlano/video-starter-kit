@@ -59,6 +59,7 @@ import { getMediaMetadata } from "@/lib/ffmpeg";
 import CameraMovement from "./camera-control";
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "./ui/sheet";
 import { ModelHelper } from "./model-helper";
+import { PlusIcon } from "lucide-react";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -184,6 +185,7 @@ export default function RightPanel({
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
+  const [isPanelClosed, setIsPanelClosed] = useState(false);
 
   const handleOnOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
@@ -196,6 +198,10 @@ export default function RightPanel({
       onOpenChange(isOpen);
     }
     openGenerateDialog();
+  };
+
+  const togglePanel = () => {
+    setIsPanelClosed(!isPanelClosed);
   };
 
   const { data: project } = useProject(projectId);
@@ -447,12 +453,25 @@ export default function RightPanel({
   };
 
   return (
-    <div
-      className={cn(
-        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto right-panel-container",
-        generateDialogOpen ? "right-0" : "-right-[400px]",
+    <>
+      {isPanelClosed && generateDialogOpen && (
+        <button
+          onClick={togglePanel}
+          className="fixed bottom-20 right-6 z-50 p-3 rounded-full bg-primary shadow-lg hover:bg-primary/90 transition-all duration-300 flex items-center justify-center floating-media-button"
+          aria-label="Open Media Panel"
+        >
+          <span className="text-white font-medium flex items-center">
+            <PlusIcon className="w-5 h-5" />
+            <span className="ml-1">Generate Media</span>
+          </span>
+        </button>
       )}
-    >
+      <div
+        className={cn(
+          "flex flex-col border-l border-border w-[560px] min-w-[560px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto right-panel-container",
+          generateDialogOpen ? (isPanelClosed ? "right-[-560px]" : "right-0") : "-right-[560px]",
+        )}
+      >
       <div className="flex-1 p-4 flex flex-col gap-4 border-b border-border h-full overflow-y-auto relative">
         <div className="flex flex-row items-center justify-between">
           <h2 className="text-sm text-muted-foreground font-semibold flex-1">
@@ -461,7 +480,7 @@ export default function RightPanel({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => handleOnOpenChange(false)}
+            onClick={togglePanel}
             className="flex items-center gap-2 hover:bg-white/10 transition-colors"
           >
             <XIcon className="w-6 h-6" />
@@ -765,6 +784,7 @@ export default function RightPanel({
         )}
       </div>
     </div>
+    </>
   );
 }
 
