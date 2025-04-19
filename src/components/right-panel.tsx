@@ -543,8 +543,9 @@ export default function RightPanel({
                     onValueChange={handleLlmModelChange}
                   />
                   <p className="text-xs text-muted-foreground mt-1">
-                    Select the LLM model to use for enhancing prompts. More powerful
-                    models may produce better results but may cost more credits.
+                    Select the LLM model to use for enhancing prompts. More
+                    powerful models may produce better results but may cost more
+                    credits.
                   </p>
                 </div>
               </div>

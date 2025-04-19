@@ -6,15 +6,15 @@
   --text-light: #2d3748;
   --glass-bg-light: rgba(255, 255, 255, 0.7);
   --glass-border-light: rgba(255, 255, 255, 0.2);
-  
+
   /* Dark Mode Colors */
   --bg-dark: #1a1a2e;
   --text-dark: #e0e0e0;
   --glass-bg-dark: rgba(26, 26, 26, 0.7);
   --glass-border-dark: rgba(255, 255, 255, 0.1);
-  
+
   /* Common Variables */
-  --font-family: 'Poppins', sans-serif;
+  --font-family: "Poppins", sans-serif;
   --transition-speed: 0.3s;
   --radius-sm: 5px;
   --radius-md: 10px;
@@ -38,7 +38,7 @@
   --accent: 220 20% 96.1%;
   --accent-foreground: 220 20% 9%;
   --border: 220 20% 89.8%;
-  
+
   /* Background gradient */
   --tw-gradient-from: hsl(214, 30%, 95%);
   --tw-gradient-to: hsl(226, 30%, 95%);
@@ -61,7 +61,7 @@
   --accent: 217.2 32.6% 17.5%;
   --accent-foreground: 210 40% 98%;
   --border: 217.2 32.6% 17.5%;
-  
+
   /* Background gradient for dark mode - matches main app */
   --tw-gradient-from: hsl(220, 30%, 13%);
   --tw-gradient-to: hsl(240, 30%, 16%);
@@ -76,8 +76,8 @@ body {
     var(--tw-gradient-to)
   );
   min-height: 100vh;
-  transition: background-color var(--transition-speed),
-              color var(--transition-speed);
+  transition: background-color var(--transition-speed), color
+    var(--transition-speed);
 }
 
 /* Glassmorphism effects - match main app */
@@ -123,7 +123,9 @@ button:hover,
 }
 
 /* Input fields */
-input, textarea, select {
+input,
+textarea,
+select {
   background-color: var(--glass-bg-light);
   border: 1px solid var(--glass-border-light);
   border-radius: var(--radius-sm);
@@ -131,16 +133,16 @@ input, textarea, select {
   transition: all var(--transition-speed) ease;
 }
 
-.dark input, 
-.dark textarea, 
+.dark input,
+.dark textarea,
 .dark select {
   background-color: var(--glass-bg-dark);
   border-color: var(--glass-border-dark);
   color: var(--text-dark);
 }
 
-input:focus, 
-textarea:focus, 
+input:focus,
+textarea:focus,
 select:focus {
   border-color: hsl(var(--primary));
   outline: none;
