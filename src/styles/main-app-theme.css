@@ -8,7 +8,7 @@
   --glass-border-light: rgba(255, 255, 255, 0.2);
 
   /* Dark Mode Colors - matches homepage */
-  --bg-dark: #0A1128;
+  --bg-dark: #0a1128;
   --text-dark: #e0e0e0;
   --glass-bg-dark: rgba(26, 26, 26, 0.5); /* Slightly more transparent for better readability */
   --glass-border-dark: rgba(255, 255, 255, 0.1);
@@ -63,9 +63,9 @@
   --border: 217.2 32.6% 17.5%;
 
   /* Background gradient for dark mode - matches homepage */
-  --tw-gradient-from: #0A1128;
-  --tw-gradient-via: #1B3A6B;
-  --tw-gradient-to: #16213E;
+  --tw-gradient-from: #0a1128;
+  --tw-gradient-via: #1b3a6b;
+  --tw-gradient-to: #16213e;
 }
 
 /* Body styles */
@@ -93,7 +93,12 @@ body {
 }
 
 .dark .glassmorphism {
-  background: linear-gradient(to bottom right, rgba(10, 17, 40, 0.7), rgba(27, 58, 107, 0.7), rgba(22, 33, 62, 0.7));
+  background: linear-gradient(
+    to bottom right,
+    rgba(10, 17, 40, 0.7),
+    rgba(27, 58, 107, 0.7),
+    rgba(22, 33, 62, 0.7)
+  );
   border-color: rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
@@ -160,6 +165,11 @@ select:focus {
 }
 
 .dark .card {
-  background: linear-gradient(to bottom right, rgba(10, 17, 40, 0.7), rgba(27, 58, 107, 0.7), rgba(22, 33, 62, 0.7));
+  background: linear-gradient(
+    to bottom right,
+    rgba(10, 17, 40, 0.7),
+    rgba(27, 58, 107, 0.7),
+    rgba(22, 33, 62, 0.7)
+  );
   border-color: var(--glass-border-dark);
 }
