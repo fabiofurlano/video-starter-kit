@@ -138,8 +138,9 @@ async function forwardToFal(req: NextRequest) {
       // Copy any other important headers from the original request
       headers.forEach((value, key) => {
         const lowerKey = key.toLowerCase();
+        // Skip headers we set manually AND skip the 'connection' header
         if (
-          !["authorization", "content-type", "x-fal-target-url"].includes(
+          !["authorization", "content-type", "x-fal-target-url", "connection"].includes(
             lowerKey,
           )
         ) {
@@ -157,9 +158,11 @@ async function forwardToFal(req: NextRequest) {
       let forwardedResponse;
       try {
         forwardedResponse = await fetch(targetUrl, {
-          method: "POST", // Hardcode to POST to match curl
+          // Use the original request's method (GET, POST, etc.)
+          method: req.method,
           headers: plainHeaders,
-          body: JSON.stringify(requestBody), // Always stringify as JSON
+          // Only include body for methods that typically have one
+          body: (req.method !== 'GET' && req.method !== 'HEAD') ? JSON.stringify(requestBody) : undefined,
         });
 
         // Log response status
