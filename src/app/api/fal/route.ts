@@ -130,9 +130,9 @@ async function forwardToFal(req: NextRequest) {
       // Forward the request - hardcode POST to match curl behavior
       // Create a plain object for headers (Test A5 style)
       const plainHeaders: Record<string, string> = {
-        "Authorization": authHeader,
+        Authorization: authHeader,
         "Content-Type": "application/json",
-        "x-fal-target-url": targetUrl
+        "x-fal-target-url": targetUrl,
       };
 
       // Copy any other important headers from the original request
