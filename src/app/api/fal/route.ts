@@ -128,13 +128,14 @@ async function forwardToFal(req: NextRequest) {
 
     try {
       // Forward the request - hardcode POST to match curl behavior
-      // Create a new headers object with our required headers
-      const fetchHeaders = new Headers();
-      fetchHeaders.set("Authorization", authHeader);
-      fetchHeaders.set("Content-Type", "application/json");
-      fetchHeaders.set("x-fal-target-url", targetUrl);
+      // Create a plain object for headers (Test A5 style)
+      const plainHeaders: Record<string, string> = {
+        "Authorization": authHeader,
+        "Content-Type": "application/json",
+        "x-fal-target-url": targetUrl
+      };
 
-      // Copy any other headers from the original request
+      // Copy any other important headers from the original request
       headers.forEach((value, key) => {
         const lowerKey = key.toLowerCase();
         if (
@@ -142,18 +143,14 @@ async function forwardToFal(req: NextRequest) {
             lowerKey,
           )
         ) {
-          fetchHeaders.set(key, value);
+          plainHeaders[key] = value;
         }
       });
 
       // CHECKPOINT D: Outgoing headers to Fal
-      const outgoingHeadersObj: Record<string, string> = {};
-      fetchHeaders.forEach((value, key) => {
-        outgoingHeadersObj[key] = value;
-      });
       console.log(
         "📤 Outgoing headers to Fal.ai:",
-        JSON.stringify(outgoingHeadersObj, null, 2),
+        JSON.stringify(plainHeaders, null, 2),
       );
 
       // CHECKPOINT E: Fetch success/failure
@@ -161,7 +158,7 @@ async function forwardToFal(req: NextRequest) {
       try {
         forwardedResponse = await fetch(targetUrl, {
           method: "POST", // Hardcode to POST to match curl
-          headers: fetchHeaders,
+          headers: plainHeaders,
           body: JSON.stringify(requestBody), // Always stringify as JSON
         });
 
