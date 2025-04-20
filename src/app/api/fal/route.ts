@@ -15,7 +15,10 @@ async function forwardToFal(req: NextRequest) {
     req.headers.forEach((value, key) => {
       incomingHeadersObj[key] = value;
     });
-    console.log("🔍 Incoming headers:", JSON.stringify(incomingHeadersObj, null, 2));
+    console.log(
+      "🔍 Incoming headers:",
+      JSON.stringify(incomingHeadersObj, null, 2),
+    );
 
     // IMPORTANT: The path should be extracted differently based on the official docs
     // For the fal.ai client, we need to:
@@ -119,7 +122,9 @@ async function forwardToFal(req: NextRequest) {
       headerObj[key] = value;
     });
     console.log(`🔍 Headers: ${JSON.stringify(headerObj).substring(0, 500)}`);
-    console.log(`🔍 Body: ${requestBody ? JSON.stringify(requestBody).substring(0, 200) + '...' : 'undefined'}`);
+    console.log(
+      `🔍 Body: ${requestBody ? JSON.stringify(requestBody).substring(0, 200) + "..." : "undefined"}`,
+    );
 
     try {
       // Forward the request - hardcode POST to match curl behavior
@@ -132,7 +137,11 @@ async function forwardToFal(req: NextRequest) {
       // Copy any other headers from the original request
       headers.forEach((value, key) => {
         const lowerKey = key.toLowerCase();
-        if (!['authorization', 'content-type', 'x-fal-target-url'].includes(lowerKey)) {
+        if (
+          !["authorization", "content-type", "x-fal-target-url"].includes(
+            lowerKey,
+          )
+        ) {
           fetchHeaders.set(key, value);
         }
       });
@@ -142,7 +151,10 @@ async function forwardToFal(req: NextRequest) {
       fetchHeaders.forEach((value, key) => {
         outgoingHeadersObj[key] = value;
       });
-      console.log("📤 Outgoing headers to Fal.ai:", JSON.stringify(outgoingHeadersObj, null, 2));
+      console.log(
+        "📤 Outgoing headers to Fal.ai:",
+        JSON.stringify(outgoingHeadersObj, null, 2),
+      );
 
       // CHECKPOINT E: Fetch success/failure
       let forwardedResponse;
@@ -157,7 +169,10 @@ async function forwardToFal(req: NextRequest) {
         console.log(`🔍 Fal.ai response status: ${forwardedResponse.status}`);
         console.log("✅ Fetch status:", forwardedResponse.status);
       } catch (error) {
-        console.error("❌ FETCH FAILED:", error instanceof Error ? error.message : String(error));
+        console.error(
+          "❌ FETCH FAILED:",
+          error instanceof Error ? error.message : String(error),
+        );
         throw error; // Re-throw to be caught by the outer try/catch
       }
 
@@ -184,13 +199,16 @@ async function forwardToFal(req: NextRequest) {
         if (forwardedResponse.ok) {
           console.log("✅ Successfully proxied request to Fal.ai");
         } else {
-          console.error(`❌ Fal.ai returned error status: ${forwardedResponse.status}`);
+          console.error(
+            `❌ Fal.ai returned error status: ${forwardedResponse.status}`,
+          );
         }
 
         return response;
       } catch (error) {
         console.error("❌ Error reading response body:", error);
-        const errorMessage = error instanceof Error ? error.message : "Failed to read response";
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to read response";
         return new NextResponse(JSON.stringify({ error: errorMessage }), {
           status: 500,
           headers: { "Content-Type": "application/json" },
@@ -199,7 +217,8 @@ async function forwardToFal(req: NextRequest) {
     } catch (error) {
       console.error("❌ Error in Fal.ai fetch:", error);
       // Handle error safely with type checking
-      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
       console.error("❌ Error details:", errorMessage);
       return new NextResponse(JSON.stringify({ error: errorMessage }), {
         status: 500,
