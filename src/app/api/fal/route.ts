@@ -140,9 +140,12 @@ async function forwardToFal(req: NextRequest) {
         const lowerKey = key.toLowerCase();
         // Skip headers we set manually AND skip the 'connection' header
         if (
-          !["authorization", "content-type", "x-fal-target-url", "connection"].includes(
-            lowerKey,
-          )
+          ![
+            "authorization",
+            "content-type",
+            "x-fal-target-url",
+            "connection",
+          ].includes(lowerKey)
         ) {
           plainHeaders[key] = value;
         }
@@ -162,7 +165,10 @@ async function forwardToFal(req: NextRequest) {
           method: req.method,
           headers: plainHeaders,
           // Only include body for methods that typically have one
-          body: (req.method !== 'GET' && req.method !== 'HEAD') ? JSON.stringify(requestBody) : undefined,
+          body:
+            req.method !== "GET" && req.method !== "HEAD"
+              ? JSON.stringify(requestBody)
+              : undefined,
         });
 
         // Log response status
