@@ -3,11 +3,19 @@ import { NextResponse, NextRequest } from "next/server";
 // Function to forward request to Fal.ai
 async function forwardToFal(req: NextRequest) {
   console.log("🔍 API ROUTE: Request received at /api/fal");
+  console.log("🟢 /api/fal route hit");
 
   try {
     // Parse the URL
     const url = new URL(req.url);
     console.log(`🔍 Request: ${req.method} ${url.pathname}${url.search}`);
+
+    // CHECKPOINT B: Incoming headers
+    const incomingHeadersObj: Record<string, string> = {};
+    req.headers.forEach((value, key) => {
+      incomingHeadersObj[key] = value;
+    });
+    console.log("🔍 Incoming headers:", JSON.stringify(incomingHeadersObj, null, 2));
 
     // IMPORTANT: The path should be extracted differently based on the official docs
     // For the fal.ai client, we need to:
@@ -32,6 +40,8 @@ async function forwardToFal(req: NextRequest) {
     }
 
     console.log(`🔍 Target URL: ${targetUrl}`);
+    // CHECKPOINT C: Target URL
+    console.log("🎥 Target URL:", targetUrl);
 
     // Get request body if it exists
     let requestBody: any = null;
@@ -45,6 +55,8 @@ async function forwardToFal(req: NextRequest) {
             "🔍 Request body:",
             JSON.stringify(requestBody).substring(0, 200) + "...",
           );
+          // CHECKPOINT C: Request body
+          console.log("📝 Request body:", JSON.stringify(requestBody, null, 2));
         } else {
           // Handle other content types if needed
           requestBody = await req.text();
@@ -100,49 +112,104 @@ async function forwardToFal(req: NextRequest) {
 
     console.log(`🔍 Forwarding to: ${targetUrl}`);
 
-    // Forward the request
-    const forwardedResponse = await fetch(targetUrl, {
-      method: req.method,
-      headers: headers,
-      body:
-        req.method !== "GET" && req.method !== "HEAD"
-          ? contentType.includes("application/json")
-            ? JSON.stringify(requestBody)
-            : requestBody
-          : undefined,
+    // Log detailed request information for debugging
+    // Convert headers to a plain object for logging
+    const headerObj: Record<string, string> = {};
+    headers.forEach((value, key) => {
+      headerObj[key] = value;
     });
+    console.log(`🔍 Headers: ${JSON.stringify(headerObj).substring(0, 500)}`);
+    console.log(`🔍 Body: ${requestBody ? JSON.stringify(requestBody).substring(0, 200) + '...' : 'undefined'}`);
 
-    // Log response status
-    console.log(`🔍 Fal.ai response status: ${forwardedResponse.status}`);
-
-    // Clone the response headers
-    const responseHeaders = new Headers();
-    forwardedResponse.headers.forEach((value, key) => {
-      responseHeaders.set(key, value);
-    });
-
-    // Get response data
-    let responseData;
     try {
-      // Try to parse as JSON first
-      responseData = await forwardedResponse.text();
+      // Forward the request - hardcode POST to match curl behavior
+      // Create a new headers object with our required headers
+      const fetchHeaders = new Headers();
+      fetchHeaders.set("Authorization", authHeader);
+      fetchHeaders.set("Content-Type", "application/json");
+      fetchHeaders.set("x-fal-target-url", targetUrl);
+
+      // Copy any other headers from the original request
+      headers.forEach((value, key) => {
+        const lowerKey = key.toLowerCase();
+        if (!['authorization', 'content-type', 'x-fal-target-url'].includes(lowerKey)) {
+          fetchHeaders.set(key, value);
+        }
+      });
+
+      // CHECKPOINT D: Outgoing headers to Fal
+      const outgoingHeadersObj: Record<string, string> = {};
+      fetchHeaders.forEach((value, key) => {
+        outgoingHeadersObj[key] = value;
+      });
+      console.log("📤 Outgoing headers to Fal.ai:", JSON.stringify(outgoingHeadersObj, null, 2));
+
+      // CHECKPOINT E: Fetch success/failure
+      let forwardedResponse;
+      try {
+        forwardedResponse = await fetch(targetUrl, {
+          method: "POST", // Hardcode to POST to match curl
+          headers: fetchHeaders,
+          body: JSON.stringify(requestBody), // Always stringify as JSON
+        });
+
+        // Log response status
+        console.log(`🔍 Fal.ai response status: ${forwardedResponse.status}`);
+        console.log("✅ Fetch status:", forwardedResponse.status);
+      } catch (error) {
+        console.error("❌ FETCH FAILED:", error instanceof Error ? error.message : String(error));
+        throw error; // Re-throw to be caught by the outer try/catch
+      }
+
+      // Get response data
+      let responseData;
+      try {
+        responseData = await forwardedResponse.text();
+        console.log(`🔍 Response body: ${responseData.substring(0, 200)}...`);
+        // CHECKPOINT E: Response body
+        console.log("📦 Response body:", responseData.substring(0, 500));
+
+        // Create response with same status and headers
+        const responseHeaders = new Headers();
+        forwardedResponse.headers.forEach((value, key) => {
+          responseHeaders.set(key, value);
+        });
+
+        const response = new NextResponse(responseData, {
+          status: forwardedResponse.status,
+          statusText: forwardedResponse.statusText,
+          headers: responseHeaders,
+        });
+
+        if (forwardedResponse.ok) {
+          console.log("✅ Successfully proxied request to Fal.ai");
+        } else {
+          console.error(`❌ Fal.ai returned error status: ${forwardedResponse.status}`);
+        }
+
+        return response;
+      } catch (error) {
+        console.error("❌ Error reading response body:", error);
+        const errorMessage = error instanceof Error ? error.message : "Failed to read response";
+        return new NextResponse(JSON.stringify({ error: errorMessage }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     } catch (error) {
-      console.error("❌ Error reading response body:", error);
-      responseData = JSON.stringify({ error: "Failed to read response" });
+      console.error("❌ Error in Fal.ai fetch:", error);
+      // Handle error safely with type checking
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("❌ Error details:", errorMessage);
+      return new NextResponse(JSON.stringify({ error: errorMessage }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
     }
-
-    // Create response with same status and headers
-    const response = new NextResponse(responseData, {
-      status: forwardedResponse.status,
-      statusText: forwardedResponse.statusText,
-      headers: responseHeaders,
-    });
-
-    console.log("✅ Successfully proxied request to Fal.ai");
-    return response;
   } catch (error) {
     console.error("❌ Error in Fal.ai proxy:", error);
-    return new NextResponse(JSON.stringify({ error: String(error) }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return new NextResponse(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
