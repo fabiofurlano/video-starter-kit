@@ -190,8 +190,13 @@ async function forwardToFal(req: NextRequest) {
         if (contentType.includes("application/json")) {
           // For JSON responses, parse the JSON and use NextResponse.json()
           const jsonData = await forwardedResponse.json();
-          console.log(`🔍 Response body (JSON): ${JSON.stringify(jsonData).substring(0, 200)}...`);
-          console.log("📦 Response body (JSON):", JSON.stringify(jsonData).substring(0, 500));
+          console.log(
+            `🔍 Response body (JSON): ${JSON.stringify(jsonData).substring(0, 200)}...`,
+          );
+          console.log(
+            "📦 Response body (JSON):",
+            JSON.stringify(jsonData).substring(0, 500),
+          );
 
           // Return properly formatted JSON response
           const response = NextResponse.json(jsonData, {
@@ -212,8 +217,13 @@ async function forwardToFal(req: NextRequest) {
         } else {
           // For non-JSON responses, use text() and preserve the original Content-Type
           const responseData = await forwardedResponse.text();
-          console.log(`🔍 Response body (text): ${responseData.substring(0, 200)}...`);
-          console.log("📦 Response body (text):", responseData.substring(0, 500));
+          console.log(
+            `🔍 Response body (text): ${responseData.substring(0, 200)}...`,
+          );
+          console.log(
+            "📦 Response body (text):",
+            responseData.substring(0, 500),
+          );
 
           // Create response with same status and headers
           const responseHeaders = new Headers();
