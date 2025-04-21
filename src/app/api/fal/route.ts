@@ -183,34 +183,60 @@ async function forwardToFal(req: NextRequest) {
       }
 
       // Get response data
-      let responseData;
       try {
-        responseData = await forwardedResponse.text();
-        console.log(`🔍 Response body: ${responseData.substring(0, 200)}...`);
-        // CHECKPOINT E: Response body
-        console.log("📦 Response body:", responseData.substring(0, 500));
+        // Check content type to determine how to handle the response
+        const contentType = forwardedResponse.headers.get("Content-Type") || "";
 
-        // Create response with same status and headers
-        const responseHeaders = new Headers();
-        forwardedResponse.headers.forEach((value, key) => {
-          responseHeaders.set(key, value);
-        });
+        if (contentType.includes("application/json")) {
+          // For JSON responses, parse the JSON and use NextResponse.json()
+          const jsonData = await forwardedResponse.json();
+          console.log(`🔍 Response body (JSON): ${JSON.stringify(jsonData).substring(0, 200)}...`);
+          console.log("📦 Response body (JSON):", JSON.stringify(jsonData).substring(0, 500));
 
-        const response = new NextResponse(responseData, {
-          status: forwardedResponse.status,
-          statusText: forwardedResponse.statusText,
-          headers: responseHeaders,
-        });
+          // Return properly formatted JSON response
+          const response = NextResponse.json(jsonData, {
+            status: forwardedResponse.status,
+            statusText: forwardedResponse.statusText,
+            // NextResponse.json() handles Content-Type: application/json automatically
+          });
 
-        if (forwardedResponse.ok) {
-          console.log("✅ Successfully proxied request to Fal.ai");
+          if (forwardedResponse.ok) {
+            console.log("✅ Successfully proxied JSON request to Fal.ai");
+          } else {
+            console.error(
+              `❌ Fal.ai returned error status: ${forwardedResponse.status}`,
+            );
+          }
+
+          return response;
         } else {
-          console.error(
-            `❌ Fal.ai returned error status: ${forwardedResponse.status}`,
-          );
-        }
+          // For non-JSON responses, use text() and preserve the original Content-Type
+          const responseData = await forwardedResponse.text();
+          console.log(`🔍 Response body (text): ${responseData.substring(0, 200)}...`);
+          console.log("📦 Response body (text):", responseData.substring(0, 500));
 
-        return response;
+          // Create response with same status and headers
+          const responseHeaders = new Headers();
+          forwardedResponse.headers.forEach((value, key) => {
+            responseHeaders.set(key, value);
+          });
+
+          const response = new NextResponse(responseData, {
+            status: forwardedResponse.status,
+            statusText: forwardedResponse.statusText,
+            headers: responseHeaders,
+          });
+
+          if (forwardedResponse.ok) {
+            console.log("✅ Successfully proxied text request to Fal.ai");
+          } else {
+            console.error(
+              `❌ Fal.ai returned error status: ${forwardedResponse.status}`,
+            );
+          }
+
+          return response;
+        }
       } catch (error) {
         console.error("❌ Error reading response body:", error);
         const errorMessage =
