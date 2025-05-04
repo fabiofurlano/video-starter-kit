@@ -6,7 +6,7 @@ import { createFalClient } from "@fal-ai/client";
 console.log("🔍 Initializing Fal.ai client...");
 
 // Function to wait for the falai_key to be set in localStorage
-async function waitForFalaiKey(maxWaitMs = 5000, checkIntervalMs = 100) {
+async function waitForFalaiKey(maxWaitMs = 10000, checkIntervalMs = 100) {
   console.log("🔍 Waiting for falai_key to be set in localStorage...");
 
   return new Promise<string>((resolve) => {
@@ -22,8 +22,26 @@ async function waitForFalaiKey(maxWaitMs = 5000, checkIntervalMs = 100) {
 
     // Set up a timeout to resolve with empty string after maxWaitMs
     const timeoutId = setTimeout(() => {
-      console.warn("❌ Timed out waiting for falai_key");
+      console.warn("❌ Timed out waiting for falai_key after " + maxWaitMs + "ms");
       clearInterval(intervalId);
+      
+      // Show UI notification about missing key
+      if (typeof window !== "undefined" && window.document) {
+        console.error("FALAI KEY MISSING: Unable to use Fal.ai features. Please ensure your API key is set in the parent application.");
+      }
+      
+      // Try one more request before giving up
+      try {
+        window.parent.postMessage({ 
+          type: "REQUEST_FALAI_KEY", 
+          retry: true,
+          timestamp: new Date().toISOString()
+        }, "*");
+        console.log("🔍 Sent final REQUEST_FALAI_KEY to parent before timeout");
+      } catch (e) {
+        console.error("🔍 Error sending final key request to parent:", e);
+      }
+      
       resolve("");
     }, maxWaitMs);
 
@@ -66,6 +84,30 @@ async function waitForFalaiKey(maxWaitMs = 5000, checkIntervalMs = 100) {
     try {
       window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, "*");
       console.log("🔍 Sent REQUEST_FALAI_KEY to parent");
+      
+      // Schedule additional requests at intervals if no response
+      const requestInterval = setInterval(() => {
+        if (localStorage?.getItem("falai_key")) {
+          clearInterval(requestInterval);
+          return;
+        }
+        
+        try {
+          window.parent.postMessage({ 
+            type: "REQUEST_FALAI_KEY",
+            retry: true,
+            timestamp: new Date().toISOString()
+          }, "*");
+          console.log("🔍 Sent follow-up REQUEST_FALAI_KEY to parent");
+        } catch (e) {
+          console.error("🔍 Error sending follow-up key request to parent:", e);
+          clearInterval(requestInterval);
+        }
+      }, 2000); // Try every 2 seconds
+      
+      // Clear the interval after maxWaitMs
+      setTimeout(() => clearInterval(requestInterval), maxWaitMs);
+      
     } catch (e) {
       console.error("🔍 Error requesting key from parent:", e);
     }
@@ -139,14 +181,14 @@ export const fal = createFalClient({
         : "NOT FOUND",
     );
 
-    // If no key found, wait for it to be set
+    // If no key found, wait for it to be set with increased timeout
     if (!apiKey) {
       console.log(
         "🔍 FAL CLIENT middleware: No key found in localStorage, waiting for it to be set",
       );
       try {
-        // Wait for the key to be set in localStorage
-        apiKey = await waitForFalaiKey(3000); // Wait up to 3 seconds
+        // Wait for the key to be set in localStorage with longer timeout
+        apiKey = await waitForFalaiKey(10000); // Wait up to 10 seconds
 
         if (apiKey) {
           console.log(
@@ -155,6 +197,24 @@ export const fal = createFalClient({
           );
         } else {
           console.warn("🔍 FAL CLIENT middleware: No key found after waiting");
+          
+          // Show UI error about missing key
+          if (typeof window !== "undefined" && window.document) {
+            console.error("FALAI KEY MISSING: Unable to proceed with request. The API key is required for Fal.ai features.");
+            
+            // Try one more request with urgent flag
+            try {
+              window.parent.postMessage({ 
+                type: "REQUEST_FALAI_KEY", 
+                urgent: true,
+                requestUrl: targetUrl,
+                timestamp: new Date().toISOString()
+              }, "*");
+              console.log("🔍 Sent URGENT REQUEST_FALAI_KEY to parent");
+            } catch (e) {
+              console.error("🔍 Error sending urgent key request to parent:", e);
+            }
+          }
         }
       } catch (e) {
         console.error("🔍 FAL CLIENT middleware: Error waiting for key:", e);
@@ -180,7 +240,8 @@ export const fal = createFalClient({
       console.error(
         "❌ FAL CLIENT middleware: No API key available to add to request",
       );
-      // Try one last desperate attempt to get the key directly from localStorage
+      
+      // Try one last check for the key
       const emergencyKey = localStorage?.getItem("falai_key");
       if (emergencyKey) {
         console.log(
@@ -194,6 +255,18 @@ export const fal = createFalClient({
         console.log(
           "🔍 FAL CLIENT middleware: EMERGENCY RECOVERY - Added Authorization header",
         );
+      } else {
+        // Show clear UI error about missing key
+        if (typeof window !== "undefined" && window.document) {
+          console.error("FALAI KEY MISSING: Request cannot proceed without API key. Please ensure your API key is set in the parent application.");
+        }
+        
+        // Add a custom header to indicate missing key for the proxy to handle appropriately
+        request.headers = {
+          ...request.headers,
+          "x-fal-key-missing": "true",
+          "x-fal-target-url": targetUrl,
+        };
       }
     }
 

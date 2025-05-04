@@ -163,7 +163,8 @@ src/
     uploadthing.ts
     utils.ts
   styles/
-    generate-shell.css
+    main-app-theme.css
+    right-panel.css
 .editorconfig
 .env.example copy
 .gitignore
@@ -179,6 +180,7 @@ package.json
 postcss.config.mjs
 README.md
 tailwind.config.ts
+test-fal.js
 tsconfig.json
 
 ================================================================
@@ -1960,11 +1962,22 @@ import { NextResponse, NextRequest } from "next/server";
 // Function to forward request to Fal.ai
 async function forwardToFal(req: NextRequest) {
   console.log("🔍 API ROUTE: Request received at /api/fal");
+  console.log("🟢 /api/fal route hit");
 
   try {
     // Parse the URL
     const url = new URL(req.url);
     console.log(`🔍 Request: ${req.method} ${url.pathname}${url.search}`);
+
+    // CHECKPOINT B: Incoming headers
+    const incomingHeadersObj: Record<string, string> = {};
+    req.headers.forEach((value, key) => {
+      incomingHeadersObj[key] = value;
+    });
+    console.log(
+      "🔍 Incoming headers:",
+      JSON.stringify(incomingHeadersObj, null, 2),
+    );
 
     // IMPORTANT: The path should be extracted differently based on the official docs
     // For the fal.ai client, we need to:
@@ -1989,6 +2002,8 @@ async function forwardToFal(req: NextRequest) {
     }
 
     console.log(`🔍 Target URL: ${targetUrl}`);
+    // CHECKPOINT C: Target URL
+    console.log("🎥 Target URL:", targetUrl);
 
     // Get request body if it exists
     let requestBody: any = null;
@@ -2002,6 +2017,8 @@ async function forwardToFal(req: NextRequest) {
             "🔍 Request body:",
             JSON.stringify(requestBody).substring(0, 200) + "...",
           );
+          // CHECKPOINT C: Request body
+          console.log("📝 Request body:", JSON.stringify(requestBody, null, 2));
         } else {
           // Handle other content types if needed
           requestBody = await req.text();
@@ -2055,54 +2072,164 @@ async function forwardToFal(req: NextRequest) {
     headers.set("Content-Type", contentType);
     headers.set("Authorization", authHeader);
 
-    // Remove the x-fal-target-url header as it's not needed for the actual request
-    headers.delete("x-fal-target-url");
-
     console.log(`🔍 Forwarding to: ${targetUrl}`);
 
-    // Forward the request
-    const forwardedResponse = await fetch(targetUrl, {
-      method: req.method,
-      headers: headers,
-      body:
-        req.method !== "GET" && req.method !== "HEAD"
-          ? contentType.includes("application/json")
-            ? JSON.stringify(requestBody)
-            : requestBody
-          : undefined,
+    // Log detailed request information for debugging
+    // Convert headers to a plain object for logging
+    const headerObj: Record<string, string> = {};
+    headers.forEach((value, key) => {
+      headerObj[key] = value;
     });
+    console.log(`🔍 Headers: ${JSON.stringify(headerObj).substring(0, 500)}`);
+    console.log(
+      `🔍 Body: ${requestBody ? JSON.stringify(requestBody).substring(0, 200) + "..." : "undefined"}`,
+    );
 
-    // Log response status
-    console.log(`🔍 Fal.ai response status: ${forwardedResponse.status}`);
-
-    // Clone the response headers
-    const responseHeaders = new Headers();
-    forwardedResponse.headers.forEach((value, key) => {
-      responseHeaders.set(key, value);
-    });
-
-    // Get response data
-    let responseData;
     try {
-      // Try to parse as JSON first
-      responseData = await forwardedResponse.text();
+      // Forward the request - hardcode POST to match curl behavior
+      // Create a plain object for headers (Test A5 style)
+      const plainHeaders: Record<string, string> = {
+        Authorization: authHeader,
+        "Content-Type": "application/json",
+        "x-fal-target-url": targetUrl,
+      };
+
+      // Copy any other important headers from the original request
+      headers.forEach((value, key) => {
+        const lowerKey = key.toLowerCase();
+        // Skip headers we set manually AND skip the 'connection' header
+        if (
+          ![
+            "authorization",
+            "content-type",
+            "x-fal-target-url",
+            "connection",
+          ].includes(lowerKey)
+        ) {
+          plainHeaders[key] = value;
+        }
+      });
+
+      // CHECKPOINT D: Outgoing headers to Fal
+      console.log(
+        "📤 Outgoing headers to Fal.ai:",
+        JSON.stringify(plainHeaders, null, 2),
+      );
+
+      // CHECKPOINT E: Fetch success/failure
+      let forwardedResponse;
+      try {
+        forwardedResponse = await fetch(targetUrl, {
+          // Use the original request's method (GET, POST, etc.)
+          method: req.method,
+          headers: plainHeaders,
+          // Only include body for methods that typically have one
+          body:
+            req.method !== "GET" && req.method !== "HEAD"
+              ? JSON.stringify(requestBody)
+              : undefined,
+        });
+
+        // Log response status
+        console.log(`🔍 Fal.ai response status: ${forwardedResponse.status}`);
+        console.log("✅ Fetch status:", forwardedResponse.status);
+      } catch (error) {
+        console.error(
+          "❌ FETCH FAILED:",
+          error instanceof Error ? error.message : String(error),
+        );
+        throw error; // Re-throw to be caught by the outer try/catch
+      }
+
+      // Get response data
+      try {
+        // Check content type to determine how to handle the response
+        const contentType = forwardedResponse.headers.get("Content-Type") || "";
+
+        if (contentType.includes("application/json")) {
+          // For JSON responses, parse the JSON and use NextResponse.json()
+          const jsonData = await forwardedResponse.json();
+          console.log(
+            `🔍 Response body (JSON): ${JSON.stringify(jsonData).substring(0, 200)}...`,
+          );
+          console.log(
+            "📦 Response body (JSON):",
+            JSON.stringify(jsonData).substring(0, 500),
+          );
+
+          // Return properly formatted JSON response
+          const response = NextResponse.json(jsonData, {
+            status: forwardedResponse.status,
+            statusText: forwardedResponse.statusText,
+            // NextResponse.json() handles Content-Type: application/json automatically
+          });
+
+          if (forwardedResponse.ok) {
+            console.log("✅ Successfully proxied JSON request to Fal.ai");
+          } else {
+            console.error(
+              `❌ Fal.ai returned error status: ${forwardedResponse.status}`,
+            );
+          }
+
+          return response;
+        } else {
+          // For non-JSON responses, use text() and preserve the original Content-Type
+          const responseData = await forwardedResponse.text();
+          console.log(
+            `🔍 Response body (text): ${responseData.substring(0, 200)}...`,
+          );
+          console.log(
+            "📦 Response body (text):",
+            responseData.substring(0, 500),
+          );
+
+          // Create response with same status and headers
+          const responseHeaders = new Headers();
+          forwardedResponse.headers.forEach((value, key) => {
+            responseHeaders.set(key, value);
+          });
+
+          const response = new NextResponse(responseData, {
+            status: forwardedResponse.status,
+            statusText: forwardedResponse.statusText,
+            headers: responseHeaders,
+          });
+
+          if (forwardedResponse.ok) {
+            console.log("✅ Successfully proxied text request to Fal.ai");
+          } else {
+            console.error(
+              `❌ Fal.ai returned error status: ${forwardedResponse.status}`,
+            );
+          }
+
+          return response;
+        }
+      } catch (error) {
+        console.error("❌ Error reading response body:", error);
+        const errorMessage =
+          error instanceof Error ? error.message : "Failed to read response";
+        return new NextResponse(JSON.stringify({ error: errorMessage }), {
+          status: 500,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
     } catch (error) {
-      console.error("❌ Error reading response body:", error);
-      responseData = JSON.stringify({ error: "Failed to read response" });
+      console.error("❌ Error in Fal.ai fetch:", error);
+      // Handle error safely with type checking
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("❌ Error details:", errorMessage);
+      return new NextResponse(JSON.stringify({ error: errorMessage }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
     }
-
-    // Create response with same status and headers
-    const response = new NextResponse(responseData, {
-      status: forwardedResponse.status,
-      statusText: forwardedResponse.statusText,
-      headers: responseHeaders,
-    });
-
-    console.log("✅ Successfully proxied request to Fal.ai");
-    return response;
   } catch (error) {
     console.error("❌ Error in Fal.ai proxy:", error);
-    return new NextResponse(JSON.stringify({ error: String(error) }), {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return new NextResponse(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -3382,9 +3509,9 @@ body {
     --chart-5: 340 75% 55%;
     --radius: 0.5rem;
 
-    /* Background gradient */
-    --tw-gradient-from: hsl(214, 100%, 97%);
-    --tw-gradient-to: hsl(226, 100%, 97%);
+    /* Background gradient - softer light tone matching homepage */
+    --tw-gradient-from: #f4f4f6;
+    --tw-gradient-to: #e8e8ec;
   }
   .dark {
     /* Dark mode variables */
@@ -3415,9 +3542,10 @@ body {
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
 
-    /* Background gradient for dark mode */
-    --tw-gradient-from: hsl(220, 24%, 7%);
-    --tw-gradient-to: hsl(246, 24%, 9%);
+    /* Background gradient for dark mode - matches homepage */
+    --tw-gradient-from: #0a1128;
+    --tw-gradient-via: #1b3a6b;
+    --tw-gradient-to: #16213e;
   }
 }
 
@@ -3444,6 +3572,7 @@ body {
   background: rgba(26, 26, 26, 0.75);
   border-color: rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
 }
 
 /* Enhanced UI Elements */
@@ -3497,7 +3626,12 @@ button:hover,
 
 /* Left panel glassmorphism effects */
 .dark [class*="left-panel"] {
-  background: rgba(26, 26, 26, 0.75);
+  background: linear-gradient(
+    to bottom right,
+    rgba(10, 17, 40, 0.75),
+    rgba(27, 58, 107, 0.75),
+    rgba(22, 33, 62, 0.75)
+  );
   backdrop-filter: blur(12px);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
@@ -3519,7 +3653,8 @@ File: src/app/layout.tsx
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import "./globals.css";
-import "@/styles/generate-shell.css";
+import "@/styles/main-app-theme.css";
+import "@/styles/right-panel.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
 export const metadata: Metadata = {
@@ -4084,7 +4219,7 @@ export default function IndexPage() {
   if (!isSessionReady) {
     // Still waiting for the initial message from the parent
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E] text-white">
         Initializing Session... Waiting for Parent Application...
       </div>
     );
@@ -4093,7 +4228,7 @@ export default function IndexPage() {
   if (isAuthenticated === false) {
     // User is not authenticated, waiting for parent to redirect
     return (
-      <div className="flex items-center justify-center min-h-screen bg-black text-white">
+      <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E] text-white">
         Authentication required. Redirecting to login...
       </div>
     );
@@ -4102,8 +4237,8 @@ export default function IndexPage() {
   if (isAuthenticated === true && sdkUserData) {
     // --- Render the main UI using sdkUserData ---
     return (
-      <div className="min-h-screen bg-gradient-to-br from-black to-[#0A0F23] text-white relative">
-        <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism mb-8">
+      <div className="min-h-screen bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E] text-white relative">
+        <header className="px-4 py-2 flex justify-between items-center border-b border-border glassmorphism mb-8 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
           <div className="flex items-center">
             <Logo />
             <span className="mx-2 text-gray-400">|</span>
@@ -4163,7 +4298,7 @@ export default function IndexPage() {
           {/* Main content is now rendered directly if authenticated */}
           <div className="space-y-8">
             {/* Tabs Only Section at Top */}
-            <div className="glassmorphism p-6 border-gray-800">
+            <div className="glassmorphism p-6 border-gray-800 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
               <h2 className="text-2xl font-bold mb-6 text-white">
                 Create Storyboard
               </h2>
@@ -4320,7 +4455,7 @@ export default function IndexPage() {
             </div>
 
             {/* Story Info Panel */}
-            <div className="glassmorphism p-6 border-gray-800">
+            <div className="glassmorphism p-6 border-gray-800 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
               <h2 className="text-2xl font-bold mb-4 text-white">
                 Story Information
               </h2>
@@ -4364,7 +4499,7 @@ export default function IndexPage() {
             </div>
 
             {/* Characters Panel */}
-            <div className="glassmorphism p-6 border-gray-800">
+            <div className="glassmorphism p-6 border-gray-800 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
               <h2 className="text-2xl font-bold mb-6 text-white">Characters</h2>
               {sdkUserData.characters && sdkUserData.characters.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
@@ -4392,7 +4527,7 @@ export default function IndexPage() {
             </div>
 
             {/* Full Storyboard Creation Section with Chapters */}
-            <div className="glassmorphism p-6 border-gray-800">
+            <div className="glassmorphism p-6 border-gray-800 bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E]">
               <Tabs defaultValue="chapters" className="w-full">
                 <TabsContent value="chapters">
                   {/* Existing Chapters Panel */}
@@ -4497,7 +4632,7 @@ export default function IndexPage() {
   // Fallback loading state if authenticated but data not yet loaded into state
   // This might occur briefly between isSessionReady=true and sdkUserData being set.
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-[#0A1128] via-[#1B3A6B] to-[#16213E] text-white">
       Loading authenticated session data...
     </div>
   );
@@ -8694,7 +8829,7 @@ export default function LeftPanel() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col border-r border-border glassmorphism">
+    <div className="h-full w-full flex flex-col border-r border-border glassmorphism bg-transparent">
       <div className="p-4 flex items-center gap-4 border-b border-border">
         <div className="flex w-full">
           <Accordion type="single" collapsible className="w-full">
@@ -9040,9 +9175,7 @@ export function App({ projectId }: AppProps) {
                 <BottomBar />
               </div>
             </main>
-            <div className="nv-generate-shell">
-              <RightPanel />
-            </div>
+            <RightPanel />
             <Footer />
           </div>
           <Toaster />
@@ -9996,10 +10129,10 @@ export function ModelHelper({ modelId }: { modelId: string }) {
   }
 
   return (
-    <div className="w-full mt-3 mb-1 bg-gray-800/40 rounded-lg border border-gray-700/50 overflow-hidden transition-all duration-300 shadow-lg backdrop-blur-sm">
+    <div className="w-full h-full flex flex-col glassmorphism overflow-hidden transition-all duration-300 shadow-lg">
       {/* Header - always visible */}
       <div
-        className="p-3 flex items-center justify-between cursor-pointer hover:bg-gray-700/30 transition-colors group"
+        className="p-3 flex items-center justify-between cursor-pointer hover:bg-primary/20 transition-colors group"
         onClick={toggleExpanded}
       >
         <div className="flex items-center space-x-2">
@@ -10029,7 +10162,7 @@ export function ModelHelper({ modelId }: { modelId: string }) {
 
       {/* Collapsible content */}
       <div
-        className={`overflow-hidden transition-all duration-300 ease-in-out ${isExpanded ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}`}
+        className={`overflow-y-auto flex-grow transition-all duration-300 ease-in-out ${isExpanded ? "opacity-100" : "max-h-0 opacity-0"}`}
       >
         <div className="px-4 pb-4 pt-1 text-sm">
           <p className="text-gray-200 mb-3 leading-relaxed">
@@ -10566,6 +10699,7 @@ import { getMediaMetadata } from "@/lib/ffmpeg";
 import CameraMovement from "./camera-control";
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "./ui/sheet";
 import { ModelHelper } from "./model-helper";
+import { PlusIcon } from "lucide-react";
 
 type ModelEndpointPickerProps = {
   mediaType: string;
@@ -10691,6 +10825,7 @@ export default function RightPanel({
   const queryClient = useQueryClient();
 
   const [open, setOpen] = useState(false);
+  const [isPanelClosed, setIsPanelClosed] = useState(false);
 
   const handleOnOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
@@ -10703,6 +10838,10 @@ export default function RightPanel({
       onOpenChange(isOpen);
     }
     openGenerateDialog();
+  };
+
+  const togglePanel = () => {
+    setIsPanelClosed(!isPanelClosed);
   };
 
   const { data: project } = useProject(projectId);
@@ -10954,317 +11093,343 @@ export default function RightPanel({
   };
 
   return (
-    <div
-      className={cn(
-        "flex flex-col border-l border-border w-[400px] min-w-[400px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto glassmorphism",
-        generateDialogOpen ? "right-0" : "-right-[400px]",
+    <>
+      {isPanelClosed && generateDialogOpen && (
+        <button
+          onClick={togglePanel}
+          className="fixed bottom-20 right-6 z-50 p-3 rounded-full bg-primary shadow-lg hover:bg-primary/90 transition-all duration-300 flex items-center justify-center floating-media-button"
+          aria-label="Open Media Panel"
+        >
+          <span className="text-white font-medium flex items-center">
+            <PlusIcon className="w-5 h-5" />
+            <span className="ml-1">Generate Media</span>
+          </span>
+        </button>
       )}
-    >
-      <div className="flex-1 p-4 flex flex-col gap-4 border-b border-border h-full overflow-y-auto relative">
-        <div className="flex flex-row items-center justify-between">
-          <h2 className="text-sm text-muted-foreground font-semibold flex-1">
-            Generate Media
-          </h2>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => handleOnOpenChange(false)}
-            className="flex items-center gap-2 hover:bg-white/10 transition-colors"
-          >
-            <XIcon className="w-6 h-6" />
-          </Button>
-        </div>
-        <div className="w-full flex flex-col nv-grid">
-          <div className="flex w-full gap-2 col-span-2">
+      <div
+        className={cn(
+          "flex flex-col border-l border-border w-[560px] min-w-[560px] z-50 transition-all duration-300 fixed top-0 bottom-0 overflow-y-auto right-panel-container",
+          generateDialogOpen
+            ? isPanelClosed
+              ? "right-[-560px]"
+              : "right-0"
+            : "-right-[560px]",
+        )}
+      >
+        <div className="flex-1 p-4 flex flex-col gap-4 border-b border-border h-full overflow-y-auto relative">
+          <div className="flex flex-row items-center justify-between">
+            <h2 className="text-sm text-muted-foreground font-semibold flex-1">
+              Generate Media
+            </h2>
             <Button
               variant="ghost"
-              onClick={() => handleMediaTypeChange("image")}
-              className={cn(
-                mediaType === "image" && "bg-white/10",
-                "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
-              )}
+              size="icon"
+              onClick={togglePanel}
+              className="flex items-center gap-2 hover:bg-white/10 transition-colors"
             >
-              <ImageIcon className="w-4 h-4 opacity-50" />
-              <span className="text-[10px]">Image</span>
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => handleMediaTypeChange("video")}
-              className={cn(
-                mediaType === "video" && "bg-white/10",
-                "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
-              )}
-            >
-              <VideoIcon className="w-4 h-4 opacity-50" />
-              <span className="text-[10px]">Video</span>
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => handleMediaTypeChange("voiceover")}
-              className={cn(
-                mediaType === "voiceover" && "bg-white/10",
-                "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
-              )}
-            >
-              <MicIcon className="w-4 h-4 opacity-50" />
-              <span className="text-[10px]">Voiceover</span>
-            </Button>
-            <Button
-              variant="ghost"
-              onClick={() => handleMediaTypeChange("music")}
-              className={cn(
-                mediaType === "music" && "bg-white/10",
-                "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
-              )}
-            >
-              <MusicIcon className="w-4 h-4 opacity-50" />
-              <span className="text-[10px]">Music</span>
+              <XIcon className="w-6 h-6" />
             </Button>
           </div>
-          <div className="flex flex-col gap-2 mt-2 justify-start font-medium text-base">
-            <div className="text-muted-foreground font-medium">Using</div>
-            <ModelEndpointPicker
-              mediaType={mediaType}
-              value={endpointId}
-              onValueChange={(endpointId) => {
-                resetGenerateData();
-                setEndpointId(endpointId);
-
-                const endpoint = AVAILABLE_ENDPOINTS.find(
-                  (endpoint) => endpoint.endpointId === endpointId,
-                );
-
-                const initialInput = endpoint?.initialInput || {};
-                setGenerateData({ ...initialInput });
-              }}
-            />
-
-            {/* Model Helper Panel */}
-            <div className="w-full px-0.5">
-              <ModelHelper modelId={endpointId} />
-            </div>
-
-            <div className="mt-2">
-              <div className="text-muted-foreground">
-                LLM Model for Prompt Enhancement
-              </div>
-              <LlmModelPicker
-                selectedModel={llmModel}
-                onValueChange={handleLlmModelChange}
-              />
-              <p className="text-xs text-muted-foreground mt-1">
-                Select the LLM model to use for enhancing prompts. More powerful
-                models may produce better results but may cost more credits.
-              </p>
-            </div>
-          </div>
-        </div>
-        <div className="flex flex-col gap-2 relative col-span-2 nv-section-divider">
-          {endpoint?.inputAsset?.map((asset, index) => (
-            <div key={getAssetType(asset)} className="flex w-full">
-              <div className="flex flex-col w-full" key={getAssetType(asset)}>
-                <div className="flex justify-between">
-                  <h4 className="capitalize text-muted-foreground mb-1 text-sm">
-                    {getAssetType(asset)} Reference
-                  </h4>
-                  {tab === `asset-${getAssetType(asset)}` && (
-                    <Button
-                      variant="ghost"
-                      onClick={() => setTab("generation")}
-                      size="sm"
-                    >
-                      <ArrowLeft /> Back
-                    </Button>
-                  )}
-                </div>
-                {(tab === "generation" ||
-                  tab !== `asset-${getAssetType(asset)}`) && (
-                  <>
-                    {!generateData[getAssetKey(asset)] && (
-                      <div className="flex gap-2 justify-between mb-3">
-                        <Button
-                          variant="ghost"
-                          onClick={() => {
-                            setTab(`asset-${getAssetType(asset)}`);
-                            setAssetMediaType(getAssetType(asset) ?? "all");
-                          }}
-                          className="cursor-pointer min-h-[30px] flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-md px-2"
-                        >
-                          <span className="text-muted-foreground text-xs text-center text-nowrap">
-                            Select
-                          </span>
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          disabled={isUploading}
-                          className="cursor-pointer min-h-[30px] flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-md px-2"
-                          asChild
-                        >
-                          <label htmlFor="assetUploadButton">
-                            <Input
-                              id="assetUploadButton"
-                              type="file"
-                              className="hidden"
-                              onChange={handleFileUpload}
-                              multiple={false}
-                              disabled={isUploading}
-                              accept="image/*,audio/*,video/*"
-                            />
-                            {isUploading ? (
-                              <LoaderCircleIcon className="w-4 h-4 opacity-50 animate-spin" />
-                            ) : (
-                              <span className="text-muted-foreground text-xs text-center text-nowrap">
-                                Upload
-                              </span>
-                            )}
-                          </label>
-                        </Button>
-                      </div>
-                    )}
-                    {generateData[getAssetKey(asset)] && (
-                      <div className="cursor-pointer overflow-hidden relative w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md bg-black/10 p-1">
-                        <WithTooltip tooltip="Remove media">
-                          <button
-                            type="button"
-                            className="p-1 rounded hover:bg-black/50 absolute top-1 z-50 bg-black/80 right-1 group-hover:text-white"
-                            onClick={() =>
-                              setGenerateData({
-                                [getAssetKey(asset)]: undefined,
-                              })
-                            }
-                          >
-                            <TrashIcon className="w-3 h-3 stroke-2" />
-                          </button>
-                        </WithTooltip>
-                        {generateData[getAssetKey(asset)] && (
-                          <SelectedAssetPreview
-                            asset={asset}
-                            data={generateData}
-                          />
-                        )}
-                      </div>
-                    )}
-                  </>
-                )}
-                {tab === `asset-${getAssetType(asset)}` && (
-                  <div className="flex items-center gap-2 flex-wrap overflow-y-auto max-h-80 divide-y divide-border">
-                    {mediaItems
-                      .filter((media) => {
-                        if (assetMediaType === "all") return true;
-                        if (
-                          assetMediaType === "audio" &&
-                          (media.mediaType === "voiceover" ||
-                            media.mediaType === "music")
-                        )
-                          return true;
-                        return media.mediaType === assetMediaType;
-                      })
-                      .map((job) => (
-                        <MediaItemRow
-                          draggable={false}
-                          key={job.id}
-                          data={job}
-                          onOpen={handleSelectMedia}
-                          className="cursor-pointer"
-                        />
-                      ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          ))}
-          <div className="relative bg-border rounded-lg pb-10 placeholder:text-base w-full resize-none">
-            <Textarea
-              className="text-base shadow-none focus:!ring-0 placeholder:text-base w-full h-24 resize-none nv-prompt"
-              placeholder="Imagine..."
-              value={generateData.prompt}
-              rows={3}
-              onChange={(e) => setGenerateData({ prompt: e.target.value })}
-            />
-            <WithTooltip tooltip="Enhance your prompt with AI-powered suggestions.">
-              <div className="absolute bottom-2 right-2">
-                <Button
-                  variant="secondary"
-                  disabled={enhancePromptMutation.isPending}
-                  className="bg-white/10 text-white text-xs rounded-full h-6 px-3 hover:bg-white/20 transition-colors"
-                  onClick={() => enhancePromptMutation.mutate()}
-                >
-                  {enhancePromptMutation.isPending ? (
-                    <LoadingIcon />
-                  ) : (
-                    <WandSparklesIcon className="opacity-50" />
-                  )}
-                  Enhance Prompt
-                </Button>
-              </div>
-            </WithTooltip>
-          </div>
-        </div>
-
-        {tab === "generation" && (
-          <div className="flex flex-col gap-2 mb-2 col-span-2 nv-section-divider">
-            {endpoint?.cameraControl && (
-              <CameraMovement
-                value={generateData.advanced_camera_control}
-                onChange={(val) =>
-                  setGenerateData({
-                    advanced_camera_control: val
-                      ? {
-                          movement_value: val.value,
-                          movement_type: val.movement,
-                        }
-                      : undefined,
-                  })
-                }
-              />
-            )}
-            {mediaType === "music" && endpointId === "fal-ai/playht/tts/v3" && (
-              <div className="flex-1 flex flex-row gap-2">
-                {mediaType === "music" && (
-                  <div className="flex flex-row items-center gap-1">
-                    <Label>Duration</Label>
-                    <Input
-                      className="w-12 text-center tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      min={5}
-                      max={30}
-                      step={1}
-                      type="number"
-                      value={generateData.duration}
-                      onChange={(e) =>
-                        setGenerateData({
-                          duration: Number.parseInt(e.target.value),
-                        })
-                      }
-                    />
-                    <span>s</span>
-                  </div>
-                )}
-                {endpointId === "fal-ai/playht/tts/v3" && (
-                  <VoiceSelector
-                    value={generateData.voice}
-                    onValueChange={(voice) => {
-                      setGenerateData({ voice });
-                    }}
-                  />
-                )}
-              </div>
-            )}
-            <div className="flex flex-row gap-2">
+          <div className="w-full flex flex-col">
+            <div className="flex w-full gap-2">
               <Button
-                className="w-full"
-                disabled={
-                  enhancePromptMutation.isPending || createJob.isPending
-                }
-                onClick={handleOnGenerate}
+                variant="ghost"
+                onClick={() => handleMediaTypeChange("image")}
+                className={cn(
+                  mediaType === "image" && "bg-primary/20",
+                  "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
+                )}
               >
-                Generate
+                <ImageIcon className="w-4 h-4 opacity-50" />
+                <span className="text-[10px]">Image</span>
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => handleMediaTypeChange("video")}
+                className={cn(
+                  mediaType === "video" && "bg-primary/20",
+                  "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
+                )}
+              >
+                <VideoIcon className="w-4 h-4 opacity-50" />
+                <span className="text-[10px]">Video</span>
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => handleMediaTypeChange("voiceover")}
+                className={cn(
+                  mediaType === "voiceover" && "bg-primary/20",
+                  "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
+                )}
+              >
+                <MicIcon className="w-4 h-4 opacity-50" />
+                <span className="text-[10px]">Voiceover</span>
+              </Button>
+              <Button
+                variant="ghost"
+                onClick={() => handleMediaTypeChange("music")}
+                className={cn(
+                  mediaType === "music" && "bg-primary/20",
+                  "h-14 flex flex-col justify-center w-1/4 rounded-md gap-2 items-center",
+                )}
+              >
+                <MusicIcon className="w-4 h-4 opacity-50" />
+                <span className="text-[10px]">Music</span>
               </Button>
             </div>
+            <div className="two-column-container">
+              <div className="model-selectors-column">
+                <div className="flex flex-col gap-2 justify-start font-medium text-base">
+                  <div className="text-muted-foreground font-medium">Using</div>
+                  <ModelEndpointPicker
+                    mediaType={mediaType}
+                    value={endpointId}
+                    onValueChange={(endpointId) => {
+                      resetGenerateData();
+                      setEndpointId(endpointId);
+
+                      const endpoint = AVAILABLE_ENDPOINTS.find(
+                        (endpoint) => endpoint.endpointId === endpointId,
+                      );
+
+                      const initialInput = endpoint?.initialInput || {};
+                      setGenerateData({ ...initialInput });
+                    }}
+                  />
+
+                  <div className="mt-2">
+                    <div className="text-muted-foreground">
+                      LLM Model for Prompt Enhancement
+                    </div>
+                    <LlmModelPicker
+                      selectedModel={llmModel}
+                      onValueChange={handleLlmModelChange}
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      Select the LLM model to use for enhancing prompts. More
+                      powerful models may produce better results but may cost
+                      more credits.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="helper-column">
+                {/* Model Helper Panel */}
+                <div className="h-full flex flex-col">
+                  <ModelHelper modelId={endpointId} />
+                </div>
+              </div>
+            </div>
           </div>
-        )}
+          <div className="flex flex-col gap-2 relative">
+            {endpoint?.inputAsset?.map((asset, index) => (
+              <div key={getAssetType(asset)} className="flex w-full">
+                <div className="flex flex-col w-full" key={getAssetType(asset)}>
+                  <div className="flex justify-between">
+                    <h4 className="capitalize text-muted-foreground mb-1 text-sm">
+                      {getAssetType(asset)} Reference
+                    </h4>
+                    {tab === `asset-${getAssetType(asset)}` && (
+                      <Button
+                        variant="ghost"
+                        onClick={() => setTab("generation")}
+                        size="sm"
+                      >
+                        <ArrowLeft /> Back
+                      </Button>
+                    )}
+                  </div>
+                  {(tab === "generation" ||
+                    tab !== `asset-${getAssetType(asset)}`) && (
+                    <>
+                      {!generateData[getAssetKey(asset)] && (
+                        <div className="flex gap-2 justify-between mb-3">
+                          <Button
+                            variant="ghost"
+                            onClick={() => {
+                              setTab(`asset-${getAssetType(asset)}`);
+                              setAssetMediaType(getAssetType(asset) ?? "all");
+                            }}
+                            className="cursor-pointer min-h-[30px] flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-md px-2"
+                          >
+                            <span className="text-muted-foreground text-xs text-center text-nowrap">
+                              Select
+                            </span>
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            disabled={isUploading}
+                            className="cursor-pointer min-h-[30px] flex-1 flex flex-col items-center justify-center border border-dashed border-border rounded-md px-2"
+                            asChild
+                          >
+                            <label htmlFor="assetUploadButton">
+                              <Input
+                                id="assetUploadButton"
+                                type="file"
+                                className="hidden"
+                                onChange={handleFileUpload}
+                                multiple={false}
+                                disabled={isUploading}
+                                accept="image/*,audio/*,video/*"
+                              />
+                              {isUploading ? (
+                                <LoaderCircleIcon className="w-4 h-4 opacity-50 animate-spin" />
+                              ) : (
+                                <span className="text-muted-foreground text-xs text-center text-nowrap">
+                                  Upload
+                                </span>
+                              )}
+                            </label>
+                          </Button>
+                        </div>
+                      )}
+                      {generateData[getAssetKey(asset)] && (
+                        <div className="cursor-pointer overflow-hidden relative w-full flex flex-col items-center justify-center border border-dashed border-border rounded-md bg-black/10 p-1">
+                          <WithTooltip tooltip="Remove media">
+                            <button
+                              type="button"
+                              className="p-1 rounded hover:bg-black/50 absolute top-1 z-50 bg-black/80 right-1 group-hover:text-white"
+                              onClick={() =>
+                                setGenerateData({
+                                  [getAssetKey(asset)]: undefined,
+                                })
+                              }
+                            >
+                              <TrashIcon className="w-3 h-3 stroke-2" />
+                            </button>
+                          </WithTooltip>
+                          {generateData[getAssetKey(asset)] && (
+                            <SelectedAssetPreview
+                              asset={asset}
+                              data={generateData}
+                            />
+                          )}
+                        </div>
+                      )}
+                    </>
+                  )}
+                  {tab === `asset-${getAssetType(asset)}` && (
+                    <div className="flex items-center gap-2 flex-wrap overflow-y-auto max-h-80 divide-y divide-border">
+                      {mediaItems
+                        .filter((media) => {
+                          if (assetMediaType === "all") return true;
+                          if (
+                            assetMediaType === "audio" &&
+                            (media.mediaType === "voiceover" ||
+                              media.mediaType === "music")
+                          )
+                            return true;
+                          return media.mediaType === assetMediaType;
+                        })
+                        .map((job) => (
+                          <MediaItemRow
+                            draggable={false}
+                            key={job.id}
+                            data={job}
+                            onOpen={handleSelectMedia}
+                            className="cursor-pointer"
+                          />
+                        ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+            <div className="relative bg-border rounded-lg pb-10 placeholder:text-base w-full resize-none">
+              <Textarea
+                className="text-base shadow-none focus:!ring-0 placeholder:text-base w-full h-24 resize-none"
+                placeholder="Imagine..."
+                value={generateData.prompt}
+                rows={3}
+                onChange={(e) => setGenerateData({ prompt: e.target.value })}
+              />
+              <WithTooltip tooltip="Enhance your prompt with AI-powered suggestions.">
+                <div className="absolute bottom-2 right-2">
+                  <Button
+                    variant="secondary"
+                    disabled={enhancePromptMutation.isPending}
+                    className="bg-primary/20 text-white text-xs rounded-full h-6 px-3 hover:bg-primary/40 transition-colors"
+                    onClick={() => enhancePromptMutation.mutate()}
+                  >
+                    {enhancePromptMutation.isPending ? (
+                      <LoadingIcon />
+                    ) : (
+                      <WandSparklesIcon className="opacity-50" />
+                    )}
+                    Enhance Prompt
+                  </Button>
+                </div>
+              </WithTooltip>
+            </div>
+          </div>
+
+          {tab === "generation" && (
+            <div className="flex flex-col gap-2 mb-2">
+              {endpoint?.cameraControl && (
+                <CameraMovement
+                  value={generateData.advanced_camera_control}
+                  onChange={(val) =>
+                    setGenerateData({
+                      advanced_camera_control: val
+                        ? {
+                            movement_value: val.value,
+                            movement_type: val.movement,
+                          }
+                        : undefined,
+                    })
+                  }
+                />
+              )}
+              {mediaType === "music" &&
+                endpointId === "fal-ai/playht/tts/v3" && (
+                  <div className="flex-1 flex flex-row gap-2">
+                    {mediaType === "music" && (
+                      <div className="flex flex-row items-center gap-1">
+                        <Label>Duration</Label>
+                        <Input
+                          className="w-12 text-center tabular-nums [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                          min={5}
+                          max={30}
+                          step={1}
+                          type="number"
+                          value={generateData.duration}
+                          onChange={(e) =>
+                            setGenerateData({
+                              duration: Number.parseInt(e.target.value),
+                            })
+                          }
+                        />
+                        <span>s</span>
+                      </div>
+                    )}
+                    {endpointId === "fal-ai/playht/tts/v3" && (
+                      <VoiceSelector
+                        value={generateData.voice}
+                        onValueChange={(voice) => {
+                          setGenerateData({ voice });
+                        }}
+                      />
+                    )}
+                  </div>
+                )}
+              <div className="flex flex-row gap-2">
+                <Button
+                  className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                  disabled={
+                    enhancePromptMutation.isPending || createJob.isPending
+                  }
+                  onClick={handleOnGenerate}
+                >
+                  Generate
+                </Button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 
@@ -12435,7 +12600,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-      className="transition-all duration-300 hover:bg-primary/10"
+      className="transition-all duration-300 hover:bg-primary/20 glassmorphism"
       title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
       aria-label="Toggle theme"
     >
@@ -15624,31 +15789,249 @@ export function getAssetKey(asset: InputAsset): string {
 }
 
 ================
-File: src/styles/generate-shell.css
+File: src/styles/main-app-theme.css
 ================
-/* Generate Shell Styles */
+/* Main App Theme Integration */
 
-@media (min-width: 1280px) {
-  .nv-generate-shell > div {
-    width: 560px;
-    max-width: 90vw;
+:root {
+  /* Import main app variables - softer light tone matching homepage */
+  --bg-light: #f4f4f6;
+  --text-light: #2d3748;
+  --glass-bg-light: rgba(255, 255, 255, 0.7);
+  --glass-border-light: rgba(255, 255, 255, 0.2);
+
+  /* Dark Mode Colors - matches homepage */
+  --bg-dark: #0a1128;
+  --text-dark: #e0e0e0;
+  --glass-bg-dark: rgba(26, 26, 26, 0.5); /* Slightly more transparent for better readability */
+  --glass-border-dark: rgba(255, 255, 255, 0.1);
+
+  /* Common Variables */
+  --font-family: "Poppins", sans-serif;
+  --transition-speed: 0.3s;
+  --radius-sm: 5px;
+  --radius-md: 10px;
+  --radius-lg: 15px;
+}
+
+/* Override Tailwind variables in light mode */
+:root {
+  --background: 220 20% 97%;
+  --foreground: 220 20% 10%;
+  --card: 0 0% 98%;
+  --card-foreground: 220 20% 10%;
+  --popover: 0 0% 98%;
+  --popover-foreground: 220 20% 10%;
+  --primary: 220 85% 57%;
+  --primary-foreground: 0 0% 98%;
+  --secondary: 220 20% 96.1%;
+  --secondary-foreground: 220 20% 9%;
+  --muted: 220 20% 96.1%;
+  --muted-foreground: 220 20% 45%;
+  --accent: 220 20% 96.1%;
+  --accent-foreground: 220 20% 9%;
+  --border: 220 20% 89.8%;
+
+  /* Background gradient - softer light tone matching homepage */
+  --tw-gradient-from: #f4f4f6;
+  --tw-gradient-to: #e8e8ec;
+}
+
+/* Override Tailwind variables in dark mode */
+.dark {
+  --background: 222 47% 11%;
+  --foreground: 0 0% 88%;
+  --card: 222 47% 11%;
+  --card-foreground: 0 0% 88%;
+  --popover: 222 47% 11%;
+  --popover-foreground: 0 0% 88%;
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+
+  /* Background gradient for dark mode - matches homepage */
+  --tw-gradient-from: #0a1128;
+  --tw-gradient-via: #1b3a6b;
+  --tw-gradient-to: #16213e;
+}
+
+/* Body styles */
+body {
+  font-family: var(--font-family);
+  background: linear-gradient(
+    to bottom right,
+    var(--tw-gradient-from),
+    var(--tw-gradient-via),
+    var(--tw-gradient-to)
+  );
+  min-height: 100vh;
+  transition: background-color var(--transition-speed), color
+    var(--transition-speed);
+}
+
+/* Glassmorphism effects - match main app - ONLY for left panel */
+.glassmorphism {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+}
+
+.dark .glassmorphism {
+  background: linear-gradient(
+    to bottom right,
+    rgba(10, 17, 40, 0.7),
+    rgba(27, 58, 107, 0.7),
+    rgba(22, 33, 62, 0.7)
+  );
+  border-color: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+/* Button hover states */
+button:hover,
+.btn:hover {
+  background: linear-gradient(145deg, #2563eb, #1d4ed8);
+  color: white;
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  height: 0.25rem;
+  width: 0.25rem;
+}
+
+::-webkit-scrollbar-track {
+  background-color: rgba(38, 38, 38, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: rgba(64, 64, 64, 0.5);
+  border-radius: 0.25rem;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(82, 82, 82, 0.8);
+}
+
+/* Input fields */
+input,
+textarea,
+select {
+  background-color: var(--glass-bg-light);
+  border: 1px solid var(--glass-border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-light);
+  transition: all var(--transition-speed) ease;
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--glass-bg-dark);
+  border-color: var(--glass-border-dark);
+  color: var(--text-dark);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: hsl(var(--primary));
+  outline: none;
+}
+
+/* Card styles */
+.card {
+  background: var(--glass-bg-light);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border-light);
+  transition: all var(--transition-speed) ease;
+}
+
+.dark .card {
+  background: linear-gradient(
+    to bottom right,
+    rgba(10, 17, 40, 0.7),
+    rgba(27, 58, 107, 0.7),
+    rgba(22, 33, 62, 0.7)
+  );
+  border-color: var(--glass-border-dark);
+}
+
+================
+File: src/styles/right-panel.css
+================
+/* Right Panel Layout Styles */
+
+/* Set width for all screen sizes */
+.right-panel-container {
+  width: 560px !important;
+  min-width: 560px !important;
+}
+
+/* Apply main app theme to right panel */
+.right-panel-container {
+  background: #f4f4f6 !important; /* Opaque light background */
+  border-color: var(--glass-border-light) !important;
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+}
+
+.dark .right-panel-container {
+  background: #0a1128 !important; /* Opaque dark background matching homepage */
+  border-color: var(--glass-border-dark) !important;
+}
+
+/* Two-column layout container */
+.two-column-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  min-height: 300px;
+}
+
+/* Left column for model selectors */
+.model-selectors-column {
+  flex: 0 0 48%;
+}
+
+/* Right column for helper */
+.helper-column {
+  flex: 0 0 48%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+/* Floating Media Button */
+.floating-media-button {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.dark .floating-media-button {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
   }
-}
-
-.nv-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.5rem;
-}
-
-.nv-section-divider {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
-  margin-top: 1rem;
-  padding-top: 1rem;
-}
-
-.nv-prompt {
-  min-height: 140px;
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 ================
@@ -16352,6 +16735,250 @@ const config: Config = withUt({
   plugins: [require("tailwindcss-animate")],
 });
 export default config;
+
+================
+File: test-fal.js
+================
+/**
+ * test-fal.js - Diagnostic script for testing Fal.ai API connectivity
+ *
+ * This script tests different approaches to making requests to the Fal.ai API
+ * to diagnose production fetch failure issues.
+ *
+ * Usage: node test-fal.js
+ */
+
+// Fal.ai API key - using the known key prefix
+const FAL_KEY =
+  "5eda4036-c86a-4637-873b-5f79ea72d588:b58feab09b3bd2bf165e5ba2ff7be918";
+const TARGET_URL = "https://queue.fal.run/fal-ai/any-llm";
+const TEST_BODY = { prompt: "hello" };
+
+// Import required modules
+const axios = require("axios").default;
+const { setTimeout } = require("timers/promises");
+
+// Utility function to log request and response details
+function logRequestDetails(testName, url, headers, body) {
+  console.log(`\n========== TEST CASE: ${testName} ==========`);
+  console.log(`Request URL: ${url}`);
+  console.log("Headers sent:");
+  console.log(JSON.stringify(headers, null, 2));
+  console.log("Body sent:");
+  console.log(JSON.stringify(body, null, 2));
+}
+
+// Utility function to log response details
+function logResponseDetails(status, body) {
+  console.log(`Response status: ${status}`);
+  console.log("Response body:");
+  console.log(typeof body === "string" ? body : JSON.stringify(body, null, 2));
+  console.log("===========================================\n");
+}
+
+// Utility function to log errors
+function logError(error) {
+  console.error("Error occurred:");
+  console.error(error);
+  if (error.response) {
+    console.error("Response status:", error.response.status);
+    console.error("Response data:", error.response.data);
+  }
+  console.log("===========================================\n");
+}
+
+/**
+ * TEST CASE A1: Exact replication of curl working request
+ * - Method: POST
+ * - Headers explicitly set
+ * - Body JSON stringified
+ */
+async function testA1() {
+  const headers = {
+    Authorization: `Key ${FAL_KEY}`,
+    "Content-Type": "application/json",
+    "x-fal-target-url": TARGET_URL,
+  };
+
+  logRequestDetails(
+    "A1 - Exact curl replication",
+    TARGET_URL,
+    headers,
+    TEST_BODY,
+  );
+
+  try {
+    const response = await fetch(TARGET_URL, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(TEST_BODY),
+    });
+
+    const responseBody = await response.text();
+    logResponseDetails(response.status, responseBody);
+    return { success: response.ok, status: response.status };
+  } catch (error) {
+    logError(error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * TEST CASE A2: Use Node Headers() object
+ * - Tests if Headers object construction affects request handling
+ */
+async function testA2() {
+  const headers = new Headers();
+  headers.append("Authorization", `Key ${FAL_KEY}`);
+  headers.append("Content-Type", "application/json");
+  headers.append("x-fal-target-url", TARGET_URL);
+
+  logRequestDetails(
+    "A2 - Using Headers() object",
+    TARGET_URL,
+    Object.fromEntries(headers.entries()),
+    TEST_BODY,
+  );
+
+  try {
+    const response = await fetch(TARGET_URL, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(TEST_BODY),
+    });
+
+    const responseBody = await response.text();
+    logResponseDetails(response.status, responseBody);
+    return { success: response.ok, status: response.status };
+  } catch (error) {
+    logError(error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * TEST CASE A3: All headers lowercase
+ * - Tests for case-sensitivity issues in header handling
+ */
+async function testA3() {
+  const headers = {
+    authorization: `Key ${FAL_KEY}`,
+    "content-type": "application/json",
+    "x-fal-target-url": TARGET_URL,
+  };
+
+  logRequestDetails("A3 - Lowercase headers", TARGET_URL, headers, TEST_BODY);
+
+  try {
+    const response = await fetch(TARGET_URL, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(TEST_BODY),
+    });
+
+    const responseBody = await response.text();
+    logResponseDetails(response.status, responseBody);
+    return { success: response.ok, status: response.status };
+  } catch (error) {
+    logError(error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * TEST CASE A4: Use axios instead of fetch
+ * - Tests if the issue is specific to fetch implementation
+ */
+async function testA4() {
+  const headers = {
+    Authorization: `Key ${FAL_KEY}`,
+    "Content-Type": "application/json",
+    "x-fal-target-url": TARGET_URL,
+  };
+
+  logRequestDetails("A4 - Using axios", TARGET_URL, headers, TEST_BODY);
+
+  try {
+    const response = await axios.post(TARGET_URL, TEST_BODY, { headers });
+    logResponseDetails(response.status, response.data);
+    return {
+      success: response.status >= 200 && response.status < 300,
+      status: response.status,
+    };
+  } catch (error) {
+    logError(error);
+    return { success: false, error };
+  }
+}
+
+/**
+ * TEST CASE A5: Raw fetch with simplified object construction
+ * - No cloning or mutation of objects
+ */
+async function testA5() {
+  logRequestDetails(
+    "A5 - Simplified fetch",
+    TARGET_URL,
+    {
+      Authorization: `Key ${FAL_KEY}`,
+      "Content-Type": "application/json",
+      "x-fal-target-url": TARGET_URL,
+    },
+    TEST_BODY,
+  );
+
+  try {
+    // Direct fetch with minimal object construction
+    const response = await fetch(TARGET_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Key ${FAL_KEY}`,
+        "Content-Type": "application/json",
+        "x-fal-target-url": TARGET_URL,
+      },
+      body: JSON.stringify(TEST_BODY),
+    });
+
+    const responseBody = await response.text();
+    logResponseDetails(response.status, responseBody);
+    return { success: response.ok, status: response.status };
+  } catch (error) {
+    logError(error);
+    return { success: false, error };
+  }
+}
+
+// Run all tests sequentially with a delay between them
+async function runAllTests() {
+  console.log("Starting Fal.ai API connectivity tests...");
+
+  // Run each test with a delay between them to avoid rate limiting
+  await testA1();
+  await setTimeout(1000);
+
+  await testA2();
+  await setTimeout(1000);
+
+  await testA3();
+  await setTimeout(1000);
+
+  await testA4();
+  await setTimeout(1000);
+
+  await testA5();
+
+  console.log(
+    "\nAll tests completed. Check the logs to see which approach succeeded.",
+  );
+  console.log(
+    "After Fabio confirms which test passes, we will port the exact successful structure back into the SDK proxy.",
+  );
+}
+
+// Run the tests
+runAllTests().catch((error) => {
+  console.error("Error running tests:", error);
+});
 
 ================
 File: tsconfig.json

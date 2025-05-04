@@ -257,4 +257,49 @@ class SessionManager {
 // Create a singleton instance
 const sessionManager = new SessionManager();
 
+/**
+ * Initialize message listeners for API keys
+ * This function sets up event listeners to receive API keys via postMessage
+ */
+function initializeMessageListeners(): void {
+  console.log("SDK: Initializing message listeners for API keys");
+  
+  const messageHandler = (event: MessageEvent) => {
+    // Handle USER_DATA message
+    if (event.data?.type === "USER_DATA") {
+      console.log("SDK: Received USER_DATA message");
+      
+      // Extract the falai key
+      const falaiKey = event.data.apiKeys?.falai;
+      if (falaiKey) {
+        console.log("SDK: Found falai_key in USER_DATA message");
+        sessionManager.saveFalApiKey(falaiKey);
+      }
+    }
+    
+    // Handle FALAI_KEY_RESPONSE message
+    if (event.data?.type === "FALAI_KEY_RESPONSE" && event.data.falai_key) {
+      console.log("SDK: Received FALAI_KEY_RESPONSE message");
+      sessionManager.saveFalApiKey(event.data.falai_key);
+    }
+  };
+  
+  // Add the event listener
+  if (typeof window !== "undefined") {
+    window.addEventListener("message", messageHandler);
+    console.log("SDK: Message listener registered for API keys");
+    
+    // Request the key from parent
+    try {
+      window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, "*");
+      console.log("SDK: Sent REQUEST_FALAI_KEY to parent");
+    } catch (e) {
+      console.error("SDK: Error requesting key from parent:", e);
+    }
+  }
+}
+
+// Initialize message listeners immediately
+initializeMessageListeners();
+
 export default sessionManager;
