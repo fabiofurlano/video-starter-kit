@@ -43,22 +43,27 @@ export async function createProjectSuggestion() {
 
     return extractJson<ProjectSuggestion>(data.output);
   } catch (error: any) {
-    console.warn("🚨 QUOTA-GUARD-TEST: Error caught in project.ts", error?.message);
+    console.warn(
+      "🚨 QUOTA-GUARD-TEST: Error caught in project.ts",
+      error?.message,
+    );
     console.warn("Failed to create project suggestion", error);
-    
+
     // Check if the error is related to quota exceeded
     const errorMessage = error?.message || "";
-    const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
-                          errorMessage.includes("Free tier quota");
-    
+    const isQuotaExceeded =
+      errorMessage.includes("quota exceeded") ||
+      errorMessage.includes("Free tier quota");
+
     if (isQuotaExceeded) {
       toast({
         title: "Project Suggestion Failed",
-        description: "You've reached your free tier limit. Please upgrade to continue.",
+        description:
+          "You've reached your free tier limit. Please upgrade to continue.",
         variant: "destructive",
       });
     }
-    
+
     // Return a default suggestion
     return {
       title: "New Project",

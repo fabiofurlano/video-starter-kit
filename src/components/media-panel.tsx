@@ -81,19 +81,23 @@ export function MediaItemRow({
             description: `Your ${data.mediaType} has been generated successfully.`,
           });
         } catch (error: any) {
-          console.warn("🚨 QUOTA-GUARD-TEST: Error caught in media-panel.tsx", error?.message);
+          console.warn(
+            "🚨 QUOTA-GUARD-TEST: Error caught in media-panel.tsx",
+            error?.message,
+          );
           console.warn("Failed to generate media", error);
-          
+
           await db.media.update(data.id, {
             ...data,
             status: "failed",
           });
-          
+
           // Check if the error is related to quota exceeded
           const errorMessage = error?.message || "";
-          const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
-                                errorMessage.includes("Free tier quota");
-          
+          const isQuotaExceeded =
+            errorMessage.includes("quota exceeded") ||
+            errorMessage.includes("Free tier quota");
+
           toast({
             title: "Generation failed",
             description: isQuotaExceeded

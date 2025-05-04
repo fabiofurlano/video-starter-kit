@@ -64,14 +64,18 @@ export const useJobCreator = ({
       });
     },
     onError: (error: any) => {
-      console.warn("🚨 QUOTA-GUARD-TEST: Error caught in mutations.ts", error?.message);
+      console.warn(
+        "🚨 QUOTA-GUARD-TEST: Error caught in mutations.ts",
+        error?.message,
+      );
       console.warn("Failed to submit job", error);
-      
+
       // Check if the error is related to quota exceeded
       const errorMessage = error?.message || "";
-      const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
-                            errorMessage.includes("Free tier quota");
-      
+      const isQuotaExceeded =
+        errorMessage.includes("quota exceeded") ||
+        errorMessage.includes("Free tier quota");
+
       toast({
         title: `${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} Generation Failed`,
         description: isQuotaExceeded

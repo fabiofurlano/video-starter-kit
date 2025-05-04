@@ -97,14 +97,18 @@ function AudioWaveform({ data }: AudioWaveformProps) {
         });
         return waveformInfo.waveform as number[];
       } catch (error: any) {
-        console.warn("🚨 QUOTA-GUARD-TEST: Error caught in video/track.tsx", error?.message);
+        console.warn(
+          "🚨 QUOTA-GUARD-TEST: Error caught in video/track.tsx",
+          error?.message,
+        );
         console.warn("Failed to generate audio waveform", error);
-        
+
         // Check if the error is related to quota exceeded
         const errorMessage = error?.message || "";
-        const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
-                              errorMessage.includes("Free tier quota");
-        
+        const isQuotaExceeded =
+          errorMessage.includes("quota exceeded") ||
+          errorMessage.includes("Free tier quota");
+
         toast({
           title: "Waveform Generation Failed",
           description: isQuotaExceeded
@@ -112,7 +116,7 @@ function AudioWaveform({ data }: AudioWaveformProps) {
             : "Failed to generate audio waveform. Try again.",
           variant: isQuotaExceeded ? "destructive" : "default",
         });
-        
+
         return [];
       }
     },

@@ -219,13 +219,17 @@ export default function RightPanel({
       setGenerateData({ prompt: enhancedPrompt });
     },
     onError: (error: any) => {
-      console.warn("🚨 QUOTA-GUARD-TEST: Error caught in right-panel.tsx", error.message);
+      console.warn(
+        "🚨 QUOTA-GUARD-TEST: Error caught in right-panel.tsx",
+        error.message,
+      );
       console.warn("Failed to create suggestion", error);
 
       // Check if the error is related to quota exceeded or missing Fal.ai API key
       const errorMessage = error?.message || "";
-      const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
-                            errorMessage.includes("Free tier quota");
+      const isQuotaExceeded =
+        errorMessage.includes("quota exceeded") ||
+        errorMessage.includes("Free tier quota");
       const isMissingApiKey =
         errorMessage.includes("API key") ||
         errorMessage.includes("401") ||
@@ -240,7 +244,7 @@ export default function RightPanel({
           : isMissingApiKey
             ? "Missing Fal.ai API key. Please ensure your API key is properly set in the parent application."
             : "There was an unexpected error. Try again.",
-        variant: (isQuotaExceeded || isMissingApiKey) ? "destructive" : "default",
+        variant: isQuotaExceeded || isMissingApiKey ? "destructive" : "default",
       });
     },
   });
@@ -377,12 +381,13 @@ export default function RightPanel({
       });
     } catch (error: any) {
       console.warn("Media generation error:", error);
-      
+
       // Check if the error is related to quota exceeded
       const errorMessage = error?.message || "";
-      const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
-                            errorMessage.includes("Free tier quota");
-      
+      const isQuotaExceeded =
+        errorMessage.includes("quota exceeded") ||
+        errorMessage.includes("Free tier quota");
+
       toast({
         title: "Generation Failed",
         description: isQuotaExceeded

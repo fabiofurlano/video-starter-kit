@@ -67,14 +67,18 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
         });
         return data as ShareResult;
       } catch (error: any) {
-        console.warn("🚨 QUOTA-GUARD-TEST: Error caught in export-dialog.tsx", error.message);
+        console.warn(
+          "🚨 QUOTA-GUARD-TEST: Error caught in export-dialog.tsx",
+          error.message,
+        );
         console.warn("Failed to export video", error);
-        
+
         // Check if the error is related to quota exceeded
         const errorMessage = error?.message || "";
-        const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
-                              errorMessage.includes("Free tier quota");
-                              
+        const isQuotaExceeded =
+          errorMessage.includes("quota exceeded") ||
+          errorMessage.includes("Free tier quota");
+
         toast({
           title: "Export Failed",
           description: isQuotaExceeded
@@ -82,7 +86,7 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
             : "There was an unexpected error. Try again.",
           variant: isQuotaExceeded ? "destructive" : "default",
         });
-        
+
         throw error;
       }
     },

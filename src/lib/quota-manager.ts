@@ -9,7 +9,13 @@
  */
 export function isPremiumUser(): boolean {
   const isPremium = localStorage?.getItem("premium_user") === "true";
-  console.log("🚨 QUOTA-GUARD-TEST: isPremiumUser() =", isPremium, "(localStorage value: '", localStorage?.getItem("premium_user"), "')");
+  console.log(
+    "🚨 QUOTA-GUARD-TEST: isPremiumUser() =",
+    isPremium,
+    "(localStorage value: '",
+    localStorage?.getItem("premium_user"),
+    "')",
+  );
   return isPremium;
 }
 
@@ -19,7 +25,13 @@ export function isPremiumUser(): boolean {
  */
 export function getFreeApiCalls(): number {
   const count = parseInt(localStorage?.getItem("free_api_calls") || "0");
-  console.log("🚨 QUOTA-GUARD-TEST: getFreeApiCalls() =", count, "(localStorage value: '", localStorage?.getItem("free_api_calls"), "')");
+  console.log(
+    "🚨 QUOTA-GUARD-TEST: getFreeApiCalls() =",
+    count,
+    "(localStorage value: '",
+    localStorage?.getItem("free_api_calls"),
+    "')",
+  );
   return count;
 }
 
@@ -29,7 +41,9 @@ export function getFreeApiCalls(): number {
 export function incrementFreeApiCalls(): void {
   const count = getFreeApiCalls();
   localStorage?.setItem("free_api_calls", String(count + 1));
-  console.log(`🚨 QUOTA-GUARD-TEST: Incremented free API calls from ${count} to ${count + 1}`);
+  console.log(
+    `🚨 QUOTA-GUARD-TEST: Incremented free API calls from ${count} to ${count + 1}`,
+  );
 }
 
 /**
@@ -37,6 +51,18 @@ export function incrementFreeApiCalls(): void {
  * @returns true if the user has reached or exceeded the free tier limit
  */
 export function quotaExceeded(): boolean {
+  // Get the current day (YYYY-MM-DD format)
+  const today = new Date().toISOString().split('T')[0];
+  const lastResetDay = localStorage?.getItem("quota_reset_day") || '';
+  
+  // Reset counter if it's a new day
+  if (today !== lastResetDay) {
+    console.log(`🚨 QUOTA-GUARD-TEST: Resetting quota for new day (${lastResetDay} → ${today})`);
+    localStorage?.setItem("free_api_calls", "0");
+    localStorage?.setItem("quota_reset_day", today);
+  }
+  
+  // Check if user has exceeded daily limit (10 calls)
   const isExceeded = getFreeApiCalls() >= 10;
   console.log("🚨 QUOTA-GUARD-TEST: quotaExceeded() =", isExceeded);
   return isExceeded;
@@ -48,6 +74,12 @@ export function quotaExceeded(): boolean {
  */
 export function resetQuota(): void {
   localStorage?.setItem("free_api_calls", "0");
+  
+  // Set the reset day to today
+  const today = new Date().toISOString().split('T')[0];
+  localStorage?.setItem("quota_reset_day", today);
+  
+  console.log("🚨 QUOTA-GUARD-TEST: Quota manually reset to 0");
 }
 
 /**
@@ -58,25 +90,31 @@ export function resetQuota(): void {
  */
 export function shouldCountRequest(url: string, method: string): boolean {
   // Don't count status checks
-  if (url.includes('/status') || url.includes('status=')) {
-    console.log(`🚨 QUOTA-GUARD-TEST: Not counting status check request: ${url}`);
+  if (url.includes("/status") || url.includes("status=")) {
+    console.log(
+      `🚨 QUOTA-GUARD-TEST: Not counting status check request: ${url}`,
+    );
     return false;
   }
-  
+
   // Don't count result retrievals
-  if (url.includes('/result') || url.includes('result=')) {
-    console.log(`🚨 QUOTA-GUARD-TEST: Not counting result retrieval request: ${url}`);
+  if (url.includes("/result") || url.includes("result=")) {
+    console.log(
+      `🚨 QUOTA-GUARD-TEST: Not counting result retrieval request: ${url}`,
+    );
     return false;
   }
-  
+
   // Don't count polling requests
-  if (url.includes('polling=true') || url.includes('mode=polling')) {
+  if (url.includes("polling=true") || url.includes("mode=polling")) {
     console.log(`🚨 QUOTA-GUARD-TEST: Not counting polling request: ${url}`);
     return false;
   }
-  
+
   // Count initial feature requests (POST requests to endpoints)
-  const shouldCount = method.toUpperCase() === 'POST';
-  console.log(`🚨 QUOTA-GUARD-TEST: shouldCountRequest(${url}, ${method}) = ${shouldCount}`);
+  const shouldCount = method.toUpperCase() === "POST";
+  console.log(
+    `🚨 QUOTA-GUARD-TEST: shouldCountRequest(${url}, ${method}) = ${shouldCount}`,
+  );
   return shouldCount;
 }
