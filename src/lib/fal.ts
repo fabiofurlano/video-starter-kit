@@ -32,12 +32,16 @@ async function waitForFalaiKey(maxWaitMs = 10000, checkIntervalMs = 100) {
         console.error(
           "FALAI KEY MISSING: Unable to use Fal.ai features. Please ensure your API key is set in the parent application.",
         );
-        
+
         // Display a more visible error in the console for easier debugging
         console.error("=== FAL.AI API KEY ERROR ===");
         console.error("The Fal.ai API key is missing or invalid.");
-        console.error("This will prevent all Fal.ai features from working correctly.");
-        console.error("Please ensure the parent application is providing the API key via postMessage.");
+        console.error(
+          "This will prevent all Fal.ai features from working correctly.",
+        );
+        console.error(
+          "Please ensure the parent application is providing the API key via postMessage.",
+        );
         console.error("==========================");
       }
 
@@ -293,10 +297,12 @@ export const fal = createFalClient({
           "x-fal-key-missing": "true",
           "x-fal-target-url": targetUrl,
         };
-        
+
         // Throw a specific error that will be caught by the application
         // This will help provide a better user experience with clear error messages
-        throw new Error("Fal.ai API key is missing. Please ensure your API key is properly set in the parent application.");
+        throw new Error(
+          "Fal.ai API key is missing. Please ensure your API key is properly set in the parent application.",
+        );
       }
     }
 
