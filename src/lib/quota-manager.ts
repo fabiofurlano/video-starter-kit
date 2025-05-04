@@ -52,16 +52,18 @@ export function incrementFreeApiCalls(): void {
  */
 export function quotaExceeded(): boolean {
   // Get the current day (YYYY-MM-DD format)
-  const today = new Date().toISOString().split('T')[0];
-  const lastResetDay = localStorage?.getItem("quota_reset_day") || '';
-  
+  const today = new Date().toISOString().split("T")[0];
+  const lastResetDay = localStorage?.getItem("quota_reset_day") || "";
+
   // Reset counter if it's a new day
   if (today !== lastResetDay) {
-    console.log(`🚨 QUOTA-GUARD-TEST: Resetting quota for new day (${lastResetDay} → ${today})`);
+    console.log(
+      `🚨 QUOTA-GUARD-TEST: Resetting quota for new day (${lastResetDay} → ${today})`,
+    );
     localStorage?.setItem("free_api_calls", "0");
     localStorage?.setItem("quota_reset_day", today);
   }
-  
+
   // Check if user has exceeded daily limit (10 calls)
   const isExceeded = getFreeApiCalls() >= 10;
   console.log("🚨 QUOTA-GUARD-TEST: quotaExceeded() =", isExceeded);
@@ -74,11 +76,11 @@ export function quotaExceeded(): boolean {
  */
 export function resetQuota(): void {
   localStorage?.setItem("free_api_calls", "0");
-  
+
   // Set the reset day to today
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split("T")[0];
   localStorage?.setItem("quota_reset_day", today);
-  
+
   console.log("🚨 QUOTA-GUARD-TEST: Quota manually reset to 0");
 }
 
