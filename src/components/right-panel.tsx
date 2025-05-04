@@ -218,11 +218,24 @@ export default function RightPanel({
     onSuccess: (enhancedPrompt) => {
       setGenerateData({ prompt: enhancedPrompt });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.warn("Failed to create suggestion", error);
+      
+      // Check if the error is related to missing Fal.ai API key
+      const errorMessage = error?.message || '';
+      const isMissingApiKey = 
+        errorMessage.includes('API key') || 
+        errorMessage.includes('401') || 
+        errorMessage.toLowerCase().includes('unauthorized') ||
+        localStorage.getItem('falai_key') === null ||
+        localStorage.getItem('falai_key') === '';
+      
       toast({
         title: "Failed to enhance prompt",
-        description: "There was an unexpected error. Try again.",
+        description: isMissingApiKey
+          ? "Missing Fal.ai API key. Please ensure your API key is properly set in the parent application."
+          : "There was an unexpected error. Try again.",
+        variant: isMissingApiKey ? "destructive" : "default",
       });
     },
   });
