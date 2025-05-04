@@ -263,12 +263,12 @@ const sessionManager = new SessionManager();
  */
 function initializeMessageListeners(): void {
   console.log("SDK: Initializing message listeners for API keys");
-  
+
   const messageHandler = (event: MessageEvent) => {
     // Handle USER_DATA message
     if (event.data?.type === "USER_DATA") {
       console.log("SDK: Received USER_DATA message");
-      
+
       // Extract the falai key
       const falaiKey = event.data.apiKeys?.falai;
       if (falaiKey) {
@@ -276,19 +276,19 @@ function initializeMessageListeners(): void {
         sessionManager.saveFalApiKey(falaiKey);
       }
     }
-    
+
     // Handle FALAI_KEY_RESPONSE message
     if (event.data?.type === "FALAI_KEY_RESPONSE" && event.data.falai_key) {
       console.log("SDK: Received FALAI_KEY_RESPONSE message");
       sessionManager.saveFalApiKey(event.data.falai_key);
     }
   };
-  
+
   // Add the event listener
   if (typeof window !== "undefined") {
     window.addEventListener("message", messageHandler);
     console.log("SDK: Message listener registered for API keys");
-    
+
     // Request the key from parent
     try {
       window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, "*");

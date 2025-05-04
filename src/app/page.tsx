@@ -360,10 +360,10 @@ export default function IndexPage() {
             // Save directly to localStorage first for immediate availability
             localStorage.setItem("falai_key", falaiKey);
             console.log("SDK: Directly saved falai_key to localStorage");
-            
+
             // Then use session manager to ensure proper handling
             sessionManager.saveFalApiKey(falaiKey);
-            
+
             // Log success for verification
             const savedKey = localStorage.getItem("falai_key");
             if (savedKey) {
@@ -376,18 +376,26 @@ export default function IndexPage() {
             console.warn(
               "SDK: Received FALAI_KEY_RESPONSE but no key was provided",
             );
-            
+
             // Request the key again with urgent flag
             try {
-              window.parent.postMessage({ 
-                type: "REQUEST_FALAI_KEY", 
-                urgent: true,
-                source: "page_handler",
-                timestamp: new Date().toISOString()
-              }, "*");
-              console.log("SDK page handler: Sent urgent REQUEST_FALAI_KEY to parent");
+              window.parent.postMessage(
+                {
+                  type: "REQUEST_FALAI_KEY",
+                  urgent: true,
+                  source: "page_handler",
+                  timestamp: new Date().toISOString(),
+                },
+                "*",
+              );
+              console.log(
+                "SDK page handler: Sent urgent REQUEST_FALAI_KEY to parent",
+              );
             } catch (e) {
-              console.error("SDK page handler: Error requesting key from parent:", e);
+              console.error(
+                "SDK page handler: Error requesting key from parent:",
+                e,
+              );
             }
           }
           return; // Stop processing after handling key response
@@ -436,14 +444,16 @@ export default function IndexPage() {
               !!openaiKey,
               !!falaiKey,
             );
-            
+
             // Save Fal.ai API key directly to localStorage for immediate availability
             if (falaiKey) {
               console.log(
                 "SDK: Found falai_key in USER_DATA message, saving directly to localStorage",
               );
               localStorage.setItem("falai_key", falaiKey);
-              console.log("SDK: Directly saved falai_key to localStorage from USER_DATA");
+              console.log(
+                "SDK: Directly saved falai_key to localStorage from USER_DATA",
+              );
             }
             console.log("- Language:", userData.language);
             console.log("- Genre:", userData.genre);
