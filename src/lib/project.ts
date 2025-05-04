@@ -1,6 +1,7 @@
 import { VideoProject } from "@/data/schema";
 import { fal } from "./fal";
 import { extractJson } from "./utils";
+import { toast } from "@/hooks/use-toast";
 
 const SYSTEM_PROMPT = `
 You're a video editor assistant. You will receive a request to create a new short video project.
@@ -31,13 +32,37 @@ type ProjectSuggestion = {
 };
 
 export async function createProjectSuggestion() {
-  const { data } = await fal.subscribe("fal-ai/any-llm", {
-    input: {
-      system_prompt: SYSTEM_PROMPT,
-      prompt: "Create a short video project with a title and description.",
-      model: "meta-llama/llama-3.2-1b-instruct",
-    },
-  });
+  try {
+    const { data } = await fal.subscribe("fal-ai/any-llm", {
+      input: {
+        system_prompt: SYSTEM_PROMPT,
+        prompt: "Create a short video project with a title and description.",
+        model: "meta-llama/llama-3.2-1b-instruct",
+      },
+    });
 
-  return extractJson<ProjectSuggestion>(data.output);
+    return extractJson<ProjectSuggestion>(data.output);
+  } catch (error: any) {
+    console.warn("🚨 QUOTA-GUARD-TEST: Error caught in project.ts", error?.message);
+    console.warn("Failed to create project suggestion", error);
+    
+    // Check if the error is related to quota exceeded
+    const errorMessage = error?.message || "";
+    const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
+                          errorMessage.includes("Free tier quota");
+    
+    if (isQuotaExceeded) {
+      toast({
+        title: "Project Suggestion Failed",
+        description: "You've reached your free tier limit. Please upgrade to continue.",
+        variant: "destructive",
+      });
+    }
+    
+    // Return a default suggestion
+    return {
+      title: "New Project",
+      description: "A new video project.",
+    };
+  }
 }

@@ -219,10 +219,13 @@ export default function RightPanel({
       setGenerateData({ prompt: enhancedPrompt });
     },
     onError: (error: any) => {
+      console.warn("🚨 QUOTA-GUARD-TEST: Error caught in right-panel.tsx", error.message);
       console.warn("Failed to create suggestion", error);
 
-      // Check if the error is related to missing Fal.ai API key
+      // Check if the error is related to quota exceeded or missing Fal.ai API key
       const errorMessage = error?.message || "";
+      const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
+                            errorMessage.includes("Free tier quota");
       const isMissingApiKey =
         errorMessage.includes("API key") ||
         errorMessage.includes("401") ||
@@ -232,10 +235,12 @@ export default function RightPanel({
 
       toast({
         title: "Failed to enhance prompt",
-        description: isMissingApiKey
-          ? "Missing Fal.ai API key. Please ensure your API key is properly set in the parent application."
-          : "There was an unexpected error. Try again.",
-        variant: isMissingApiKey ? "destructive" : "default",
+        description: isQuotaExceeded
+          ? "You've reached your free tier limit. Please upgrade to continue."
+          : isMissingApiKey
+            ? "Missing Fal.ai API key. Please ensure your API key is properly set in the parent application."
+            : "There was an unexpected error. Try again.",
+        variant: (isQuotaExceeded || isMissingApiKey) ? "destructive" : "default",
       });
     },
   });
@@ -362,13 +367,30 @@ export default function RightPanel({
   });
 
   const handleOnGenerate = async () => {
-    await createJob.mutateAsync({} as any, {
-      onSuccess: async () => {
-        if (!createJob.isError) {
-          handleOnOpenChange(false);
-        }
-      },
-    });
+    try {
+      await createJob.mutateAsync({} as any, {
+        onSuccess: async () => {
+          if (!createJob.isError) {
+            handleOnOpenChange(false);
+          }
+        },
+      });
+    } catch (error: any) {
+      console.warn("Media generation error:", error);
+      
+      // Check if the error is related to quota exceeded
+      const errorMessage = error?.message || "";
+      const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
+                            errorMessage.includes("Free tier quota");
+      
+      toast({
+        title: "Generation Failed",
+        description: isQuotaExceeded
+          ? "You've reached your free tier limit. Please upgrade to continue."
+          : "There was an unexpected error. Try again.",
+        variant: isQuotaExceeded ? "destructive" : "default",
+      });
+    }
   };
 
   useEffect(() => {

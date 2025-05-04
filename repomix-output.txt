@@ -55,8 +55,6 @@ docs/
   video_images_music_models..md
 public/
   key-checker.js
-  key-copy.js
-  key-injector.html
   model-guide.md
   model-hints.json
 src/
@@ -159,6 +157,7 @@ src/
     ffmpeg.ts
     project.ts
     prompt.ts
+    quota-manager.ts
     share.ts
     uploadthing.ts
     utils.ts
@@ -835,113 +834,6 @@ File: public/key-checker.js
     );
   }
 })();
-
-================
-File: public/key-copy.js
-================
-// Script to receive the falai_key from parent via postMessage
-console.log("🔑🔑🔑 KEY-COPY.JS LOADED 🔑🔑🔑");
-
-// DIRECT ACCESS ATTEMPT - Try to directly access parent localStorage
-try {
-  console.log("🔑 DIRECT ACCESS: Attempting to access parent localStorage");
-  const parentKey = window.parent.localStorage.getItem("falai_key");
-  console.log("🔑 DIRECT ACCESS: Parent key found?", parentKey ? "YES" : "NO");
-
-  if (parentKey) {
-    localStorage.setItem("falai_key", parentKey);
-    console.log(
-      "🔑 DIRECT ACCESS: Successfully copied key to localStorage:",
-      parentKey.substring(0, 5) + "...",
-    );
-  }
-} catch (e) {
-  console.error("🔑 DIRECT ACCESS: Error accessing parent localStorage:", e);
-}
-
-// POSTMESSAGE APPROACH - Listen for messages from the parent page
-console.log("🔑 POSTMESSAGE: Setting up event listener for API key");
-window.addEventListener("message", function (event) {
-  // Log all messages for debugging
-  console.log("🔑 POSTMESSAGE: Received message:", event.data?.type);
-
-  // Check if this is a USER_DATA message
-  if (event.data && event.data.type === "USER_DATA") {
-    console.log("🔑 POSTMESSAGE: Received USER_DATA message");
-
-    // Extract the falai_key from the message
-    const falaiKey = event.data.apiKeys?.falai;
-
-    if (falaiKey) {
-      // Store the key in localStorage
-      localStorage.setItem("falai_key", falaiKey);
-      console.log(
-        "🔑 POSTMESSAGE: Successfully stored falai_key:",
-        falaiKey.substring(0, 5) + "...",
-      );
-    } else {
-      console.warn("🔑 POSTMESSAGE: No falai_key found in USER_DATA message");
-    }
-  }
-});
-
-// Send a ready message to the parent
-try {
-  console.log("🔑 POSTMESSAGE: Sending IFRAME_READY message to parent");
-  window.parent.postMessage({ type: "IFRAME_READY" }, "*");
-  console.log("🔑 POSTMESSAGE: Sent IFRAME_READY message to parent");
-} catch (e) {
-  console.error("🔑 POSTMESSAGE: Error sending ready message:", e);
-}
-
-// MANUAL INJECTION - Directly set the key in localStorage
-// This is a last resort if all else fails
-console.log("🔑 MANUAL INJECTION: Setting hardcoded key in localStorage");
-const hardcodedKey =
-  "5eda4036-c86a-4637-873b-5f79ea72d588:b58feab09b3bd2bf165e5ba2ff7be918";
-localStorage.setItem("falai_key", hardcodedKey);
-console.log(
-  "🔑 MANUAL INJECTION: Successfully set hardcoded key in localStorage",
-);
-
-// Check if the key is now in localStorage
-const finalKey = localStorage.getItem("falai_key");
-console.log(
-  "🔑 FINAL CHECK: falai_key in localStorage:",
-  finalKey ? "YES (" + finalKey.substring(0, 5) + "...)" : "NO",
-);
-
-================
-File: public/key-injector.html
-================
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Key Injector</title>
-    <script>
-        // This script runs when the page loads
-        window.onload = function() {
-            console.log('🔑 KEY INJECTOR HTML: Page loaded');
-            
-            // Set the key in localStorage
-            const key = '5eda4036-c86a-4637-873b-5f79ea72d588:b58feab09b3bd2bf165e5ba2ff7be918';
-            localStorage.setItem('falai_key', key);
-            console.log('🔑 KEY INJECTOR HTML: Set falai_key in localStorage:', key.substring(0, 5) + '...');
-            
-            // Check if the key is now in localStorage
-            const storedKey = localStorage.getItem('falai_key');
-            console.log('🔑 KEY INJECTOR HTML: falai_key in localStorage:', storedKey ? 'YES' : 'NO');
-            
-            // Redirect to the main page
-            window.location.href = '/';
-        };
-    </script>
-</head>
-<body>
-    <h1>Key Injector</h1>
-    <p>Setting the falai_key in localStorage and redirecting...</p>
-</body>
-</html>
 
 ================
 File: public/model-guide.md
@@ -4053,11 +3945,46 @@ export default function IndexPage() {
             console.log(
               "SDK: Received falai_key from parent, saving to localStorage",
             );
+            // Save directly to localStorage first for immediate availability
+            localStorage.setItem("falai_key", falaiKey);
+            console.log("SDK: Directly saved falai_key to localStorage");
+
+            // Then use session manager to ensure proper handling
             sessionManager.saveFalApiKey(falaiKey);
+
+            // Log success for verification
+            const savedKey = localStorage.getItem("falai_key");
+            if (savedKey) {
+              console.log(
+                "SDK: Verified falai_key was saved correctly:",
+                savedKey.substring(0, 5) + "...",
+              );
+            }
           } else {
             console.warn(
               "SDK: Received FALAI_KEY_RESPONSE but no key was provided",
             );
+
+            // Request the key again with urgent flag
+            try {
+              window.parent.postMessage(
+                {
+                  type: "REQUEST_FALAI_KEY",
+                  urgent: true,
+                  source: "page_handler",
+                  timestamp: new Date().toISOString(),
+                },
+                "*",
+              );
+              console.log(
+                "SDK page handler: Sent urgent REQUEST_FALAI_KEY to parent",
+              );
+            } catch (e) {
+              console.error(
+                "SDK page handler: Error requesting key from parent:",
+                e,
+              );
+            }
           }
           return; // Stop processing after handling key response
         }
@@ -4105,6 +4032,17 @@ export default function IndexPage() {
               !!openaiKey,
               !!falaiKey,
             );
+
+            // Save Fal.ai API key directly to localStorage for immediate availability
+            if (falaiKey) {
+              console.log(
+                "SDK: Found falai_key in USER_DATA message, saving directly to localStorage",
+              );
+              localStorage.setItem("falai_key", falaiKey);
+              console.log(
+                "SDK: Directly saved falai_key to localStorage from USER_DATA",
+              );
+            }
             console.log("- Language:", userData.language);
             console.log("- Genre:", userData.genre);
             console.log("- Title:", userData.title);
@@ -4949,6 +4887,51 @@ class SessionManager {
 
 // Create a singleton instance
 const sessionManager = new SessionManager();
+
+/**
+ * Initialize message listeners for API keys
+ * This function sets up event listeners to receive API keys via postMessage
+ */
+function initializeMessageListeners(): void {
+  console.log("SDK: Initializing message listeners for API keys");
+
+  const messageHandler = (event: MessageEvent) => {
+    // Handle USER_DATA message
+    if (event.data?.type === "USER_DATA") {
+      console.log("SDK: Received USER_DATA message");
+
+      // Extract the falai key
+      const falaiKey = event.data.apiKeys?.falai;
+      if (falaiKey) {
+        console.log("SDK: Found falai_key in USER_DATA message");
+        sessionManager.saveFalApiKey(falaiKey);
+      }
+    }
+
+    // Handle FALAI_KEY_RESPONSE message
+    if (event.data?.type === "FALAI_KEY_RESPONSE" && event.data.falai_key) {
+      console.log("SDK: Received FALAI_KEY_RESPONSE message");
+      sessionManager.saveFalApiKey(event.data.falai_key);
+    }
+  };
+
+  // Add the event listener
+  if (typeof window !== "undefined") {
+    window.addEventListener("message", messageHandler);
+    console.log("SDK: Message listener registered for API keys");
+
+    // Request the key from parent
+    try {
+      window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, "*");
+      console.log("SDK: Sent REQUEST_FALAI_KEY to parent");
+    } catch (e) {
+      console.error("SDK: Error requesting key from parent:", e);
+    }
+  }
+}
+
+// Initialize message listeners immediately
+initializeMessageListeners();
 
 export default sessionManager;
 
@@ -10858,11 +10841,24 @@ export default function RightPanel({
     onSuccess: (enhancedPrompt) => {
       setGenerateData({ prompt: enhancedPrompt });
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.warn("Failed to create suggestion", error);
+
+      // Check if the error is related to missing Fal.ai API key
+      const errorMessage = error?.message || "";
+      const isMissingApiKey =
+        errorMessage.includes("API key") ||
+        errorMessage.includes("401") ||
+        errorMessage.toLowerCase().includes("unauthorized") ||
+        localStorage.getItem("falai_key") === null ||
+        localStorage.getItem("falai_key") === "";
+
       toast({
         title: "Failed to enhance prompt",
-        description: "There was an unexpected error. Try again.",
+        description: isMissingApiKey
+          ? "Missing Fal.ai API key. Please ensure your API key is properly set in the parent application."
+          : "There was an unexpected error. Try again.",
+        variant: isMissingApiKey ? "destructive" : "default",
       });
     },
   });
@@ -15037,12 +15033,13 @@ File: src/lib/fal.ts
 "use client";
 
 import { createFalClient } from "@fal-ai/client";
+import { isPremiumUser, quotaExceeded, incrementFreeApiCalls } from "./quota-manager";
 
 // Add logging for debugging
 console.log("🔍 Initializing Fal.ai client...");
 
 // Function to wait for the falai_key to be set in localStorage
-async function waitForFalaiKey(maxWaitMs = 5000, checkIntervalMs = 100) {
+async function waitForFalaiKey(maxWaitMs = 10000, checkIntervalMs = 100) {
   console.log("🔍 Waiting for falai_key to be set in localStorage...");
 
   return new Promise<string>((resolve) => {
@@ -15058,8 +15055,44 @@ async function waitForFalaiKey(maxWaitMs = 5000, checkIntervalMs = 100) {
 
     // Set up a timeout to resolve with empty string after maxWaitMs
     const timeoutId = setTimeout(() => {
-      console.warn("❌ Timed out waiting for falai_key");
+      console.warn(
+        "❌ Timed out waiting for falai_key after " + maxWaitMs + "ms",
+      );
       clearInterval(intervalId);
+
+      // Show UI notification about missing key
+      if (typeof window !== "undefined" && window.document) {
+        console.error(
+          "FALAI KEY MISSING: Unable to use Fal.ai features. Please ensure your API key is set in the parent application.",
+        );
+
+        // Display a more visible error in the console for easier debugging
+        console.error("=== FAL.AI API KEY ERROR ===");
+        console.error("The Fal.ai API key is missing or invalid.");
+        console.error(
+          "This will prevent all Fal.ai features from working correctly.",
+        );
+        console.error(
+          "Please ensure the parent application is providing the API key via postMessage.",
+        );
+        console.error("==========================");
+      }
+
+      // Try one more request before giving up
+      try {
+        window.parent.postMessage(
+          {
+            type: "REQUEST_FALAI_KEY",
+            retry: true,
+            timestamp: new Date().toISOString(),
+          },
+          "*",
+        );
+        console.log("🔍 Sent final REQUEST_FALAI_KEY to parent before timeout");
+      } catch (e) {
+        console.error("🔍 Error sending final key request to parent:", e);
+      }
+
       resolve("");
     }, maxWaitMs);
 
@@ -15102,6 +15135,32 @@ async function waitForFalaiKey(maxWaitMs = 5000, checkIntervalMs = 100) {
     try {
       window.parent.postMessage({ type: "REQUEST_FALAI_KEY" }, "*");
       console.log("🔍 Sent REQUEST_FALAI_KEY to parent");
+
+      // Schedule additional requests at intervals if no response
+      const requestInterval = setInterval(() => {
+        if (localStorage?.getItem("falai_key")) {
+          clearInterval(requestInterval);
+          return;
+        }
+
+        try {
+          window.parent.postMessage(
+            {
+              type: "REQUEST_FALAI_KEY",
+              retry: true,
+              timestamp: new Date().toISOString(),
+            },
+            "*",
+          );
+          console.log("🔍 Sent follow-up REQUEST_FALAI_KEY to parent");
+        } catch (e) {
+          console.error("🔍 Error sending follow-up key request to parent:", e);
+          clearInterval(requestInterval);
+        }
+      }, 2000); // Try every 2 seconds
+
+      // Clear the interval after maxWaitMs
+      setTimeout(() => clearInterval(requestInterval), maxWaitMs);
     } catch (e) {
       console.error("🔍 Error requesting key from parent:", e);
     }
@@ -15160,6 +15219,16 @@ export const fal = createFalClient({
   // This middleware is called before each request to allow customizing the request
   requestMiddleware: async (request) => {
     console.log("🔍 FAL CLIENT: Request middleware executed");
+    
+    // Free tier quota enforcement
+    if (!isPremiumUser()) {
+      if (quotaExceeded()) {
+        console.error("❌ FAL CLIENT: Free tier quota exceeded");
+        throw new Error("Free tier quota exceeded. Please upgrade to continue.");
+      }
+      incrementFreeApiCalls();
+      console.log("🔍 FAL CLIENT: Free tier API call counted");
+    }
 
     // Log request details for debugging
     const targetUrl = request.url;
@@ -15175,14 +15244,14 @@ export const fal = createFalClient({
         : "NOT FOUND",
     );
 
-    // If no key found, wait for it to be set
+    // If no key found, wait for it to be set with increased timeout
     if (!apiKey) {
       console.log(
         "🔍 FAL CLIENT middleware: No key found in localStorage, waiting for it to be set",
       );
       try {
-        // Wait for the key to be set in localStorage
-        apiKey = await waitForFalaiKey(3000); // Wait up to 3 seconds
+        // Wait for the key to be set in localStorage with longer timeout
+        apiKey = await waitForFalaiKey(10000); // Wait up to 10 seconds
 
         if (apiKey) {
           console.log(
@@ -15191,6 +15260,32 @@ export const fal = createFalClient({
           );
         } else {
           console.warn("🔍 FAL CLIENT middleware: No key found after waiting");
+
+          // Show UI error about missing key
+          if (typeof window !== "undefined" && window.document) {
+            console.error(
+              "FALAI KEY MISSING: Unable to proceed with request. The API key is required for Fal.ai features.",
+            );
+
+            // Try one more request with urgent flag
+            try {
+              window.parent.postMessage(
+                {
+                  type: "REQUEST_FALAI_KEY",
+                  urgent: true,
+                  requestUrl: targetUrl,
+                  timestamp: new Date().toISOString(),
+                },
+                "*",
+              );
+              console.log("🔍 Sent URGENT REQUEST_FALAI_KEY to parent");
+            } catch (e) {
+              console.error(
+                "🔍 Error sending urgent key request to parent:",
+                e,
+              );
+            }
+          }
         }
       } catch (e) {
         console.error("🔍 FAL CLIENT middleware: Error waiting for key:", e);
@@ -15216,7 +15311,8 @@ export const fal = createFalClient({
       console.error(
         "❌ FAL CLIENT middleware: No API key available to add to request",
       );
-      // Try one last desperate attempt to get the key directly from localStorage
+
+      // Try one last check for the key
       const emergencyKey = localStorage?.getItem("falai_key");
       if (emergencyKey) {
         console.log(
@@ -15229,6 +15325,26 @@ export const fal = createFalClient({
         };
         console.log(
           "🔍 FAL CLIENT middleware: EMERGENCY RECOVERY - Added Authorization header",
+        );
+      } else {
+        // Show clear UI error about missing key
+        if (typeof window !== "undefined" && window.document) {
+          console.error(
+            "FALAI KEY MISSING: Request cannot proceed without API key. Please ensure your API key is set in the parent application.",
+          );
+        }
+
+        // Add a custom header to indicate missing key for the proxy to handle appropriately
+        request.headers = {
+          ...request.headers,
+          "x-fal-key-missing": "true",
+          "x-fal-target-url": targetUrl,
+        };
+
+        // Throw a specific error that will be caught by the application
+        // This will help provide a better user experience with clear error messages
+        throw new Error(
+          "Fal.ai API key is missing. Please ensure your API key is properly set in the parent application.",
         );
       }
     }
@@ -15601,6 +15717,54 @@ export async function enhancePrompt(
     console.error("❌ enhancePrompt error:", error);
     throw error;
   }
+}
+
+================
+File: src/lib/quota-manager.ts
+================
+/**
+ * Quota Manager for Fal.ai API calls
+ * Handles tracking and enforcing free tier usage limits
+ */
+
+/**
+ * Check if the user has premium status
+ * @returns true if the user is marked as premium
+ */
+export function isPremiumUser(): boolean {
+  return localStorage?.getItem("premium_user") === "true";
+}
+
+/**
+ * Get the current count of free API calls made
+ * @returns number of API calls made in the free tier
+ */
+export function getFreeApiCalls(): number {
+  return parseInt(localStorage?.getItem("free_api_calls") || "0");
+}
+
+/**
+ * Increment the count of free API calls
+ */
+export function incrementFreeApiCalls(): void {
+  const count = getFreeApiCalls();
+  localStorage?.setItem("free_api_calls", String(count + 1));
+}
+
+/**
+ * Check if the user has exceeded their free tier quota
+ * @returns true if the user has reached or exceeded the free tier limit
+ */
+export function quotaExceeded(): boolean {
+  return getFreeApiCalls() >= 10;
+}
+
+/**
+ * Reset the free API calls counter to zero
+ * Useful for testing or administrative purposes
+ */
+export function resetQuota(): void {
+  localStorage?.setItem("free_api_calls", "0");
 }
 
 ================

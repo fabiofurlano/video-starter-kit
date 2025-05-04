@@ -1,6 +1,7 @@
 "use client";
 
 import { createFalClient } from "@fal-ai/client";
+import { isPremiumUser, quotaExceeded, incrementFreeApiCalls, shouldCountRequest } from "./quota-manager";
 
 // Add logging for debugging
 console.log("🔍 Initializing Fal.ai client...");
@@ -185,7 +186,24 @@ export const fal = createFalClient({
 
   // This middleware is called before each request to allow customizing the request
   requestMiddleware: async (request) => {
+    console.log("🚨 QUOTA-GUARD-TEST: requestMiddleware EXECUTED");
     console.log("🔍 FAL CLIENT: Request middleware executed");
+    
+    // Free tier quota enforcement
+    if (!isPremiumUser()) {
+      if (quotaExceeded()) {
+        console.error("❌ FAL CLIENT: Free tier quota exceeded");
+        throw new Error("Free tier quota exceeded. Please upgrade to continue.");
+      }
+      
+      // Only count requests that should be counted against the quota
+      if (shouldCountRequest(request.url, request.method)) {
+        incrementFreeApiCalls();
+        console.log("🔍 FAL CLIENT: Free tier API call counted");
+      } else {
+        console.log("🔍 FAL CLIENT: Request not counted against quota (status/result check)");
+      }
+    }
 
     // Log request details for debugging
     const targetUrl = request.url;

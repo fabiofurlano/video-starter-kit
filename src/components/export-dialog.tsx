@@ -27,6 +27,7 @@ import { Input } from "./ui/input";
 import type { ShareVideoParams } from "@/lib/share";
 import { PROJECT_PLACEHOLDER } from "@/data/schema";
 import { useRouter } from "next/navigation";
+import { useToast } from "@/hooks/use-toast";
 
 type ExportDialogProps = {} & Parameters<typeof Dialog>[0];
 
@@ -40,6 +41,7 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
   const { data: composition = EMPTY_VIDEO_COMPOSITION } =
     useVideoComposition(projectId);
   const router = useRouter();
+  const { toast } = useToast();
   const exportVideo = useMutation({
     mutationFn: async () => {
       const mediaItems = composition.mediaItems;
@@ -55,14 +57,34 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
       if (videoData.length === 0) {
         throw new Error("No tracks to export");
       }
-      const { data } = await fal.subscribe("fal-ai/ffmpeg-api/compose", {
-        input: {
-          tracks: videoData,
-        },
-        mode: "polling",
-        pollInterval: 3000,
-      });
-      return data as ShareResult;
+      try {
+        const { data } = await fal.subscribe("fal-ai/ffmpeg-api/compose", {
+          input: {
+            tracks: videoData,
+          },
+          mode: "polling",
+          pollInterval: 3000,
+        });
+        return data as ShareResult;
+      } catch (error: any) {
+        console.warn("🚨 QUOTA-GUARD-TEST: Error caught in export-dialog.tsx", error.message);
+        console.warn("Failed to export video", error);
+        
+        // Check if the error is related to quota exceeded
+        const errorMessage = error?.message || "";
+        const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
+                              errorMessage.includes("Free tier quota");
+                              
+        toast({
+          title: "Export Failed",
+          description: isQuotaExceeded
+            ? "You've reached your free tier limit. Please upgrade to continue."
+            : "There was an unexpected error. Try again.",
+          variant: isQuotaExceeded ? "destructive" : "default",
+        });
+        
+        throw error;
+      }
     },
   });
   const setExportDialogOpen = useVideoProjectStore(

@@ -23,6 +23,7 @@ import {
 import { WithTooltip } from "../ui/tooltip";
 import { useProjectId, useVideoProjectStore } from "@/data/store";
 import { fal } from "@/lib/fal";
+import { useToast } from "@/hooks/use-toast";
 
 type VideoTrackRowProps = {
   data: VideoTrack;
@@ -69,30 +70,51 @@ type AudioWaveformProps = {
 };
 
 function AudioWaveform({ data }: AudioWaveformProps) {
+  const { toast } = useToast();
   const { data: waveform = [] } = useQuery({
     queryKey: ["media", "waveform", data.id],
     queryFn: async () => {
       if (data.metadata?.waveform && Array.isArray(data.metadata.waveform)) {
         return data.metadata.waveform;
       }
-      const { data: waveformInfo } = await fal.subscribe(
-        "fal-ai/ffmpeg-api/waveform",
-        {
-          input: {
-            media_url: resolveMediaUrl(data),
-            points_per_second: 5,
-            precision: 3,
+      try {
+        const { data: waveformInfo } = await fal.subscribe(
+          "fal-ai/ffmpeg-api/waveform",
+          {
+            input: {
+              media_url: resolveMediaUrl(data),
+              points_per_second: 5,
+              precision: 3,
+            },
           },
-        },
-      );
-      await db.media.update(data.id, {
-        ...data,
-        metadata: {
-          ...data.metadata,
-          waveform: waveformInfo.waveform,
-        },
-      });
-      return waveformInfo.waveform as number[];
+        );
+        await db.media.update(data.id, {
+          ...data,
+          metadata: {
+            ...data.metadata,
+            waveform: waveformInfo.waveform,
+          },
+        });
+        return waveformInfo.waveform as number[];
+      } catch (error: any) {
+        console.warn("🚨 QUOTA-GUARD-TEST: Error caught in video/track.tsx", error?.message);
+        console.warn("Failed to generate audio waveform", error);
+        
+        // Check if the error is related to quota exceeded
+        const errorMessage = error?.message || "";
+        const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
+                              errorMessage.includes("Free tier quota");
+        
+        toast({
+          title: "Waveform Generation Failed",
+          description: isQuotaExceeded
+            ? "You've reached your free tier limit. Please upgrade to continue."
+            : "Failed to generate audio waveform. Try again.",
+          variant: isQuotaExceeded ? "destructive" : "default",
+        });
+        
+        return [];
+      }
     },
     placeholderData: keepPreviousData,
     staleTime: Number.POSITIVE_INFINITY,

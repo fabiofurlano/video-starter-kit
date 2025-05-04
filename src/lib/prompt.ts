@@ -1,5 +1,6 @@
 import type { VideoProject } from "@/data/schema";
 import { fal } from "./fal";
+import { toast } from "@/hooks/use-toast";
 
 // Define the allowed LLM model types based on the Fal.ai API schema
 export type LlmModelType =
@@ -85,8 +86,24 @@ export async function enhancePrompt(
 
     console.log("🔍 Received response from Fal.ai:", data);
     return data.output.replace(/^"|"$/g, "");
-  } catch (error) {
+  } catch (error: any) {
+    console.warn("🚨 QUOTA-GUARD-TEST: Error caught in prompt.ts", error?.message);
     console.error("❌ enhancePrompt error:", error);
+    
+    // Check if the error is related to quota exceeded
+    const errorMessage = error?.message || "";
+    const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
+                          errorMessage.includes("Free tier quota");
+    
+    if (isQuotaExceeded) {
+      toast({
+        title: "Prompt Enhancement Failed",
+        description: "You've reached your free tier limit. Please upgrade to continue.",
+        variant: "destructive",
+      });
+    }
+    
+    // Rethrow the error to be handled by the component
     throw error;
   }
 }

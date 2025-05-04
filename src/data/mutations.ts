@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { db } from "./db";
 import { queryKeys } from "./queries";
 import type { VideoProject } from "./schema";
+import { useToast } from "@/hooks/use-toast";
 
 export const useProjectUpdater = (projectId: string) => {
   const queryClient = useQueryClient();
@@ -40,6 +41,7 @@ export const useJobCreator = ({
   input,
 }: JobCreatorParams) => {
   const queryClient = useQueryClient();
+  const { toast } = useToast();
   return useMutation({
     mutationFn: () =>
       fal.queue.submit(endpointId, {
@@ -59,6 +61,23 @@ export const useJobCreator = ({
 
       await queryClient.invalidateQueries({
         queryKey: queryKeys.projectMediaItems(projectId),
+      });
+    },
+    onError: (error: any) => {
+      console.warn("🚨 QUOTA-GUARD-TEST: Error caught in mutations.ts", error?.message);
+      console.warn("Failed to submit job", error);
+      
+      // Check if the error is related to quota exceeded
+      const errorMessage = error?.message || "";
+      const isQuotaExceeded = errorMessage.includes("quota exceeded") || 
+                            errorMessage.includes("Free tier quota");
+      
+      toast({
+        title: `${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} Generation Failed`,
+        description: isQuotaExceeded
+          ? "You've reached your free tier limit. Please upgrade to continue."
+          : "There was an unexpected error. Try again.",
+        variant: isQuotaExceeded ? "destructive" : "default",
       });
     },
   });
