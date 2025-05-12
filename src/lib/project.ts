@@ -58,9 +58,11 @@ export async function createProjectSuggestion() {
     if (isQuotaExceeded) {
       toast({
         title: "⚠️ FREE TIER LIMIT REACHED",
-        description: "You've reached your free tier limit. Please click the Settings button in the top navigation bar to upgrade.",
+        description:
+          "You've reached your free tier limit. Please click the Settings button in the top navigation bar to upgrade.",
         variant: "destructive",
-        className: "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold",
+        className:
+          "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold",
       });
     }
 
