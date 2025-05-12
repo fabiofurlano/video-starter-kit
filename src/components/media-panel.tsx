@@ -104,7 +104,9 @@ export function MediaItemRow({
               ? "You've reached your free tier limit. Please upgrade to continue."
               : `Failed to generate ${data.mediaType}.`,
             variant: isQuotaExceeded ? "destructive" : "default",
-            className: isQuotaExceeded ? "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold" : "",
+            className: isQuotaExceeded
+              ? "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold"
+              : "",
           });
         } finally {
           await queryClient.invalidateQueries({
