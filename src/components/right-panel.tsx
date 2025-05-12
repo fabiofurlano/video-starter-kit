@@ -238,13 +238,14 @@ export default function RightPanel({
         localStorage.getItem("falai_key") === "";
 
       toast({
-        title: "Failed to enhance prompt",
+        title: "⚠️ FREE TIER LIMIT REACHED",
         description: isQuotaExceeded
           ? "You've reached your free tier limit. Please upgrade to continue."
           : isMissingApiKey
             ? "Missing Fal.ai API key. Please ensure your API key is properly set in the parent application."
             : "There was an unexpected error. Try again.",
         variant: isQuotaExceeded || isMissingApiKey ? "destructive" : "default",
+        className: isQuotaExceeded ? "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold" : "",
       });
     },
   });
@@ -389,11 +390,12 @@ export default function RightPanel({
         errorMessage.includes("Free tier quota");
 
       toast({
-        title: "Generation Failed",
+        title: "⚠️ FREE TIER LIMIT REACHED",
         description: isQuotaExceeded
           ? "You've reached your free tier limit. Please upgrade to continue."
           : "There was an unexpected error. Try again.",
         variant: isQuotaExceeded ? "destructive" : "default",
+        className: isQuotaExceeded ? "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold" : "",
       });
     }
   };

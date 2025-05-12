@@ -80,11 +80,12 @@ export function ExportDialog({ onOpenChange, ...props }: ExportDialogProps) {
           errorMessage.includes("Free tier quota");
 
         toast({
-          title: "Export Failed",
+          title: "⚠️ FREE TIER LIMIT REACHED",
           description: isQuotaExceeded
             ? "You've reached your free tier limit. Please upgrade to continue."
             : "There was an unexpected error. Try again.",
           variant: isQuotaExceeded ? "destructive" : "default",
+          className: isQuotaExceeded ? "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold" : "",
         });
 
         throw error;

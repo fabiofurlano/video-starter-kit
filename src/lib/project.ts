@@ -59,7 +59,7 @@ export async function createProjectSuggestion() {
       toast({
         title: "⚠️ FREE TIER LIMIT REACHED",
         description:
-          "You've reached your free tier limit. Please click the Settings button in the top navigation bar to upgrade.",
+          "You've reached your free tier limit. Please upgrade to continue.",
         variant: "destructive",
         className:
           "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold",

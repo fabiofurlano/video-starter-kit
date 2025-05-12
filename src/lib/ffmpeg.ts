@@ -32,10 +32,12 @@ export async function getMediaMetadata(media: MediaItem) {
 
     if (isQuotaExceeded) {
       toast({
-        title: "Media Processing Failed",
+        title: "⚠️ FREE TIER LIMIT REACHED",
         description:
           "You've reached your free tier limit. Please upgrade to continue.",
         variant: "destructive",
+        className:
+          "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold",
       });
     }
 
