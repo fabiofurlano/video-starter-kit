@@ -57,9 +57,9 @@ export async function createProjectSuggestion() {
 
     if (isQuotaExceeded) {
       toast({
-        title: "Project Suggestion Failed",
+        title: "Free tier qouta limit reached",
         description:
-          "You've reached your free tier limit. Please upgrade to continue.",
+          "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe.",
         variant: "destructive",
       });
     }
