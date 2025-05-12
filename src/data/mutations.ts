@@ -79,7 +79,7 @@ export const useJobCreator = ({
       toast({
         title: `${mediaType.charAt(0).toUpperCase() + mediaType.slice(1)} Generation Failed`,
         description: isQuotaExceeded
-          ? "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe."
+          ? "You've reached your free tier limit. Please click the Settings button in the top navigation bar to upgrade."
           : "There was an unexpected error. Try again.",
         variant: isQuotaExceeded ? "destructive" : "default",
       });

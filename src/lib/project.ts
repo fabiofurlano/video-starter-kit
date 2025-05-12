@@ -57,10 +57,10 @@ export async function createProjectSuggestion() {
 
     if (isQuotaExceeded) {
       toast({
-        title: "Free tier qouta limit reached",
-        description:
-          "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe.",
+        title: "⚠️ FREE TIER LIMIT REACHED",
+        description: "You've reached your free tier limit. Please click the Settings button in the top navigation bar to upgrade.",
         variant: "destructive",
+        className: "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold",
       });
     }
 
