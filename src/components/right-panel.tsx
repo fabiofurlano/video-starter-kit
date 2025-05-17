@@ -240,7 +240,7 @@ export default function RightPanel({
       toast({
         title: "⚠️ FREE TIER LIMIT REACHED",
         description: isQuotaExceeded
-          ? "You've reached your free tier limit. Please upgrade to continue."
+          ? "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe."
           : isMissingApiKey
             ? "Missing Fal.ai API key. Please ensure your API key is properly set in the parent application."
             : "There was an unexpected error. Try again.",
@@ -394,7 +394,7 @@ export default function RightPanel({
       toast({
         title: "⚠️ FREE TIER LIMIT REACHED",
         description: isQuotaExceeded
-          ? "You've reached your free tier limit. Please upgrade to continue."
+          ? "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe."
           : "There was an unexpected error. Try again.",
         variant: isQuotaExceeded ? "destructive" : "default",
         className: isQuotaExceeded

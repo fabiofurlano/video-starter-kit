@@ -103,7 +103,7 @@ export async function enhancePrompt(
       toast({
         title: "Prompt Enhancement Failed",
         description:
-          "You've reached your free tier limit. Please upgrade to continue.",
+          "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe.",
         variant: "destructive",
       });
     }

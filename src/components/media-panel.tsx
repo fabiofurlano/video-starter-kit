@@ -101,7 +101,7 @@ export function MediaItemRow({
           toast({
             title: "⚠️ FREE TIER LIMIT REACHED",
             description: isQuotaExceeded
-              ? "You've reached your free tier limit. Please upgrade to continue."
+              ? "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe."
               : `Failed to generate ${data.mediaType}.`,
             variant: isQuotaExceeded ? "destructive" : "default",
             className: isQuotaExceeded

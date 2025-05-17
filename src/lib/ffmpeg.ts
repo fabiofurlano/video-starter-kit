@@ -34,7 +34,7 @@ export async function getMediaMetadata(media: MediaItem) {
       toast({
         title: "⚠️ FREE TIER LIMIT REACHED",
         description:
-          "You've reached your free tier limit. Please upgrade to continue.",
+          "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe.",
         variant: "destructive",
         className:
           "border-4 border-orange-400 shadow-lg shadow-red-900/20 font-bold",

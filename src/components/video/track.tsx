@@ -112,7 +112,7 @@ function AudioWaveform({ data }: AudioWaveformProps) {
         toast({
           title: "Waveform Generation Failed",
           description: isQuotaExceeded
-            ? "You've reached your free tier limit. Please upgrade to continue."
+            ? "You've reached your free tier limit. Please upgrade to continue. Go to Settings to subscribe."
             : "Failed to generate audio waveform. Try again.",
           variant: isQuotaExceeded ? "destructive" : "default",
         });
