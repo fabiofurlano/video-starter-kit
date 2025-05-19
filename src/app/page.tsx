@@ -437,6 +437,10 @@ export default function IndexPage() {
               userData.apiKeys?.openai || userData.openaiApiKey || "";
             const falaiKey =
               userData.apiKeys?.falai || userData.falaiApiKey || "";
+              
+            // Check for premium status
+            const isPremium = userData.isPremium === true;
+            console.log("- Premium status:", isPremium ? "✅ Premium" : "❌ Free tier");
 
             console.log(
               "- API Keys present:",

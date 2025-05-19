@@ -8,6 +8,7 @@ export interface UserData {
   // Auth Status
   isAuthenticated: boolean; // ADDED
   userId: string | null; // ADDED
+  isPremium: boolean; // Premium status flag
 
   // API keys
   openaiApiKey?: string;
@@ -54,6 +55,7 @@ class SessionManager {
   private initialized: boolean = false;
   private isAuthenticated: boolean = false; // ADDED
   private userId: string | null = null; // ADDED
+  private isPremium: boolean = false; // Premium status flag
 
   /**
    * Initialize the SDK session with user data
@@ -65,8 +67,11 @@ class SessionManager {
     // Store auth status
     this.isAuthenticated = userData.isAuthenticated ?? false; // ADDED
     this.userId = userData.userId ?? null; // ADDED
+    
+    // Store premium status
+    this.isPremium = userData.isPremium === true;
     console.log(
-      `SDK Auth Status Received: isAuthenticated=${this.isAuthenticated}, userId=${this.userId}`,
+      `SDK Auth Status Received: isAuthenticated=${this.isAuthenticated}, userId=${this.userId}, isPremium=${this.isPremium}`,
     );
 
     // Process API keys from different message formats
@@ -92,6 +97,7 @@ class SessionManager {
     this.userData = {
       isAuthenticated: this.isAuthenticated, // Store in userData object as well
       userId: this.userId, // Store in userData object as well
+      isPremium: this.isPremium, // Store premium status in userData object
       openaiApiKey: apiKeys.openai || userData.openai_key || "",
       openrouterApiKey: apiKeys.openrouter || userData.openrouter_key || "",
       falaiApiKey: falaiKey,
@@ -142,12 +148,20 @@ class SessionManager {
     return this.initialized;
   }
 
-  /** // ADDED Getters for Auth Status
+  /**
    * Get the authentication status received from the parent.
    * @returns True if the parent indicated the user is authenticated.
    */
   getIsAuthenticated(): boolean {
     return this.isAuthenticated;
+  }
+
+  /**
+   * Get the premium status
+   * @returns true if the user has premium status
+   */
+  getIsPremium(): boolean {
+    return this.isPremium;
   }
 
   /**

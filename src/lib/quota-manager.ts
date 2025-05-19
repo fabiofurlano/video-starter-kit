@@ -3,17 +3,37 @@
  * Handles tracking and enforcing free tier usage limits
  */
 
+// Import session manager to get premium status
+import sessionManager from "../app/session-manager";
+
 /**
  * Check if the user has premium status
  * @returns true if the user is marked as premium
  */
 export function isPremiumUser(): boolean {
-  const isPremium = localStorage?.getItem("premium_user") === "true";
+  // First try to get premium status from session manager (set via postMessage)
+  try {
+    // Check if session manager has premium status
+    if (typeof sessionManager.getIsPremium === 'function') {
+      const sessionPremium = sessionManager.getIsPremium();
+      console.log("🚨 QUOTA-GUARD-TEST: isPremiumUser() =", sessionPremium, "(from session manager)");
+      
+      // If session manager has a definitive premium status, use it
+      if (sessionPremium === true) {
+        return true;
+      }
+    }
+  } catch (error) {
+    console.error("Error checking premium status from session manager:", error);
+  }
+  
+  // Fallback to localStorage if session manager doesn't have premium status
+  const isPremium = localStorage?.getItem("is_premium") === "true";
   console.log(
-    "🚨 QUOTA-GUARD-TEST: isPremiumUser() =",
+    "🚨 QUOTA-GUARD-TEST: isPremiumUser() fallback =",
     isPremium,
     "(localStorage value: '",
-    localStorage?.getItem("premium_user"),
+    localStorage?.getItem("is_premium"),
     "')",
   );
   return isPremium;
