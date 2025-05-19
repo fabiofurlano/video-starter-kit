@@ -67,7 +67,7 @@ class SessionManager {
     // Store auth status
     this.isAuthenticated = userData.isAuthenticated ?? false; // ADDED
     this.userId = userData.userId ?? null; // ADDED
-    
+
     // Store premium status
     this.isPremium = userData.isPremium === true;
     console.log(

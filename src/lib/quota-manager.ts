@@ -14,10 +14,14 @@ export function isPremiumUser(): boolean {
   // First try to get premium status from session manager (set via postMessage)
   try {
     // Check if session manager has premium status
-    if (typeof sessionManager.getIsPremium === 'function') {
+    if (typeof sessionManager.getIsPremium === "function") {
       const sessionPremium = sessionManager.getIsPremium();
-      console.log("🚨 QUOTA-GUARD-TEST: isPremiumUser() =", sessionPremium, "(from session manager)");
-      
+      console.log(
+        "🚨 QUOTA-GUARD-TEST: isPremiumUser() =",
+        sessionPremium,
+        "(from session manager)",
+      );
+
       // If session manager has a definitive premium status, use it
       if (sessionPremium === true) {
         return true;
@@ -26,7 +30,7 @@ export function isPremiumUser(): boolean {
   } catch (error) {
     console.error("Error checking premium status from session manager:", error);
   }
-  
+
   // Fallback to localStorage if session manager doesn't have premium status
   const isPremium = localStorage?.getItem("is_premium") === "true";
   console.log(
